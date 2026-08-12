@@ -17,6 +17,7 @@ export const demoUsers: Record<UserRole, User> = {
     trustScore: 88,
     country: 'United Kingdom (Diaspora)',
   },
+
   contractor: {
     id: 'u-contractor-1',
     fullName: 'Segun Adeyemi',
@@ -27,6 +28,7 @@ export const demoUsers: Record<UserRole, User> = {
     trustScore: 79,
     country: 'Nigeria',
   },
+
   supplier: {
     id: 'u-supplier-1',
     fullName: 'Chika Nwosu',
@@ -37,6 +39,7 @@ export const demoUsers: Record<UserRole, User> = {
     trustScore: 71,
     country: 'Nigeria',
   },
+
   project_manager: {
     id: 'u-pm-1',
     fullName: 'Ibrahim Musa',
@@ -47,6 +50,7 @@ export const demoUsers: Record<UserRole, User> = {
     trustScore: 92,
     country: 'Nigeria',
   },
+
   professional: {
     id: 'u-pro-1',
     fullName: 'Funmi Bello',
@@ -57,6 +61,7 @@ export const demoUsers: Record<UserRole, User> = {
     trustScore: 85,
     country: 'Nigeria',
   },
+
   admin: {
     id: 'u-admin-1',
     fullName: 'Tola Fashina',
@@ -87,6 +92,7 @@ export const projects: Project[] = [
     openDisputes: 0,
     pendingApprovals: 2,
   },
+
   {
     id: 'p-1002',
     name: 'Abuja Terrace (3 Units)',
@@ -103,6 +109,7 @@ export const projects: Project[] = [
     openDisputes: 0,
     pendingApprovals: 5,
   },
+
   {
     id: 'p-1003',
     name: 'Ibadan Bungalow Renovation',
@@ -123,35 +130,165 @@ export const projects: Project[] = [
 ]
 
 export const bids: Bid[] = [
-  { id: 'b-1', projectId: 'p-1002', contractorName: 'Prime Build Ltd', trustScore: 79, verified: true, amount: 141_500_000, currency: 'NGN', timelineWeeks: 44, status: 'shortlisted' },
-  { id: 'b-2', projectId: 'p-1002', contractorName: 'Zenith Structures', trustScore: 64, verified: true, amount: 137_000_000, currency: 'NGN', timelineWeeks: 48, status: 'submitted' },
-  { id: 'b-3', projectId: 'p-1002', contractorName: 'Concrete & Co', trustScore: 58, verified: false, amount: 129_800_000, currency: 'NGN', timelineWeeks: 50, status: 'submitted' },
+  {
+    id: 'b-1',
+    projectId: 'p-1002',
+    contractorName: 'Prime Build Ltd',
+    trustScore: 79,
+    verified: true,
+    amount: 141_500_000,
+    currency: 'NGN',
+    timelineWeeks: 44,
+    status: 'shortlisted',
+  },
+
+  {
+    id: 'b-2',
+    projectId: 'p-1002',
+    contractorName: 'Zenith Structures',
+    trustScore: 64,
+    verified: true,
+    amount: 137_000_000,
+    currency: 'NGN',
+    timelineWeeks: 48,
+    status: 'submitted',
+  },
+
+  {
+    id: 'b-3',
+    projectId: 'p-1002',
+    contractorName: 'Concrete & Co',
+    trustScore: 58,
+    verified: false,
+    amount: 129_800_000,
+    currency: 'NGN',
+    timelineWeeks: 50,
+    status: 'submitted',
+  },
 ]
 
 export const escrowTransactions: EscrowTransaction[] = [
-  { id: 'e-1', projectId: 'p-1001', type: 'deposit', amount: 20_000_000, currency: 'NGN', milestoneLabel: 'Initial Deposit', date: '2026-02-12' },
-  { id: 'e-2', projectId: 'p-1001', type: 'release', amount: 8_000_000, currency: 'NGN', milestoneLabel: 'Foundation Complete', date: '2026-03-30' },
-  { id: 'e-3', projectId: 'p-1001', type: 'deposit', amount: 12_500_000, currency: 'NGN', milestoneLabel: 'Milestone 2 Top-up', date: '2026-05-18' },
-  { id: 'e-4', projectId: 'p-1003', type: 'freeze', amount: 2_100_000, currency: 'NGN', milestoneLabel: 'Under Dispute Review', date: '2026-07-02' },
+  {
+    id: 'e-1',
+    projectId: 'p-1001',
+    type: 'deposit',
+    amount: 20_000_000,
+    currency: 'NGN',
+    milestoneLabel: 'Initial Deposit',
+    date: '2026-02-12',
+    fundingSource: 'Client Wallet',
+  },
+
+  {
+    id: 'e-2',
+    projectId: 'p-1001',
+    type: 'release',
+    amount: 8_000_000,
+    currency: 'NGN',
+    milestoneLabel: 'Foundation Complete',
+    date: '2026-03-30',
+    fundingSource: 'Escrow Account',
+  },
+
+  {
+    id: 'e-3',
+    projectId: 'p-1001',
+    type: 'deposit',
+    amount: 12_500_000,
+    currency: 'NGN',
+    milestoneLabel: 'Milestone 2 Top-up',
+    date: '2026-05-18',
+    fundingSource: 'Client Wallet',
+  },
+
+  {
+    id: 'e-4',
+    projectId: 'p-1003',
+    type: 'freeze',
+    amount: 2_100_000,
+    currency: 'NGN',
+    milestoneLabel: 'Under Dispute Review',
+    date: '2026-07-02',
+    fundingSource: 'Escrow Account',
+  },
 ]
 
 export const disputes: Dispute[] = [
-  { id: 'd-1', projectId: 'p-1003', category: 'Quality of Work', raisedBy: 'Wale Fashola', respondent: 'Solid Foundation Ltd', amount: 2_100_000, status: 'under_review', openedDate: '2026-07-01' },
+  {
+    id: 'd-1',
+    projectId: 'p-1003',
+    category: 'Quality of Work',
+    raisedBy: 'Wale Fashola',
+    respondent: 'Solid Foundation Ltd',
+    amount: 2_100_000,
+    status: 'under_review',
+    openedDate: '2026-07-01',
+  },
 ]
 
 export const materialRequests: MaterialRequest[] = [
-  { id: 'm-1', projectId: 'p-1001', item: 'Dangote Cement (50kg bags)', quantity: '600 bags', status: 'ordered', supplierName: 'Nwosu Materials' },
-  { id: 'm-2', projectId: 'p-1001', item: '12mm Reinforcement Rods', quantity: '4 tons', status: 'quoted' },
-  { id: 'm-3', projectId: 'p-1001', item: 'Roofing Sheets (Aluminium)', quantity: '350 sheets', status: 'requested' },
+  {
+    id: 'm-1',
+    projectId: 'p-1001',
+    item: 'Dangote Cement (50kg bags)',
+    quantity: '600 bags',
+    status: 'ordered',
+    supplierName: 'Nwosu Materials',
+  },
+
+  {
+    id: 'm-2',
+    projectId: 'p-1001',
+    item: '12mm Reinforcement Rods',
+    quantity: '4 tons',
+    status: 'quoted',
+  },
+
+  {
+    id: 'm-3',
+    projectId: 'p-1001',
+    item: 'Roofing Sheets (Aluminium)',
+    quantity: '350 sheets',
+    status: 'requested',
+  },
 ]
 
 // Monthly escrow activity, used by the escrow trend chart (Sec. 18).
 // Real implementation: aggregate escrowTransactions server-side by month.
 export const escrowMonthlyTrend = [
-  { month: 'Feb', deposited: 20.0, released: 0 },
-  { month: 'Mar', deposited: 4.0, released: 8.0 },
-  { month: 'Apr', deposited: 6.5, released: 5.0 },
-  { month: 'May', deposited: 12.5, released: 9.0 },
-  { month: 'Jun', deposited: 8.0, released: 11.5 },
-  { month: 'Jul', deposited: 5.0, released: 7.0 },
+  {
+    month: 'Feb',
+    deposited: 20.0,
+    released: 0,
+  },
+
+  {
+    month: 'Mar',
+    deposited: 4.0,
+    released: 8.0,
+  },
+
+  {
+    month: 'Apr',
+    deposited: 6.5,
+    released: 5.0,
+  },
+
+  {
+    month: 'May',
+    deposited: 12.5,
+    released: 9.0,
+  },
+
+  {
+    month: 'Jun',
+    deposited: 8.0,
+    released: 11.5,
+  },
+
+  {
+    month: 'Jul',
+    deposited: 5.0,
+    released: 7.0,
+  },
 ]
