@@ -176,7 +176,7 @@ export const escrowTransactions: EscrowTransaction[] = [
     currency: 'NGN',
     milestoneLabel: 'Initial Deposit',
     date: '2026-02-12',
-    fundingSource: 'Client Wallet',
+    fundingSource: 'direct_bank_transfer',
   },
 
   {
@@ -187,7 +187,7 @@ export const escrowTransactions: EscrowTransaction[] = [
     currency: 'NGN',
     milestoneLabel: 'Foundation Complete',
     date: '2026-03-30',
-    fundingSource: 'Escrow Account',
+    fundingSource: 'partner_escrow',
   },
 
   {
@@ -198,7 +198,7 @@ export const escrowTransactions: EscrowTransaction[] = [
     currency: 'NGN',
     milestoneLabel: 'Milestone 2 Top-up',
     date: '2026-05-18',
-    fundingSource: 'Client Wallet',
+    fundingSource: 'direct_bank_transfer',
   },
 
   {
@@ -209,7 +209,7 @@ export const escrowTransactions: EscrowTransaction[] = [
     currency: 'NGN',
     milestoneLabel: 'Under Dispute Review',
     date: '2026-07-02',
-    fundingSource: 'Escrow Account',
+    fundingSource: 'partner_escrow',
   },
 ]
 
