@@ -1,24 +1,45 @@
-import { useState, useEffect, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { useLocation } from 'react-router-dom'
 import { Sidebar } from './components/Sidebar'
 import { Topbar } from './components/Topbar'
 
-export function DashboardLayout({ title, children }: { title: string; children: ReactNode }) {
+interface DashboardLayoutProps {
+  title: string
+  children: ReactNode
+}
+
+export function DashboardLayout({
+  title,
+  children,
+}: DashboardLayoutProps) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const location = useLocation()
 
-  // Close the mobile drawer automatically on route change
   useEffect(() => {
     setMobileNavOpen(false)
   }, [location.pathname])
 
   return (
-    <div className="flex h-screen bg-paper-2">
-      <Sidebar mobileOpen={mobileNavOpen} onMobileClose={() => setMobileNavOpen(false)} />
-      <div className="flex flex-1 flex-col overflow-hidden">
-        <Topbar title={title} onMenuClick={() => setMobileNavOpen(true)} />
-        <main className="flex-1 overflow-y-auto px-4 py-5 sm:px-6 sm:py-6">
-          <div className="mx-auto max-w-6xl">{children}</div>
+    <div className="flex min-h-screen w-full overflow-hidden bg-paper-2">
+      {/* Sidebar */}
+      <Sidebar
+        mobileOpen={mobileNavOpen}
+        onMobileClose={() => setMobileNavOpen(false)}
+      />
+
+      {/* Main application area */}
+      <div className="flex min-w-0 flex-1 flex-col">
+        {/* Top navigation */}
+        <Topbar
+          title={title}
+          onMenuClick={() => setMobileNavOpen(true)}
+        />
+
+        {/* Page content */}
+        <main className="min-h-0 flex-1 overflow-y-auto">
+          <div className="mx-auto w-full max-w-[1600px] px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
+            {children}
+          </div>
         </main>
       </div>
     </div>

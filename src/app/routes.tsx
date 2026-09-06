@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 
 import { Home } from '@/pages/public/Home'
 import { Login } from '@/pages/auth/Login'
+import { Join } from '@/pages/auth/Join'
 import { Register } from '@/pages/auth/Register'
 
 import { ClientDashboard } from '@/pages/client/Dashboard'
@@ -21,13 +22,13 @@ import { ReportsPage as ContractorReportsPage } from '@/pages/contractor/Reports
 import { PaymentsPage as ContractorPaymentsPage } from '@/pages/contractor/Payments'
 import { DisputesPage as ContractorDisputesPage } from '@/pages/contractor/Disputes'
 
-import { SupplierDashboard } from '@/pages/supplier/Dashboard'
-import { CataloguePage } from '@/pages/supplier/Catalogue'
-import { QuotationsPage } from '@/pages/supplier/Quotations'
-import { OrdersPage } from '@/pages/supplier/Orders'
-import { DeliveriesPage } from '@/pages/supplier/Deliveries'
-import { PaymentsPage as SupplierPaymentsPage } from '@/pages/supplier/Payments'
-import { DisputesPage as SupplierDisputesPage } from '@/pages/supplier/Disputes'
+import { MarketDashboard } from '@/pages/market-place/Dashboard'
+import { CataloguePage } from '@/pages/market-place/Catalogue'
+import { QuotationsPage } from '@/pages/market-place/Quotations'
+import { OrdersPage } from '@/pages/market-place/Orders'
+import { DeliveriesPage } from '@/pages/market-place/Deliveries'
+import { PaymentsPage as MarketPaymentsPage } from '@/pages/market-place/Payments'
+import { DisputesPage as MarketDisputesPage } from '@/pages/market-place/Disputes'
 
 import { ProjectManagerDashboard } from '@/pages/project-manager/Dashboard'
 import { ProjectsPage as PMProjectsPage } from '@/pages/project-manager/Projects'
@@ -61,6 +62,7 @@ export function AppRoutes() {
       {/* Public */}
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/join" element={<Join />} />
       <Route path="/register" element={<Register />} />
 
       {/* Client */}
@@ -82,14 +84,14 @@ export function AppRoutes() {
       <Route path="/app/contractor/payments" element={<ContractorPaymentsPage />} />
       <Route path="/app/contractor/disputes" element={<ContractorDisputesPage />} />
 
-      {/* Supplier */}
-      <Route path="/app/supplier" element={<SupplierDashboard />} />
-      <Route path="/app/supplier/catalogue" element={<CataloguePage />} />
-      <Route path="/app/supplier/quotations" element={<QuotationsPage />} />
-      <Route path="/app/supplier/orders" element={<OrdersPage />} />
-      <Route path="/app/supplier/deliveries" element={<DeliveriesPage />} />
-      <Route path="/app/supplier/payments" element={<SupplierPaymentsPage />} />
-      <Route path="/app/supplier/disputes" element={<SupplierDisputesPage />} />
+      {/* Market Place */}
+      <Route path="/app/market" element={<MarketDashboard />} />
+      <Route path="/app/market/catalogue" element={<CataloguePage />} />
+      <Route path="/app/market/quotations" element={<QuotationsPage />} />
+      <Route path="/app/market/orders" element={<OrdersPage />} />
+      <Route path="/app/market/deliveries" element={<DeliveriesPage />} />
+      <Route path="/app/market/payments" element={<MarketPaymentsPage />} />
+      <Route path="/app/market/disputes" element={<MarketDisputesPage />} />
 
       {/* Project Manager */}
       <Route path="/app/pm" element={<ProjectManagerDashboard />} />
@@ -120,6 +122,7 @@ export function AppRoutes() {
       <Route path="/app/admin/reports" element={<AdminReportsPage />} />
       <Route path="/app/admin/analytics" element={<AnalyticsPage />} />
 
+      {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )

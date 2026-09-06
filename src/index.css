@@ -1,117 +1,315 @@
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 @import "tailwindcss";
 
+/* =========================================================
+   BUILD OS — BRAND SYSTEM
+   Derived from the official logo: Electric Blue → Sky Blue → Deep Navy.
+   This is a *single-hue* system on purpose — every accent below is a blue,
+   not a duotone. See /design-system.md for how the three tiers are used
+   (teal = verified/action, "laterite" = a deeper trust-navy, ink = text).
+
+   ⚠️  NAMING GOTCHA — read before adding classes elsewhere in the app:
+   Tailwind ships its own default `teal-*` and `amber-*` scales (real teal
+   and real amber/orange). Defining --color-teal and --color-amber below
+   only overrides the *bare* keyword (`bg-teal`, `text-teal`), not the
+   numbered scale. `bg-teal-500` or `text-amber-600` will silently fall
+   back to Tailwind's stock green-teal / orange-amber, not this brand
+   blue — a very easy way to ship a wrong-colored element. Always use the
+   bare token (`teal`, `teal-light`, `laterite`, `amber`) or the explicit
+   -dark variants defined here; never reach for a numbered teal/amber
+   shade in this project.
+   ========================================================= */
+
 @theme {
-  /* Build OS design tokens */
-  --color-ink: #14213D;
-  --color-ink-2: #0F1B2B;
-  --color-paper: #F5F6F4;
-  --color-paper-2: #ECEEEA;
-  --color-line: #DDE1DC;
+  /* Core brand — "verified" blue */
+  --color-teal: #1657ff;
+  --color-teal-light: #eaf0ff;
 
-  --color-amber: #E8A33D;
-  --color-amber-dark: #C7862A;
-  --color-teal: #17806B;
-  --color-teal-light: #E4F2EE;
-  --color-brick: #C7433F;
-  --color-brick-light: #FBEAE9;
+  /* Gradient endpoint only — sky blue. Not a semantic color on its own,
+     see design-system.md §1: never used as a solid fill. */
+  --color-amber: #34a6ff;
+  --color-amber-dark: #1689e8;
 
-  --font-display: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
-  --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
-  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  /* Trust / finance tier — deep navy blue (named "laterite" for historical
+     reasons; it is not a rust/terracotta hue despite the name — see the
+     naming gotcha above and the note in design-system.md). */
+  --color-laterite: #1b3a8c;
+  --color-laterite-dark: #122b69;
+  --color-laterite-light: #e9efff;
+
+  /* Dark system */
+  --color-ink: #0b1220;
+  --color-ink-2: #07101f;
+
+  /* Surfaces */
+  --color-paper: #f6f8fc;
+  --color-paper-2: #edf2f8;
+
+  /* Borders */
+  --color-line: #dfe6f0;
+
+  /* Typography */
+  --font-display: "Space Grotesk", sans-serif;
+  --font-sans: "Inter", sans-serif;
+  --font-mono: "IBM Plex Mono", monospace;
 }
+
+/* =========================================================
+   BASE
+   ========================================================= */
 
 html {
   scroll-behavior: smooth;
+  color-scheme: light;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 body {
-  font-family: var(--font-body);
-  background-color: var(--color-paper);
+  margin: 0;
+  min-width: 320px;
+  background: var(--color-paper);
   color: var(--color-ink);
+  font-family: "Inter", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 ::selection {
-  background-color: var(--color-amber);
-  color: var(--color-ink-2);
+  background: color-mix(in srgb, var(--color-teal) 18%, transparent);
+  color: var(--color-ink);
 }
 
-/* Blueprint grid signature texture, used sparingly */
-.blueprint-grid {
-  background-image:
-    linear-gradient(rgba(20, 33, 61, 0.055) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(20, 33, 61, 0.055) 1px, transparent 1px);
-  background-size: 28px 28px;
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
 }
+
+a {
+  text-decoration: none;
+}
+
+/* Global keyboard-focus style. Components (see Primitives.jsx) add their
+   own focus-visible ring utilities for buttons/cards; this is the fallback
+   for anything that doesn't — plain links, native inputs, etc. — so a
+   keyboard user is never left without a visible focus indicator anywhere
+   in the app. */
+:focus-visible {
+  outline: 2px solid var(--color-teal);
+  outline-offset: 2px;
+}
+
+/* =========================================================
+   BRAND UTILITIES
+   ========================================================= */
+
+@utility brand-gradient {
+  background: linear-gradient(
+    135deg,
+    var(--color-teal) 0%,
+    var(--color-amber-dark) 48%,
+    var(--color-amber) 100%
+  );
+}
+
+@utility brand-gradient-text {
+  background: linear-gradient(
+    135deg,
+    var(--color-teal) 0%,
+    var(--color-amber-dark) 45%,
+    var(--color-amber) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility navy-gradient {
+  background: linear-gradient(
+    135deg,
+    var(--color-ink-2) 0%,
+    var(--color-ink) 52%,
+    var(--color-laterite-dark) 100%
+  );
+}
+
+/* =========================================================
+   BLUEPRINT / GRID BACKGROUND
+   ========================================================= */
+
+.blueprint-grid {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+
+  background:
+    radial-gradient(
+      circle at 75% 15%,
+      color-mix(in srgb, var(--color-teal) 9%, transparent),
+      transparent 32%
+    ),
+    radial-gradient(
+      circle at 15% 80%,
+      color-mix(in srgb, var(--color-amber) 7%, transparent),
+      transparent 30%
+    ),
+    var(--color-paper);
+}
+
+.blueprint-grid::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+
+  background-image:
+    linear-gradient(
+      color-mix(in srgb, var(--color-ink) 3.5%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--color-ink) 3.5%, transparent) 1px,
+      transparent 1px
+    );
+
+  background-size: 48px 48px;
+
+  mask-image: linear-gradient(
+    to bottom,
+    black 0%,
+    rgba(0, 0, 0, 0.65) 55%,
+    transparent 100%
+  );
+}
+
+/* =========================================================
+   CORNER DETAIL
+   ========================================================= */
 
 .corner-ticks {
   position: relative;
 }
+
 .corner-ticks::before,
 .corner-ticks::after {
   content: "";
   position: absolute;
   width: 10px;
   height: 10px;
-  border-color: var(--color-amber);
-  opacity: 0.8;
+  pointer-events: none;
+  transition:
+    width 220ms ease,
+    height 220ms ease;
 }
+
 .corner-ticks::before {
   top: -1px;
   left: -1px;
-  border-top: 2px solid;
-  border-left: 2px solid;
+  border-top: 1.5px solid color-mix(in srgb, var(--color-teal) 55%, transparent);
+  border-left: 1.5px solid color-mix(in srgb, var(--color-teal) 55%, transparent);
 }
+
 .corner-ticks::after {
-  bottom: -1px;
   right: -1px;
-  border-bottom: 2px solid;
-  border-right: 2px solid;
+  bottom: -1px;
+  border-right: 1.5px solid color-mix(in srgb, var(--color-amber) 55%, transparent);
+  border-bottom: 1.5px solid color-mix(in srgb, var(--color-amber) 55%, transparent);
 }
 
-:focus-visible {
-  outline: 2px solid var(--color-amber);
-  outline-offset: 2px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
-    scroll-behavior: auto !important;
+@media (prefers-reduced-motion: no-preference) {
+  .corner-ticks:hover::before,
+  .corner-ticks:hover::after {
+    width: 16px;
+    height: 16px;
   }
 }
+
+/* =========================================================
+   GLASS
+   ========================================================= */
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid color-mix(in srgb, var(--color-ink) 8%, transparent);
+  box-shadow:
+    0 24px 70px -32px color-mix(in srgb, var(--color-ink) 28%, transparent),
+    0 8px 24px -16px color-mix(in srgb, var(--color-teal) 12%, transparent);
+  backdrop-filter: blur(18px);
+}
+
+/* =========================================================
+   ANIMATIONS
+   Gated at the CSS level too (belt-and-suspenders alongside the
+   `motion-safe:` Tailwind variants used in components) so anything that
+   forgets the variant still respects the OS-level preference.
+   ========================================================= */
 
 @keyframes toast-in {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(18px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
+
 .animate-toast-in {
-  animation: toast-in 0.18s ease-out;
+  animation: toast-in 650ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
+@keyframes float-soft {
+  0%,
   100% {
-    background-position: 200% 0;
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-7px);
   }
 }
-.animate-shimmer {
-  background-image: linear-gradient(
-    90deg,
-    var(--color-paper-2) 25%,
-    rgba(20, 33, 61, 0.06) 37%,
-    var(--color-paper-2) 63%
-  );
-  background-size: 400% 100%;
-  animation: shimmer 1.4s ease-in-out infinite;
+
+.animate-float-soft {
+  animation: float-soft 5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-toast-in,
+  .animate-float-soft {
+    animation: none;
+  }
+}
+
+/* =========================================================
+   SCROLLBAR
+   ========================================================= */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #c8d2e2 var(--color-paper);
+}
+
+::-webkit-scrollbar {
+  width: 9px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-paper);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c8d2e2;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9eabc0;
 }

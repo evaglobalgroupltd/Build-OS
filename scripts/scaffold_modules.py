@@ -62,7 +62,7 @@ MODULE_MAP = {
         ("ContractorPortfolio", "Contractor Portfolio", "Past work and references."),
         ("ContractorVerification", "Contractor Verification", "Verification status and documents."),
     ]),
-    "suppliers": ("Suppliers", "Sec. 17.2", [
+    "markets": ("Markets", "Sec. 17.2", [
         ("SupplierList", "Suppliers", "Browse the supplier marketplace."),
         ("SupplierProfile", "Supplier Profile", "Public profile of a supplier."),
         ("Catalogue", "Catalogue", "Supplier's listed materials and pricing."),

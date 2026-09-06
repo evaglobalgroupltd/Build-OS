@@ -1,14 +1,35 @@
 import type { HTMLAttributes, ReactNode } from 'react'
 
+/**
+ * Generic structured-content card (dashboard widgets, list panels, detail
+ * views) — distinct from `Panel` in Primitives.jsx, which is specifically
+ * the nested "device chrome" frame used for hero/marketing mockups. Use
+ * `Card` for real app content; use `Panel` for a screenshot-style preview.
+ */
+
+// The one hover language used everywhere else in the app (Pillars, Roles,
+// Steps) — see design-system.md §5. Pull this in via `interactive`, don't
+// hand-roll a second hover treatment at the call site.
+const INTERACTIVE_CLASSES =
+  'transition-all duration-300 hover:-translate-y-1 hover:border-teal/20 hover:shadow-[0_24px_50px_-30px_rgba(22,87,255,0.4)]'
+
 export function Card({
   children,
   className = '',
   corners = false,
+  interactive = false,
   ...rest
-}: HTMLAttributes<HTMLDivElement> & { children: ReactNode; corners?: boolean }) {
+}: HTMLAttributes<HTMLDivElement> & {
+  children: ReactNode
+  corners?: boolean
+  /** Apply the standard card hover-lift for clickable cards. */
+  interactive?: boolean
+}) {
   return (
     <div
-      className={`rounded-lg border border-line bg-white ${corners ? 'corner-ticks' : ''} ${className}`}
+      className={`rounded-2xl border border-line bg-white ${corners ? 'corner-ticks' : ''} ${
+        interactive ? INTERACTIVE_CLASSES : ''
+      } ${className}`}
       {...rest}
     >
       {children}

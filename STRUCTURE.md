@@ -115,12 +115,12 @@ card tagged with its BRD section, ready for you to fill in.
 
 | Route | Status | BRD ref |
 |---|---|---|
-| `/app/supplier` (Overview) | ✅ Built | Sec. 23 |
-| `/app/supplier/catalogue` | 🚧 Placeholder | Sec. 17.2 |
-| `/app/supplier/quotations` | 🚧 Placeholder | Sec. 17.3 |
-| `/app/supplier/deliveries` | 🚧 Placeholder | Sec. 17.3 |
-| `/app/supplier/payments` | 🚧 Placeholder | Sec. 41.3 |
-| `/app/supplier/disputes` | 🚧 Placeholder | Sec. 19.2 |
+| `/app/market` (Overview) | ✅ Built | Sec. 23 |
+| `/app/market/catalogue` | 🚧 Placeholder | Sec. 17.2 |
+| `/app/market/quotations` | 🚧 Placeholder | Sec. 17.3 |
+| `/app/market/deliveries` | 🚧 Placeholder | Sec. 17.3 |
+| `/app/market/payments` | 🚧 Placeholder | Sec. 41.3 |
+| `/app/market/disputes` | 🚧 Placeholder | Sec. 19.2 |
 
 ### Project Manager (Sec. 43)
 

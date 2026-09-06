@@ -13,6 +13,15 @@ export const navByRole: Record<UserRole, NavItem[]> = {
     { label: 'Disputes', path: '/app/client/disputes', icon: 'Gavel' },
     { label: 'Property Passport', path: '/app/client/passport', icon: 'BadgeCheck' },
   ],
+  diaspora_client: [
+    { label: 'Overview', path: '/app/client', icon: 'LayoutDashboard' },
+    { label: 'Projects', path: '/app/client/projects', icon: 'Building2' },
+    { label: 'Escrow Wallet', path: '/app/client/escrow', icon: 'Wallet' },
+    { label: 'Procurement', path: '/app/client/procurement', icon: 'PackageSearch' },
+    { label: 'Reports', path: '/app/client/reports', icon: 'FileBarChart' },
+    { label: 'Disputes', path: '/app/client/disputes', icon: 'Gavel' },
+    { label: 'Property Passport', path: '/app/client/passport', icon: 'BadgeCheck' },
+  ],
   contractor: [
     { label: 'Overview', path: '/app/contractor', icon: 'LayoutDashboard' },
     { label: 'Available Projects', path: '/app/contractor/available', icon: 'Search' },
@@ -23,14 +32,14 @@ export const navByRole: Record<UserRole, NavItem[]> = {
     { label: 'Payments', path: '/app/contractor/payments', icon: 'Wallet' },
     { label: 'Disputes', path: '/app/contractor/disputes', icon: 'Scale' },
   ],
-  supplier: [
-    { label: 'Overview', path: '/app/supplier', icon: 'LayoutDashboard' },
-    { label: 'Catalogue', path: '/app/supplier/catalogue', icon: 'Boxes' },
-    { label: 'Quotation Requests', path: '/app/supplier/quotations', icon: 'FileText' },
-    { label: 'Purchase Orders', path: '/app/supplier/orders', icon: 'ClipboardList' },
-    { label: 'Deliveries', path: '/app/supplier/deliveries', icon: 'Truck' },
-    { label: 'Payments', path: '/app/supplier/payments', icon: 'Wallet' },
-    { label: 'Disputes', path: '/app/supplier/disputes', icon: 'Scale' },
+  market_place: [
+    { label: 'Overview', path: '/app/market', icon: 'LayoutDashboard' },
+    { label: 'Catalogue', path: '/app/market/catalogue', icon: 'Boxes' },
+    { label: 'Quotation Requests', path: '/app/market/quotations', icon: 'FileText' },
+    { label: 'Purchase Orders', path: '/app/market/orders', icon: 'ClipboardList' },
+    { label: 'Deliveries', path: '/app/market/deliveries', icon: 'Truck' },
+    { label: 'Payments', path: '/app/market/payments', icon: 'Wallet' },
+    { label: 'Disputes', path: '/app/market/disputes', icon: 'Scale' },
   ],
   project_manager: [
     { label: 'Overview', path: '/app/pm', icon: 'LayoutDashboard' },
@@ -64,9 +73,10 @@ export const navByRole: Record<UserRole, NavItem[]> = {
 }
 
 export const roleLabels: Record<UserRole, string> = {
-  client: 'Client / Diaspora Investor',
+  client: 'Client',
+  diaspora_client: 'Diaspora Client',
   contractor: 'Contractor',
-  supplier: 'Supplier',
+  market_place: 'Market Place',
   project_manager: 'Project Manager',
   professional: 'Professional Expert',
   admin: 'Build OS Admin',

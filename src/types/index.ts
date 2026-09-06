@@ -5,8 +5,9 @@
 
 export type UserRole =
   | 'client'
+  | 'diaspora_client'
   | 'contractor'
-  | 'supplier'
+  | 'market_place'
   | 'project_manager'
   | 'professional'
   | 'admin'

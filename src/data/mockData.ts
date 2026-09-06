@@ -18,6 +18,17 @@ export const demoUsers: Record<UserRole, User> = {
     country: 'United Kingdom (Diaspora)',
   },
 
+  diaspora_client: {
+    id: 'u-client-1',
+    fullName: 'Chukwu Obi',
+    email: 'amaka.obi@example.com',
+    role: 'diaspora_client',
+    avatarInitials: 'AO',
+    verificationStatus: 'verified',
+    trustScore: 89,
+    country: 'United Kingdom (Diaspora)',
+  },
+
   contractor: {
     id: 'u-contractor-1',
     fullName: 'Segun Adeyemi',
@@ -29,11 +40,11 @@ export const demoUsers: Record<UserRole, User> = {
     country: 'Nigeria',
   },
 
-  supplier: {
-    id: 'u-supplier-1',
+  market_place: {
+    id: 'u-market_place-1',
     fullName: 'Chika Nwosu',
     email: 'chika@nwosumaterials.com',
-    role: 'supplier',
+    role: 'market_place',
     avatarInitials: 'CN',
     verificationStatus: 'pending',
     trustScore: 71,

@@ -7,7 +7,7 @@ import { MaterialRequestList } from '@/modules/procurement/components/MaterialRe
 import { materialRequests } from '@/data/mockData'
 import { useAuth } from '@/context/AuthContext'
 
-export function SupplierDashboard() {
+export function MarketDashboard() {
   const { user } = useAuth()
 
   return (

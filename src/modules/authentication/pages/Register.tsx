@@ -1,22 +1,26 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+
 import { ArrowRight, Loader2 } from 'lucide-react'
+
 import { useAuth } from '@/context/AuthContext'
 import { useToast } from '@/context/ToastContext'
+
 import { Button } from '@/components/ui/Button'
 import { FormField } from '@/components/forms/FormField'
 import { AuthLayout } from '@/layouts/AuthLayout'
-import type { UserRole } from '@/types'
-import { roleLabels } from '@/config/navigation'
 
-const roleHomePath: Record<UserRole, string> = {
-  client: '/app/client',
-  contractor: '/app/contractor',
-  supplier: '/app/supplier',
-  project_manager: '/app/pm',
-  professional: '/app/professional',
-  admin: '/app/admin',
-}
+type RegistrationRole = 'client' | 'professional' | 'supplier'
+
+type ProfessionalType =
+  | 'architect'
+  | 'engineer'
+  | 'surveyor'
+  | 'project_manager'
+  | 'contractor'
+  | 'artisan'
+  | 'other_professional'
 
 interface FormState {
   fullName: string
@@ -28,12 +32,78 @@ interface FormState {
 
 type FormErrors = Partial<Record<keyof FormState | 'agreed', string>>
 
+const professionalLabels: Record<ProfessionalType, string> = {
+  architect: 'Architect',
+  engineer: 'Engineer',
+  surveyor: 'Surveyor / Quantity Surveyor',
+  project_manager: 'Project Manager',
+  contractor: 'Contractor',
+  artisan: 'Artisan',
+  other_professional: 'Other Professional',
+}
+
+const roleLabels: Record<RegistrationRole, string> = {
+  client: 'Client',
+  professional: 'Professional',
+  supplier: 'Supplier',
+}
+
+const roleHomePath: Record<RegistrationRole, string> = {
+  client: '/app/client',
+  professional: '/app/professional',
+  supplier: '/app/market',
+}
+
+function isValidEmail(value: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())
+}
+
+function isValidPhone(value: string) {
+  return /^[+\d][\d\s-]{6,}$/.test(value.trim())
+}
+
+function isRegistrationRole(value: string | null): value is RegistrationRole {
+  return value === 'client' || value === 'professional' || value === 'supplier'
+}
+
+function isProfessionalType(value: string | null): value is ProfessionalType {
+  return (
+    value === 'architect' ||
+    value === 'engineer' ||
+    value === 'surveyor' ||
+    value === 'project_manager' ||
+    value === 'contractor' ||
+    value === 'artisan' ||
+    value === 'other_professional'
+  )
+}
+
 export function Register() {
   const { login } = useAuth()
   const { showToast } = useToast()
   const navigate = useNavigate()
-  const [role, setRole] = useState<UserRole>('client')
-  const [form, setForm] = useState<FormState>({ fullName: '', country: '', email: '', phone: '', password: '' })
+  const [searchParams] = useSearchParams()
+
+  const roleParam = searchParams.get('role')
+  const professionalTypeParam = searchParams.get('professionalType')
+
+  const role: RegistrationRole = isRegistrationRole(roleParam)
+    ? roleParam
+    : 'client'
+
+  const professionalType: ProfessionalType | undefined =
+    role === 'professional' && isProfessionalType(professionalTypeParam)
+      ? professionalTypeParam
+      : undefined
+
+  const [form, setForm] = useState<FormState>({
+    fullName: '',
+    country: '',
+    email: '',
+    phone: '',
+    password: '',
+  })
+
   const [agreed, setAgreed] = useState(false)
   const [errors, setErrors] = useState<FormErrors>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -44,62 +114,116 @@ export function Register() {
 
   function validate() {
     const next: FormErrors = {}
-    if (!form.fullName.trim()) next.fullName = 'Enter your full name.'
-    if (!form.country.trim()) next.country = 'Enter your country.'
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) next.email = 'Enter a valid email address.'
-    if (!/^[+\d][\d\s-]{6,}$/.test(form.phone.trim())) next.phone = 'Enter a valid phone number.'
-    if (form.password.length < 8) next.password = 'Password must be at least 8 characters.'
-    if (!agreed) next.agreed = 'You need to accept the terms to continue.'
+
+    if (!form.fullName.trim()) {
+      next.fullName = 'Enter your full name.'
+    }
+
+    if (!form.country.trim()) {
+      next.country = 'Enter your country.'
+    }
+
+    if (!isValidEmail(form.email)) {
+      next.email = 'Enter a valid email address.'
+    }
+
+    if (!isValidPhone(form.phone)) {
+      next.phone = 'Enter a valid phone number.'
+    }
+
+    if (form.password.length < 8) {
+      next.password = 'Password must be at least 8 characters.'
+    }
+
+    if (!agreed) {
+      next.agreed = 'You need to accept the terms to continue.'
+    }
+
     setErrors(next)
+
     return Object.keys(next).length === 0
   }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+
     if (!validate()) return
 
     setIsSubmitting(true)
-    // Demo-only: real implementation validates duplicates and sends OTP (Sec. 24)
+
+    // Demo-only: real implementation should:
+    // 1. Submit the registration payload to authService.
+    // 2. Validate duplicate email/phone.
+    // 3. Create the account with the selected role.
+    // 4. Store professionalType when role === 'professional'.
+    // 5. Send OTP / verification flow (BRD Sec. 24).
+
     window.setTimeout(() => {
       login(role)
+
       showToast({
         tone: 'success',
         title: 'Account created',
-        description: `Welcome to Build OS, ${form.fullName.split(' ')[0] || 'there'}.`,
+        description: `Welcome to Build OS, ${
+          form.fullName.split(' ')[0] || 'there'
+        }.`,
       })
+
       navigate(roleHomePath[role])
     }, 500)
   }
 
+  const accountLabel =
+    role === 'professional' && professionalType
+      ? professionalLabels[professionalType]
+      : roleLabels[role]
+
   return (
     <AuthLayout
       title="Create your account"
-      subtitle="Tell us who you are so we set up the right dashboard."
+      subtitle="Complete your details to get started with Build OS."
       footer={
         <>
           Already registered?{' '}
-          <Link to="/login" className="font-medium text-ink hover:underline">
+          <Link
+            to="/login"
+            className="font-medium text-ink hover:underline"
+          >
             Log in
           </Link>
         </>
       }
     >
-      <form onSubmit={handleSubmit} noValidate className="space-y-4">
-        <div>
-          <label className="mb-1.5 block text-xs font-medium text-ink/60">I am a</label>
-          <select
-            value={role}
-            onChange={(e) => setRole(e.target.value as UserRole)}
-            className="w-full rounded-md border border-line bg-white px-3 py-2.5 text-sm text-ink focus:outline-none"
-          >
-            {(Object.keys(roleLabels) as UserRole[]).map((r) => (
-              <option key={r} value={r}>
-                {roleLabels[r]}
-              </option>
-            ))}
-          </select>
+      <form onSubmit={handleSubmit} noValidate className="space-y-5">
+        {/* Selected account type */}
+        <div className="rounded-xl border border-line bg-paper-2 px-4 py-3">
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-ink/35">
+                Account type
+              </p>
+
+              <p className="mt-1 text-sm font-semibold text-ink">
+                {accountLabel}
+              </p>
+
+              {role === 'professional' && professionalType && (
+                <p className="mt-0.5 text-xs text-ink/45">
+                  Professional account
+                </p>
+              )}
+            </div>
+
+            <Link
+              to="/join"
+              className="shrink-0 text-xs font-medium text-ink/55 hover:text-ink hover:underline"
+            >
+              Change
+            </Link>
+          </div>
         </div>
 
+        {/* Personal details */}
         <div className="grid grid-cols-2 gap-3">
           <FormField
             label="Full name"
@@ -108,6 +232,7 @@ export function Register() {
             placeholder="Jane Doe"
             error={errors.fullName}
           />
+
           <FormField
             label="Country"
             value={form.country}
@@ -143,6 +268,7 @@ export function Register() {
           error={errors.password}
         />
 
+        {/* Terms */}
         <div>
           <label className="flex items-start gap-2 text-xs text-ink/60">
             <input
@@ -151,16 +277,31 @@ export function Register() {
               onChange={(e) => setAgreed(e.target.checked)}
               className="mt-0.5"
             />
-            I agree to the Build OS terms of service and escrow policy.
+
+            <span>
+              I agree to the Build OS terms of service and escrow policy.
+            </span>
           </label>
-          {errors.agreed && <p className="mt-1.5 text-xs text-brick">{errors.agreed}</p>}
+
+          {errors.agreed && (
+            <p className="mt-1.5 text-xs text-brick">
+              {errors.agreed}
+            </p>
+          )}
         </div>
 
+        {/* Submit */}
         <Button
           type="submit"
           className="w-full"
           disabled={isSubmitting}
-          icon={isSubmitting ? <Loader2 size={15} className="animate-spin" /> : <ArrowRight size={15} />}
+          icon={
+            isSubmitting ? (
+              <Loader2 size={15} className="animate-spin" />
+            ) : (
+              <ArrowRight size={15} />
+            )
+          }
         >
           {isSubmitting ? 'Creating account…' : 'Create account'}
         </Button>
