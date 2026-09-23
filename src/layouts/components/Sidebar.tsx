@@ -25,7 +25,7 @@ import {
 
 import { navByRole, roleLabels } from '@/config/navigation'
 import { roleMeta, accentClasses, roleOrder } from '@/config/roleUi'
-import type { AppRole } from '@/config/roles'
+import type { AppRole } from '@/config/roleUi'
 import { useAuth } from '@/context/AuthContext'
 
 /* -------------------------------------------------------------------------- */

@@ -19,11 +19,11 @@ export const demoUsers: Record<UserRole, User> = {
   },
 
   diaspora_client: {
-    id: 'u-client-1',
+    id: 'u-client-2',
     fullName: 'Chukwu Obi',
-    email: 'amaka.obi@example.com',
+    email: 'chukwu.obi@example.com',
     role: 'diaspora_client',
-    avatarInitials: 'AO',
+    avatarInitials: 'CO',
     verificationStatus: 'verified',
     trustScore: 89,
     country: 'United Kingdom (Diaspora)',
@@ -140,6 +140,8 @@ export const projects: Project[] = [
   },
 ]
 
+// Full bid detail, including cost breakdown and track record, used by both
+// the bidding list/comparison views and the detailed bid review screen.
 export const bids: Bid[] = [
   {
     id: 'b-1',
@@ -151,6 +153,14 @@ export const bids: Bid[] = [
     currency: 'NGN',
     timelineWeeks: 44,
     status: 'shortlisted',
+    materialCost: 78_000_000,
+    labourCost: 42_000_000,
+    equipmentCost: 15_500_000,
+    logisticsCost: 6_000_000,
+    rating: 4.6,
+    experienceYears: 12,
+    completedProjects: 34,
+    riskFlags: [],
   },
 
   {
@@ -163,6 +173,14 @@ export const bids: Bid[] = [
     currency: 'NGN',
     timelineWeeks: 48,
     status: 'submitted',
+    materialCost: 76_000_000,
+    labourCost: 40_000_000,
+    equipmentCost: 14_000_000,
+    logisticsCost: 7_000_000,
+    rating: 4.1,
+    experienceYears: 7,
+    completedProjects: 19,
+    riskFlags: ['Timeline exceeds project target by 4 weeks'],
   },
 
   {
@@ -175,6 +193,34 @@ export const bids: Bid[] = [
     currency: 'NGN',
     timelineWeeks: 50,
     status: 'submitted',
+    materialCost: 71_000_000,
+    labourCost: 38_500_000,
+    equipmentCost: 13_800_000,
+    logisticsCost: 6_500_000,
+    rating: 3.4,
+    experienceYears: 3,
+    completedProjects: 5,
+    riskFlags: ['Contractor not yet verified', 'Below-market bid amount'],
+  },
+]
+
+export const disputes: Dispute[] = [
+  {
+    id: 'd-1',
+    projectId: 'p-1003',
+    category: 'quality',
+    raisedBy: 'Wale Fashola',
+    respondent: 'Solid Foundation Ltd',
+    amount: 2_100_000,
+    currency: 'NGN',
+    status: 'under_review',
+    stage: 'admin_review',
+    openedDate: '2026-07-01',
+    paymentFrozen: true,
+    evidenceCount: 3,
+    responseCount: 1,
+    createdAt: '2026-07-01T09:00:00Z',
+    updatedAt: '2026-07-15T14:30:00Z',
   },
 ]
 
@@ -221,19 +267,6 @@ export const escrowTransactions: EscrowTransaction[] = [
     milestoneLabel: 'Under Dispute Review',
     date: '2026-07-02',
     fundingSource: 'partner_escrow',
-  },
-]
-
-export const disputes: Dispute[] = [
-  {
-    id: 'd-1',
-    projectId: 'p-1003',
-    category: 'Quality of Work',
-    raisedBy: 'Wale Fashola',
-    respondent: 'Solid Foundation Ltd',
-    amount: 2_100_000,
-    status: 'under_review',
-    openedDate: '2026-07-01',
   },
 ]
 

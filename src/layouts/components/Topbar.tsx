@@ -11,7 +11,7 @@ import { Link } from 'react-router-dom'
 import { ChevronDown, LogOut, Menu, Search, UserCircle } from 'lucide-react'
 
 import { roleLabels } from '@/config/navigation'
-import type { AppRole } from '@/config/roles'
+import type { AppRole } from '@/config/roleUi'
 import { useAuth } from '@/context/AuthContext'
 
 /* -------------------------------------------------------------------------- */
@@ -170,8 +170,8 @@ function AccountMenu() {
 
   const containerRef = useDismiss<HTMLDivElement>(open, dismiss)
 
-  const initials = getInitials(user?.name, user?.email)
-  const displayName = user?.name || user?.email || 'Account'
+  const initials = getInitials(user?.fullName, user?.email)
+  const displayName = user?.fullName || user?.email || 'Account'
   const roleLabel = roleLabels[role as AppRole] ?? 'Workspace'
 
   return (
@@ -220,7 +220,7 @@ function AccountMenu() {
 
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold text-ink">
-              {user?.name || 'Build OS user'}
+              {user?.fullName || 'Build OS user'}
             </p>
 
             {user?.email && (

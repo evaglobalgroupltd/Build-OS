@@ -1,4 +1,3 @@
-
 // Bidding module — domain types
 //
 // BRD references:
@@ -179,13 +178,22 @@ export interface Bid {
   approach?: string
 
   /* ------------------------------------------------------------------------ */
-  /* Cost structure                                                           */
+  /* Cost structure (detailed, review/comparison views)                       */
   /* ------------------------------------------------------------------------ */
 
   /**
    * Detailed commercial breakdown used for bid review and comparison.
    */
   costs?: BidCostItem[]
+
+  /**
+   * Flat cost breakdown, used by list/comparison views that don't need
+   * the full line-item detail in `costs`.
+   */
+  materialCost?: number
+  labourCost?: number
+  equipmentCost?: number
+  logisticsCost?: number
 
   /* ------------------------------------------------------------------------ */
   /* Payment structure                                                        */
@@ -209,6 +217,20 @@ export interface Bid {
    * Number of calendar days for which the submitted proposal remains valid.
    */
   bidValidityDays?: number
+
+  /* ------------------------------------------------------------------------ */
+  /* Contractor track record (list/comparison views)                          */
+  /* ------------------------------------------------------------------------ */
+
+  rating?: number
+  experienceYears?: number
+  completedProjects?: number
+
+  /* ------------------------------------------------------------------------ */
+  /* Risk flags                                                                */
+  /* ------------------------------------------------------------------------ */
+
+  riskFlags?: string[]
 
   /* ------------------------------------------------------------------------ */
   /* Clarification workflow                                                   */
