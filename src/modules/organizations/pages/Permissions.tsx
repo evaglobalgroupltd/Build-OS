@@ -1,3 +1,5 @@
+import type { ComponentType } from 'react'
+
 import {
   Check,
   ChevronDown,
@@ -34,6 +36,7 @@ const roles = [
 const permissionGroups = [
   {
     title: 'Organization',
+    description: 'Identity, membership and administrative controls.',
     permissions: [
       'View organization profile',
       'Edit organization profile',
@@ -43,6 +46,7 @@ const permissionGroups = [
   },
   {
     title: 'Projects',
+    description: 'Project creation, delivery and operational decisions.',
     permissions: [
       'View projects',
       'Create projects',
@@ -52,6 +56,7 @@ const permissionGroups = [
   },
   {
     title: 'Procurement',
+    description: 'Materials, supplier requests and delivery verification.',
     permissions: [
       'View procurement requests',
       'Create material requests',
@@ -61,6 +66,7 @@ const permissionGroups = [
   },
   {
     title: 'Finance & Escrow',
+    description: 'Financial visibility, funding and controlled releases.',
     permissions: [
       'View wallet balances',
       'Fund project escrow',
@@ -70,6 +76,7 @@ const permissionGroups = [
   },
   {
     title: 'Monitoring & Reports',
+    description: 'Evidence, milestones, reporting and project oversight.',
     permissions: [
       'View project reports',
       'Upload reports',
@@ -102,27 +109,88 @@ const enabledPermissions = new Set([
 
 export function Permissions() {
   return (
-    <div className="space-y-6">
-      <div>
-        <p className="text-xs font-semibold uppercase tracking-wide text-ink/40">
-          Organization security
-        </p>
+    <div className="space-y-7">
+      {/* ------------------------------------------------------------------ */}
+      {/* Hero                                                               */}
+      {/* ------------------------------------------------------------------ */}
+      <section className="relative overflow-hidden rounded-[24px] border border-ink/[0.07] bg-white shadow-[0_18px_50px_rgba(20,40,30,0.08)]">
+        <div className="pointer-events-none absolute -right-24 -top-28 h-64 w-64 rounded-full bg-[#12613E]/[0.07] blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-32 left-1/3 h-64 w-64 rounded-full bg-[#B85C12]/[0.05] blur-3xl" />
 
-        <h1 className="mt-1 font-display text-2xl font-semibold tracking-tight text-ink">
-          Permissions
-        </h1>
+        <div className="relative px-6 py-7 sm:px-8 lg:px-10 lg:py-9">
+          <div className="flex flex-col gap-7 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-3xl">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#12613E]/[0.08] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#12613E]">
+                  <ShieldCheck className="h-3 w-3" />
+                  Security governance
+                </span>
 
-        <p className="mt-1 text-sm text-ink/45">
-          Configure role-based access to organization resources and actions.
-        </p>
-      </div>
+                <span className="text-[10px] font-medium uppercase tracking-[0.12em] text-ink/25">
+                  Role-based access
+                </span>
+              </div>
 
+              <h1 className="mt-4 font-display text-3xl font-semibold tracking-[-0.035em] text-ink sm:text-4xl">
+                Permissions
+              </h1>
+
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-ink/45">
+                Define how organization members access projects, financial
+                operations, procurement, monitoring and administrative
+                controls.
+              </p>
+
+              <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-2">
+                <HeroMeta
+                  icon={ShieldCheck}
+                  label="Access model"
+                  value="Role-based"
+                />
+
+                <HeroMeta
+                  icon={LockKeyhole}
+                  label="Control posture"
+                  value="Least privilege"
+                />
+
+                <HeroMeta
+                  icon={Users}
+                  label="Assigned users"
+                  value="10 members"
+                />
+              </div>
+            </div>
+
+            <div className="shrink-0 rounded-2xl border border-[#12613E]/[0.09] bg-[#F4F8F5] px-4 py-3">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-ink/30">
+                Current role
+              </p>
+
+              <div className="mt-1.5 flex items-center gap-2">
+                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#12613E]/[0.1]">
+                  <ShieldCheck className="h-3.5 w-3.5 text-[#12613E]" />
+                </div>
+
+                <span className="text-xs font-semibold text-[#18271F]">
+                  Organization Admin
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ------------------------------------------------------------------ */}
+      {/* Summary                                                            */}
+      {/* ------------------------------------------------------------------ */}
       <div className="grid gap-4 sm:grid-cols-3">
         <Summary
           icon={ShieldCheck}
           label="Roles"
           value="4"
           description="Configured access roles"
+          accent="green"
         />
 
         <Summary
@@ -130,6 +198,7 @@ export function Permissions() {
           label="Members"
           value="10"
           description="Users assigned to roles"
+          accent="bronze"
         />
 
         <Summary
@@ -137,128 +206,236 @@ export function Permissions() {
           label="Permissions"
           value="24"
           description="Available organization controls"
+          accent="neutral"
         />
       </div>
 
+      {/* ------------------------------------------------------------------ */}
+      {/* Role registry                                                      */}
+      {/* ------------------------------------------------------------------ */}
       <Card>
         <CardHeader
           title="Role configuration"
-          subtitle="Select a role to manage its permission set"
+          subtitle="Select a role to inspect its organization access profile."
         />
 
         <CardBody>
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            {roles.map((role, index) => (
-              <button
-                key={role.name}
-                type="button"
-                className={`rounded-xl border p-4 text-left transition-colors ${
-                  index === 0
-                    ? 'border-ink bg-ink text-white'
-                    : 'border-line bg-paper-2 text-ink hover:border-ink/20'
-                }`}
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-sm font-semibold">{role.name}</p>
-                    <p
-                      className={`mt-1 text-xs ${
-                        index === 0 ? 'text-white/50' : 'text-ink/40'
-                      }`}
-                    >
-                      {role.description}
-                    </p>
-                  </div>
+            {roles.map((role, index) => {
+              const selected = index === 0
 
-                  <ChevronDown
-                    className={`h-4 w-4 ${
-                      index === 0 ? 'text-white/50' : 'text-ink/30'
-                    }`}
-                  />
-                </div>
-
-                <div
-                  className={`mt-4 text-[10px] font-semibold ${
-                    index === 0 ? 'text-white/60' : 'text-ink/40'
+              return (
+                <button
+                  key={role.name}
+                  type="button"
+                  className={`group relative overflow-hidden rounded-[18px] border p-4 text-left transition-all duration-200 ${
+                    selected
+                      ? 'border-[#18271F] bg-[#18271F] text-white shadow-[0_14px_32px_rgba(24,39,31,0.16)]'
+                      : 'border-ink/[0.07] bg-[#F8F9F7] text-ink hover:-translate-y-0.5 hover:border-[#12613E]/[0.18] hover:bg-white hover:shadow-[0_12px_28px_rgba(20,40,30,0.07)]'
                   }`}
                 >
-                  {role.members} assigned member
-                  {role.members !== 1 ? 's' : ''}
-                </div>
-              </button>
-            ))}
+                  {selected && (
+                    <div className="pointer-events-none absolute -right-8 -top-10 h-28 w-28 rounded-full bg-[#12613E]/20 blur-2xl" />
+                  )}
+
+                  <div className="relative flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <div
+                          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl ${
+                            selected
+                              ? 'bg-white/[0.1]'
+                              : 'bg-[#12613E]/[0.08]'
+                          }`}
+                        >
+                          <ShieldCheck
+                            className={`h-3.5 w-3.5 ${
+                              selected
+                                ? 'text-white/75'
+                                : 'text-[#12613E]/75'
+                            }`}
+                          />
+                        </div>
+
+                        <p className="text-sm font-semibold leading-5">
+                          {role.name}
+                        </p>
+                      </div>
+
+                      <p
+                        className={`mt-3 text-xs leading-5 ${
+                          selected ? 'text-white/45' : 'text-ink/40'
+                        }`}
+                      >
+                        {role.description}
+                      </p>
+                    </div>
+
+                    <ChevronDown
+                      className={`mt-1 h-4 w-4 shrink-0 transition-transform ${
+                        selected
+                          ? 'text-white/45'
+                          : 'text-ink/25 group-hover:text-ink/50'
+                      }`}
+                    />
+                  </div>
+
+                  <div
+                    className={`relative mt-5 flex items-center justify-between border-t pt-3 text-[10px] font-semibold ${
+                      selected
+                        ? 'border-white/[0.08] text-white/50'
+                        : 'border-ink/[0.06] text-ink/35'
+                    }`}
+                  >
+                    <span>
+                      {role.members} assigned member
+                      {role.members !== 1 ? 's' : ''}
+                    </span>
+
+                    {selected && (
+                      <span className="inline-flex items-center gap-1.5 text-[#B9DCC9]">
+                        <span className="h-1.5 w-1.5 rounded-full bg-[#6CC394]" />
+                        Selected
+                      </span>
+                    )}
+                  </div>
+                </button>
+              )
+            })}
           </div>
         </CardBody>
       </Card>
 
+      {/* ------------------------------------------------------------------ */}
+      {/* Selected role                                                       */}
+      {/* ------------------------------------------------------------------ */}
       <Card className="overflow-hidden">
-        <CardHeader
-          title="Organization Admin permissions"
-          subtitle="Full-access role · 1 member assigned"
-          action={
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1.5 text-[10px] font-semibold text-emerald-700">
-              <ShieldCheck className="h-3.5 w-3.5" />
-              Protected role
-            </span>
-          }
-        />
+        <div className="border-b border-ink/[0.06] bg-[#F4F6F3] px-6 py-6 sm:px-7">
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-3">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#18271F] shadow-[0_10px_24px_rgba(24,39,31,0.12)]">
+                <ShieldCheck className="h-5 w-5 text-white" />
+              </div>
 
-        <div className="divide-y divide-line">
-          {permissionGroups.map((group) => (
-            <div key={group.title} className="px-6 py-6">
-              <div className="mb-4">
-                <h3 className="text-sm font-semibold text-ink">
-                  {group.title}
-                </h3>
+              <div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <h2 className="font-display text-lg font-semibold tracking-tight text-ink">
+                    Organization Admin permissions
+                  </h2>
+
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-[#12613E]/[0.08] px-2.5 py-1 text-[10px] font-semibold text-[#12613E]">
+                    <ShieldCheck className="h-3 w-3" />
+                    Protected role
+                  </span>
+                </div>
 
                 <p className="mt-1 text-xs text-ink/40">
-                  Controls available within this area.
+                  Full-access role · 1 member assigned
                 </p>
               </div>
-
-              <div className="grid gap-2 sm:grid-cols-2">
-                {group.permissions.map((permission) => {
-                  const enabled = enabledPermissions.has(permission)
-
-                  return (
-                    <div
-                      key={permission}
-                      className="flex items-center gap-3 rounded-xl border border-line bg-paper-2 px-3 py-3"
-                    >
-                      <div
-                        className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${
-                          enabled
-                            ? 'bg-emerald-500/10'
-                            : 'bg-ink/5'
-                        }`}
-                      >
-                        {enabled ? (
-                          <Check className="h-3.5 w-3.5 text-emerald-600" />
-                        ) : (
-                          <LockKeyhole className="h-3.5 w-3.5 text-ink/30" />
-                        )}
-                      </div>
-
-                      <span className="text-xs font-medium text-ink/65">
-                        {permission}
-                      </span>
-                    </div>
-                  )
-                })}
-              </div>
             </div>
+
+            <div className="rounded-xl border border-ink/[0.07] bg-white px-3.5 py-2.5">
+              <p className="text-[10px] uppercase tracking-[0.08em] text-ink/30">
+                Access coverage
+              </p>
+
+              <p className="mt-0.5 text-sm font-semibold text-[#12613E]">
+                18 of 18 enabled
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="divide-y divide-ink/[0.06]">
+          {permissionGroups.map((group, groupIndex) => (
+            <PermissionGroup
+              key={group.title}
+              group={group}
+              index={groupIndex}
+            />
           ))}
         </div>
 
-        <div className="border-t border-line bg-paper-2 px-6 py-4">
-          <p className="text-[10px] leading-5 text-ink/40">
-            Permissions should follow the principle of least privilege.
-            Financial releases, verification decisions and sensitive
-            administrative actions should require the appropriate approval
-            chain and remain fully auditable.
-          </p>
+        {/* Governance note */}
+        <div className="border-t border-ink/[0.06] bg-[#F8F9F7] px-6 py-5 sm:px-7">
+          <div className="flex gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#B85C12]/[0.08]">
+              <LockKeyhole className="h-4 w-4 text-[#B85C12]" />
+            </div>
+
+            <div>
+              <p className="text-xs font-semibold text-ink">
+                Governance principle
+              </p>
+
+              <p className="mt-1 max-w-4xl text-xs leading-5 text-ink/40">
+                Permissions should follow the principle of least privilege.
+                Financial releases, verification decisions and sensitive
+                administrative actions should follow the appropriate approval
+                chain and remain fully auditable.
+              </p>
+            </div>
+          </div>
         </div>
       </Card>
+
+      {/* ------------------------------------------------------------------ */}
+      {/* Security posture                                                    */}
+      {/* ------------------------------------------------------------------ */}
+      <div className="rounded-[20px] border border-[#12613E]/[0.09] bg-[#F4F8F5] p-5 sm:p-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#12613E]/[0.09]">
+              <ShieldCheck className="h-4 w-4 text-[#12613E]" />
+            </div>
+
+            <div>
+              <p className="text-xs font-semibold text-[#18271F]">
+                Access governance is active
+              </p>
+
+              <p className="mt-1 max-w-2xl text-xs leading-5 text-ink/40">
+                Organization permissions are structured by role. Sensitive
+                actions should remain restricted to authorized users and
+                recorded within the organization audit trail.
+              </p>
+            </div>
+          </div>
+
+          <div className="shrink-0 rounded-full bg-white px-3 py-1.5 text-[10px] font-semibold text-[#12613E] shadow-sm">
+            Policy enforced
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* -------------------------------------------------------------------------- */
+/* Supporting components                                                       */
+/* -------------------------------------------------------------------------- */
+
+function HeroMeta({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: ComponentType<{ className?: string }>
+  label: string
+  value: string
+}) {
+  return (
+    <div className="flex items-center gap-2">
+      <Icon className="h-3.5 w-3.5 text-[#12613E]" />
+
+      <div className="flex items-center gap-1.5">
+        <span className="text-[10px] uppercase tracking-[0.08em] text-ink/30">
+          {label}
+        </span>
+
+        <span className="text-xs font-medium text-ink/60">{value}</span>
+      </div>
     </div>
   )
 }
@@ -268,33 +445,148 @@ function Summary({
   label,
   value,
   description,
+  accent,
 }: {
-  icon: React.ComponentType<{ className?: string }>
+  icon: ComponentType<{ className?: string }>
   label: string
   value: string
   description: string
+  accent: 'green' | 'bronze' | 'neutral'
 }) {
-  return (
-    <Card>
-      <CardBody>
-        <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-ink/5">
-            <Icon className="h-4 w-4 text-ink/55" />
-          </div>
+  const accentStyles = {
+    green: {
+      icon: 'bg-[#12613E]/[0.08] text-[#12613E]',
+      value: 'text-[#12613E]',
+    },
+    bronze: {
+      icon: 'bg-[#B85C12]/[0.08] text-[#B85C12]',
+      value: 'text-[#B85C12]',
+    },
+    neutral: {
+      icon: 'bg-ink/[0.05] text-ink/55',
+      value: 'text-ink',
+    },
+  }
 
+  const styles = accentStyles[accent]
+
+  return (
+    <Card className="transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_14px_34px_rgba(20,40,30,0.07)]">
+      <CardBody>
+        <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-wide text-ink/35">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-ink/30">
               {label}
             </p>
 
-            <p className="mt-0.5 font-display text-xl font-semibold text-ink">
+            <p
+              className={`mt-1.5 font-display text-2xl font-semibold tracking-tight ${styles.value}`}
+            >
               {value}
+            </p>
+          </div>
+
+          <div
+            className={`flex h-10 w-10 items-center justify-center rounded-xl ${styles.icon}`}
+          >
+            <Icon className="h-4 w-4" />
+          </div>
+        </div>
+
+        <p className="mt-3 text-xs leading-5 text-ink/40">{description}</p>
+      </CardBody>
+    </Card>
+  )
+}
+
+function PermissionGroup({
+  group,
+  index,
+}: {
+  group: (typeof permissionGroups)[number]
+  index: number
+}) {
+  return (
+    <div className="px-6 py-6 sm:px-7">
+      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex items-start gap-3">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#F4F6F3]">
+            <span className="font-display text-xs font-semibold text-ink/45">
+              {String(index + 1).padStart(2, '0')}
+            </span>
+          </div>
+
+          <div>
+            <h3 className="text-sm font-semibold text-ink">
+              {group.title}
+            </h3>
+
+            <p className="mt-1 text-xs leading-5 text-ink/40">
+              {group.description}
             </p>
           </div>
         </div>
 
-        <p className="mt-3 text-xs text-ink/40">{description}</p>
-      </CardBody>
-    </Card>
+        <span className="self-start rounded-full bg-ink/[0.04] px-2.5 py-1 text-[10px] font-semibold text-ink/35">
+          {group.permissions.length} controls
+        </span>
+      </div>
+
+      <div className="grid gap-2 sm:grid-cols-2">
+        {group.permissions.map((permission) => {
+          const enabled = enabledPermissions.has(permission)
+
+          return (
+            <PermissionRow
+              key={permission}
+              permission={permission}
+              enabled={enabled}
+            />
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+function PermissionRow({
+  permission,
+  enabled,
+}: {
+  permission: string
+  enabled: boolean
+}) {
+  return (
+    <div
+      className={`group flex items-center gap-3 rounded-xl border px-3.5 py-3 transition-colors ${
+        enabled
+          ? 'border-[#12613E]/[0.07] bg-[#F8F9F7] hover:border-[#12613E]/[0.14] hover:bg-[#F4F8F5]'
+          : 'border-ink/[0.06] bg-ink/[0.02]'
+      }`}
+    >
+      <div
+        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${
+          enabled ? 'bg-[#12613E]/[0.09]' : 'bg-ink/[0.05]'
+        }`}
+      >
+        {enabled ? (
+          <Check className="h-3.5 w-3.5 text-[#12613E]" />
+        ) : (
+          <LockKeyhole className="h-3.5 w-3.5 text-ink/25" />
+        )}
+      </div>
+
+      <span
+        className={`text-xs font-medium ${
+          enabled ? 'text-ink/65' : 'text-ink/35'
+        }`}
+      >
+        {permission}
+      </span>
+
+      {enabled && (
+        <span className="ml-auto h-1.5 w-1.5 rounded-full bg-[#12613E]/50" />
+      )}
+    </div>
   )
 }

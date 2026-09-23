@@ -12,6 +12,7 @@ import {
   TrendingUp,
   Wallet,
 } from 'lucide-react'
+
 import { Card } from '@/components/ui/Card'
 
 interface WeeklyActivity {
@@ -86,36 +87,230 @@ const milestones: MilestoneProgress[] = [
 const activityStatusConfig = {
   complete: {
     label: 'Completed',
-    className: 'bg-emerald-500/10 text-emerald-600',
+    className: 'bg-[#12613E]/[0.07] text-[#12613E]',
   },
   'in-progress': {
     label: 'In progress',
-    className: 'bg-amber-500/10 text-amber-700',
+    className: 'bg-[#B85C12]/[0.07] text-[#B85C12]',
   },
   planned: {
     label: 'Planned',
-    className: 'bg-ink/5 text-ink/50',
+    className: 'bg-ink/[0.05] text-ink/45',
   },
 }
 
 const milestoneStatusConfig = {
   ahead: {
     label: 'Ahead',
-    className: 'text-emerald-600',
+    className: 'text-[#12613E]',
+    barClassName: 'bg-[#12613E]',
   },
   'on-track': {
     label: 'On track',
-    className: 'text-teal',
+    className: 'text-[#12613E]',
+    barClassName: 'bg-[#12613E]/75',
   },
   delayed: {
     label: 'Delayed',
     className: 'text-red-600',
+    barClassName: 'bg-red-500',
   },
+}
+
+function MetricCard({
+  label,
+  value,
+  description,
+  icon: Icon,
+  tone = 'neutral',
+  progress,
+}: {
+  label: string
+  value: string
+  description: string
+  icon: typeof TrendingUp
+  tone?: 'neutral' | 'green' | 'bronze' | 'critical'
+  progress?: number
+}) {
+  const styles = {
+    neutral: {
+      icon: 'bg-ink/[0.045] text-ink/55',
+      value: 'text-ink',
+      bar: 'bg-ink/30',
+    },
+    green: {
+      icon: 'bg-[#12613E]/[0.07] text-[#12613E]',
+      value: 'text-[#12613E]',
+      bar: 'bg-[#12613E]',
+    },
+    bronze: {
+      icon: 'bg-[#B85C12]/[0.07] text-[#B85C12]',
+      value: 'text-[#B85C12]',
+      bar: 'bg-[#B85C12]',
+    },
+    critical: {
+      icon: 'bg-red-500/[0.07] text-red-600',
+      value: 'text-red-600',
+      bar: 'bg-red-500',
+    },
+  }
+
+  const style = styles[tone]
+
+  return (
+    <Card className="group overflow-hidden">
+      <div className="p-5 sm:p-6">
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0 flex-1">
+            <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-ink/35">
+              {label}
+            </p>
+
+            <p
+              className={`mt-3 font-display text-[32px] font-semibold leading-none tracking-[-0.045em] ${style.value}`}
+            >
+              {value}
+            </p>
+
+            {progress !== undefined ? (
+              <div className="mt-4">
+                <div className="h-1.5 overflow-hidden rounded-full bg-ink/[0.06]">
+                  <div
+                    className={`h-full rounded-full ${style.bar}`}
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+              </div>
+            ) : null}
+
+            <p className="mt-2.5 text-[11px] text-ink/40">
+              {description}
+            </p>
+          </div>
+
+          <div
+            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] ${style.icon}`}
+          >
+            <Icon className="h-[18px] w-[18px]" strokeWidth={1.7} />
+          </div>
+        </div>
+      </div>
+
+      <div className="h-px bg-ink/[0.04]">
+        <div className="h-px w-10 bg-ink/[0.08] transition-all duration-500 group-hover:w-16" />
+      </div>
+    </Card>
+  )
+}
+
+function HealthCard({
+  label,
+  status,
+  description,
+  tone,
+}: {
+  label: string
+  status: string
+  description: string
+  tone: 'healthy' | 'watch'
+}) {
+  const isHealthy = tone === 'healthy'
+
+  return (
+    <div
+      className={`rounded-[15px] border p-4 ${
+        isHealthy
+          ? 'border-[#12613E]/10 bg-[#12613E]/[0.025]'
+          : 'border-[#B85C12]/10 bg-[#B85C12]/[0.025]'
+      }`}
+    >
+      <div className="flex items-center justify-between gap-4">
+        <span className="text-[12px] font-semibold text-ink">{label}</span>
+
+        <span
+          className={`font-mono text-[8px] font-semibold uppercase tracking-[0.14em] ${
+            isHealthy ? 'text-[#12613E]' : 'text-[#B85C12]'
+          }`}
+        >
+          {status}
+        </span>
+      </div>
+
+      <p className="mt-2 text-[11px] leading-5 text-ink/45">
+        {description}
+      </p>
+    </div>
+  )
+}
+
+function MilestoneRow({ milestone }: { milestone: MilestoneProgress }) {
+  const status = milestoneStatusConfig[milestone.status]
+
+  return (
+    <div>
+      <div className="flex items-end justify-between gap-4">
+        <div className="min-w-0">
+          <p className="truncate text-[12px] font-semibold text-ink">
+            {milestone.name}
+          </p>
+
+          <p className={`mt-1 text-[10px] font-medium ${status.className}`}>
+            {status.label}
+          </p>
+        </div>
+
+        <span className="shrink-0 font-mono text-[10px] font-semibold text-ink/45">
+          {milestone.progress}%
+        </span>
+      </div>
+
+      <div className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-ink/[0.055]">
+        <div
+          className={`h-full rounded-full ${status.barClassName}`}
+          style={{ width: `${milestone.progress}%` }}
+        />
+      </div>
+    </div>
+  )
+}
+
+function ActivityIcon({
+  status,
+}: {
+  status: WeeklyActivity['status']
+}) {
+  if (status === 'complete') {
+    return (
+      <CheckCircle2
+        className="h-[18px] w-[18px] text-[#12613E]"
+        strokeWidth={1.7}
+      />
+    )
+  }
+
+  if (status === 'in-progress') {
+    return (
+      <Clock3
+        className="h-[18px] w-[18px] text-[#B85C12]"
+        strokeWidth={1.7}
+      />
+    )
+  }
+
+  return (
+    <CalendarDays
+      className="h-[18px] w-[18px] text-ink/45"
+      strokeWidth={1.7}
+    />
+  )
 }
 
 /**
  * Weekly Report — Monitoring module
- * BRD reference: Sec. 20.3 / 43
+ *
+ * BRD reference:
+ * - Sec. 20.3
+ * - Sec. 43
  *
  * Weekly overview of project performance, progress, activity,
  * budget health and emerging risks.
@@ -124,369 +319,337 @@ export function WeeklyReport() {
   const reportPeriod = '18 – 24 August 2026'
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <div className="mb-2 flex items-center gap-2">
-            <FileText className="h-4 w-4 text-teal" />
+    <div className="space-y-7 pb-8">
+      {/* Hero */}
+      <section className="relative overflow-hidden rounded-[24px] border border-ink/[0.06] bg-white px-5 py-7 shadow-[0_18px_50px_rgba(20,40,30,0.07)] sm:px-7 sm:py-8 lg:px-9 lg:py-9">
+        <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-[#12613E]/[0.055] blur-3xl" />
 
-            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink/40">
-              Monitoring · Weekly Intelligence
+        <div className="pointer-events-none absolute -bottom-28 left-1/3 h-56 w-56 rounded-full bg-[#B85C12]/[0.035] blur-3xl" />
+
+        <div className="relative flex flex-col justify-between gap-7 lg:flex-row lg:items-end">
+          <div className="max-w-3xl">
+            <div className="mb-4 flex flex-wrap items-center gap-x-3 gap-y-2">
+              <span className="inline-flex items-center gap-2 rounded-full border border-[#12613E]/10 bg-[#12613E]/[0.05] px-3 py-1.5 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-[#12613E]">
+                <FileText className="h-3 w-3" />
+                Monitoring / Weekly Intelligence
+              </span>
+
+              <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-ink/30">
+                BRD Sec. 20.3 / 43
+              </span>
+            </div>
+
+            <h1 className="font-display text-[34px] font-semibold leading-[1.02] tracking-[-0.055em] text-ink sm:text-[42px] lg:text-[48px]">
+              Weekly project intelligence.
+            </h1>
+
+            <p className="mt-4 max-w-2xl text-sm leading-6 text-ink/50 sm:text-[15px]">
+              A consolidated management view of delivery progress, milestone
+              performance, project health, activities, and emerging exposure
+              for the reporting period.
+            </p>
+
+            <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2.5 text-[10px] font-medium uppercase tracking-[0.12em] text-ink/35">
+              <span>18 – 24 August 2026</span>
+
+              <span className="hidden h-1 w-1 rounded-full bg-ink/20 sm:block" />
+
+              <span>Portfolio monitoring</span>
+
+              <span className="hidden h-1 w-1 rounded-full bg-ink/20 sm:block" />
+
+              <span>Weekly cycle</span>
+            </div>
+          </div>
+
+          <div className="flex shrink-0 items-center gap-2 rounded-[12px] border border-ink/[0.06] bg-[#F8F9F7] px-4 py-3">
+            <span className="h-2 w-2 rounded-full bg-[#12613E]" />
+
+            <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-ink/40">
+              Reporting cycle active
             </span>
           </div>
-
-          <h1 className="text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
-            Weekly Report
-          </h1>
-
-          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink/55">
-            A consolidated view of project progress, performance, risks and
-            activities for the selected reporting period.
-          </p>
         </div>
+      </section>
 
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="rounded-full bg-ink/5 px-3 py-1.5 font-mono text-[10px] text-ink/45">
-            BRD ref: Sec. 20.3 / 43
-          </div>
+      {/* Period navigation */}
+      <Card className="overflow-hidden">
+        <div className="flex flex-col gap-5 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+          <div>
+            <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-[#12613E]">
+              Reporting period
+            </p>
 
-          <button
-            type="button"
-            className="flex items-center gap-2 rounded-lg border border-ink/10 bg-paper px-3 py-2 text-xs font-medium text-ink transition-colors hover:bg-ink/5"
-          >
-            <CalendarDays className="h-3.5 w-3.5" />
-            {reportPeriod}
-          </button>
-        </div>
-      </div>
+            <div className="mt-2 flex flex-wrap items-center gap-3">
+              <h2 className="font-display text-xl font-semibold tracking-[-0.035em] text-ink">
+                {reportPeriod}
+              </h2>
 
-      {/* Report Period Navigation */}
-      <Card className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-ink/40">
-            Reporting period
-          </p>
-
-          <p className="mt-1 text-sm font-medium text-ink">
-            {reportPeriod}
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            className="flex h-9 w-9 items-center justify-center rounded-lg border border-ink/10 text-ink/55 transition-colors hover:bg-ink/5"
-            aria-label="Previous week"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </button>
-
-          <button
-            type="button"
-            className="flex h-9 items-center gap-2 rounded-lg bg-ink px-4 text-xs font-medium text-paper transition-opacity hover:opacity-90"
-          >
-            <CalendarDays className="h-3.5 w-3.5" />
-            Current week
-          </button>
-
-          <button
-            type="button"
-            className="flex h-9 w-9 items-center justify-center rounded-lg border border-ink/10 text-ink/55 transition-colors hover:bg-ink/5"
-            aria-label="Next week"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </button>
-        </div>
-      </Card>
-
-      {/* Summary Metrics */}
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <Card className="p-5">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink/40">
-                Overall progress
-              </p>
-
-              <p className="mt-2 text-3xl font-semibold text-ink">64%</p>
-
-              <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-ink/8">
-                <div className="h-full w-[64%] rounded-full bg-teal" />
-              </div>
-
-              <p className="mt-2 text-xs text-ink/45">
-                +6.2% this week
-              </p>
-            </div>
-
-            <div className="rounded-xl bg-teal/10 p-2.5">
-              <TrendingUp className="h-5 w-5 text-teal" />
+              <span className="rounded-full bg-[#12613E]/[0.07] px-2.5 py-1 font-mono text-[8px] font-semibold uppercase tracking-[0.12em] text-[#12613E]">
+                Current report
+              </span>
             </div>
           </div>
-        </Card>
 
-        <Card className="p-5">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink/40">
-                Budget utilisation
-              </p>
-
-              <p className="mt-2 text-3xl font-semibold text-ink">58%</p>
-
-              <p className="mt-2 text-xs text-ink/45">
-                Within approved budget
-              </p>
-            </div>
-
-            <div className="rounded-xl bg-amber/10 p-2.5">
-              <Wallet className="h-5 w-5 text-amber" />
-            </div>
-          </div>
-        </Card>
-
-        <Card className="p-5">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink/40">
-                Completed activities
-              </p>
-
-              <p className="mt-2 text-3xl font-semibold text-ink">12</p>
-
-              <p className="mt-2 text-xs text-ink/45">
-                3 more than last week
-              </p>
-            </div>
-
-            <div className="rounded-xl bg-emerald-500/10 p-2.5">
-              <CheckCircle2 className="h-5 w-5 text-emerald-600" />
-            </div>
-          </div>
-        </Card>
-
-        <Card className="p-5">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink/40">
-                Active risks
-              </p>
-
-              <p className="mt-2 text-3xl font-semibold text-ink">4</p>
-
-              <p className="mt-2 text-xs text-red-600">
-                1 requires immediate action
-              </p>
-            </div>
-
-            <div className="rounded-xl bg-red-500/10 p-2.5">
-              <AlertTriangle className="h-5 w-5 text-red-600" />
-            </div>
-          </div>
-        </Card>
-      </div>
-
-      <div className="grid gap-6 xl:grid-cols-[1.45fr_0.85fr]">
-        {/* Milestone Performance */}
-        <Card className="p-5 sm:p-6">
-          <div className="flex items-start justify-between">
-            <div>
-              <div className="flex items-center gap-2">
-                <ClipboardCheck className="h-4 w-4 text-teal" />
-
-                <h2 className="font-semibold text-ink">
-                  Milestone performance
-                </h2>
-              </div>
-
-              <p className="mt-1 text-sm text-ink/45">
-                Progress against the approved project plan.
-              </p>
-            </div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              className="flex h-9 w-9 items-center justify-center rounded-[10px] border border-ink/[0.07] text-ink/45 transition hover:bg-ink/[0.04] hover:text-ink"
+              aria-label="Previous week"
+            >
+              <ChevronLeft className="h-4 w-4" strokeWidth={1.8} />
+            </button>
 
             <button
               type="button"
-              className="flex items-center gap-1 text-xs font-medium text-ink/55 transition-colors hover:text-ink"
+              className="flex h-9 items-center gap-2 rounded-[10px] bg-[#18271F] px-4 text-[10px] font-semibold text-white transition hover:bg-[#12613E]"
             >
-              View progress
-              <ArrowUpRight className="h-3.5 w-3.5" />
+              <CalendarDays className="h-3.5 w-3.5" strokeWidth={1.8} />
+              Current week
+            </button>
+
+            <button
+              type="button"
+              className="flex h-9 w-9 items-center justify-center rounded-[10px] border border-ink/[0.07] text-ink/45 transition hover:bg-ink/[0.04] hover:text-ink"
+              aria-label="Next week"
+            >
+              <ChevronRight className="h-4 w-4" strokeWidth={1.8} />
             </button>
           </div>
+        </div>
+      </Card>
 
-          <div className="mt-6 space-y-5">
-            {milestones.map((milestone) => {
-              const status = milestoneStatusConfig[milestone.status]
+      {/* Executive metrics */}
+      <section>
+        <div className="mb-4">
+          <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-[#12613E]">
+            Executive indicators
+          </p>
 
-              return (
-                <div key={milestone.id}>
-                  <div className="flex items-center justify-between gap-4">
-                    <div>
-                      <p className="text-sm font-medium text-ink">
-                        {milestone.name}
-                      </p>
+          <h2 className="mt-1.5 font-display text-xl font-semibold tracking-[-0.035em] text-ink">
+            Weekly position
+          </h2>
+        </div>
 
-                      <p className={`mt-1 text-xs ${status.className}`}>
-                        {status.label}
-                      </p>
-                    </div>
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <MetricCard
+            label="Overall progress"
+            value="64%"
+            description="+6.2% delivered this week"
+            icon={TrendingUp}
+            tone="green"
+            progress={64}
+          />
 
-                    <span className="font-mono text-xs text-ink/55">
-                      {milestone.progress}%
-                    </span>
-                  </div>
+          <MetricCard
+            label="Budget utilisation"
+            value="58%"
+            description="Within approved budget"
+            icon={Wallet}
+            tone="bronze"
+          />
 
-                  <div className="mt-2 h-2 overflow-hidden rounded-full bg-ink/7">
-                    <div
-                      className={`h-full rounded-full ${
-                        milestone.status === 'delayed'
-                          ? 'bg-red-500'
-                          : milestone.status === 'ahead'
-                            ? 'bg-emerald-500'
-                            : 'bg-teal'
-                      }`}
-                      style={{ width: `${milestone.progress}%` }}
+          <MetricCard
+            label="Completed activities"
+            value="12"
+            description="3 more than last week"
+            icon={CheckCircle2}
+            tone="green"
+          />
+
+          <MetricCard
+            label="Active risks"
+            value="4"
+            description="1 requires immediate action"
+            icon={AlertTriangle}
+            tone="critical"
+          />
+        </div>
+      </section>
+
+      {/* Main intelligence */}
+      <div className="grid gap-6 xl:grid-cols-[1.45fr_0.85fr]">
+        {/* Milestones */}
+        <Card className="overflow-hidden">
+          <div className="border-b border-ink/[0.06] px-5 py-5 sm:px-6">
+            <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
+              <div>
+                <div className="flex items-center gap-2.5">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-[#12613E]/[0.07] text-[#12613E]">
+                    <ClipboardCheck
+                      className="h-4 w-4"
+                      strokeWidth={1.7}
                     />
                   </div>
+
+                  <h2 className="font-display text-lg font-semibold tracking-[-0.03em] text-ink">
+                    Milestone performance
+                  </h2>
                 </div>
-              )
-            })}
+
+                <p className="mt-2 text-[11px] leading-5 text-ink/40">
+                  Progress against the approved project plan.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                className="inline-flex items-center gap-1.5 text-[10px] font-semibold text-[#12613E] transition hover:text-[#0D4C31]"
+              >
+                View progress
+                <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={1.8} />
+              </button>
+            </div>
+          </div>
+
+          <div className="space-y-6 p-5 sm:p-6">
+            {milestones.map((milestone) => (
+              <MilestoneRow key={milestone.id} milestone={milestone} />
+            ))}
+          </div>
+
+          <div className="border-t border-ink/[0.06] bg-[#F8F9F7]/70 px-5 py-4 sm:px-6">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <span className="font-mono text-[8px] font-semibold uppercase tracking-[0.14em] text-ink/30">
+                4 milestones monitored
+              </span>
+
+              <span className="text-[10px] text-ink/40">
+                1 delayed · 1 ahead · 2 on track
+              </span>
+            </div>
           </div>
         </Card>
 
-        {/* Weekly Health */}
-        <Card className="p-5 sm:p-6">
-          <div className="flex items-center gap-2">
-            <HardHat className="h-4 w-4 text-amber" />
+        {/* Health */}
+        <Card className="overflow-hidden">
+          <div className="border-b border-ink/[0.06] px-5 py-5 sm:px-6">
+            <div className="flex items-center gap-2.5">
+              <div className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-[#B85C12]/[0.07] text-[#B85C12]">
+                <HardHat className="h-4 w-4" strokeWidth={1.7} />
+              </div>
 
-            <h2 className="font-semibold text-ink">Weekly health</h2>
+              <div>
+                <h2 className="font-display text-lg font-semibold tracking-[-0.03em] text-ink">
+                  Weekly health
+                </h2>
+
+                <p className="mt-0.5 text-[10px] text-ink/40">
+                  Current operating position
+                </p>
+              </div>
+            </div>
           </div>
 
-          <p className="mt-1 text-sm text-ink/45">
-            Overall project health assessment.
-          </p>
+          <div className="space-y-3 p-5 sm:p-6">
+            <HealthCard
+              label="Budget health"
+              status="Healthy"
+              tone="healthy"
+              description="Current spending remains within the approved project budget."
+            />
 
-          <div className="mt-6 space-y-5">
-            <div className="rounded-xl border border-emerald-500/15 bg-emerald-500/[0.04] p-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-ink">
-                  Budget health
-                </span>
+            <HealthCard
+              label="Schedule health"
+              status="Watch"
+              tone="watch"
+              description="One structural milestone requires schedule recovery attention."
+            />
 
-                <span className="font-mono text-[10px] uppercase text-emerald-600">
-                  Healthy
-                </span>
-              </div>
+            <HealthCard
+              label="Quality health"
+              status="Stable"
+              tone="healthy"
+              description="Inspection evidence indicates acceptable quality performance."
+            />
+          </div>
 
-              <p className="mt-2 text-xs leading-relaxed text-ink/50">
-                Current spending remains within the approved project budget.
-              </p>
-            </div>
+          <div className="border-t border-ink/[0.06] px-5 py-4 sm:px-6">
+            <div className="flex items-center gap-2">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#12613E]" />
 
-            <div className="rounded-xl border border-amber-500/15 bg-amber-500/[0.04] p-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-ink">
-                  Schedule health
-                </span>
-
-                <span className="font-mono text-[10px] uppercase text-amber-700">
-                  Watch
-                </span>
-              </div>
-
-              <p className="mt-2 text-xs leading-relaxed text-ink/50">
-                One structural milestone requires schedule recovery attention.
-              </p>
-            </div>
-
-            <div className="rounded-xl border border-emerald-500/15 bg-emerald-500/[0.04] p-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-ink">
-                  Quality health
-                </span>
-
-                <span className="font-mono text-[10px] uppercase text-emerald-600">
-                  Stable
-                </span>
-              </div>
-
-              <p className="mt-2 text-xs leading-relaxed text-ink/50">
-                Inspection evidence indicates acceptable quality performance.
-              </p>
+              <span className="font-mono text-[8px] font-semibold uppercase tracking-[0.14em] text-ink/30">
+                Overall position · Stable
+              </span>
             </div>
           </div>
         </Card>
       </div>
 
-      {/* Weekly Activity */}
+      {/* Weekly activity */}
       <Card className="overflow-hidden">
-        <div className="flex flex-col gap-3 border-b border-ink/8 p-5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 border-b border-ink/[0.06] px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <div>
-            <div className="flex items-center gap-2">
-              <Clock3 className="h-4 w-4 text-teal" />
+            <div className="flex items-center gap-2.5">
+              <div className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-[#12613E]/[0.07] text-[#12613E]">
+                <Clock3 className="h-4 w-4" strokeWidth={1.7} />
+              </div>
 
-              <h2 className="font-semibold text-ink">Weekly activity</h2>
+              <h2 className="font-display text-lg font-semibold tracking-[-0.03em] text-ink">
+                Weekly activity
+              </h2>
             </div>
 
-            <p className="mt-1 text-sm text-ink/45">
+            <p className="mt-2 text-[11px] text-ink/40">
               Key activities recorded during this reporting period.
             </p>
           </div>
 
-          <span className="font-mono text-[10px] text-ink/35">
-            {activities.length} KEY ACTIVITIES
+          <span className="font-mono text-[8px] font-semibold uppercase tracking-[0.14em] text-ink/30">
+            {activities.length} key activities
           </span>
         </div>
 
-        <div className="divide-y divide-ink/7">
+        <div className="divide-y divide-ink/[0.06]">
           {activities.map((activity) => {
             const status = activityStatusConfig[activity.status]
 
             return (
               <div
                 key={activity.id}
-                className="flex flex-col gap-4 p-5 sm:flex-row sm:items-start sm:justify-between"
+                className="group flex flex-col gap-4 px-5 py-5 transition hover:bg-ink/[0.012] sm:px-6 lg:flex-row lg:items-start lg:justify-between"
               >
-                <div className="flex gap-4">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-ink/5">
-                    {activity.status === 'complete' ? (
-                      <CheckCircle2 className="h-5 w-5 text-emerald-600" />
-                    ) : activity.status === 'in-progress' ? (
-                      <Clock3 className="h-5 w-5 text-amber" />
-                    ) : (
-                      <CalendarDays className="h-5 w-5 text-ink/50" />
-                    )}
+                <div className="flex min-w-0 gap-4">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] border border-ink/[0.06] bg-[#F8F9F7]">
+                    <ActivityIcon status={activity.status} />
                   </div>
 
-                  <div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="text-sm font-medium text-ink">
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2.5">
+                      <h3 className="text-[12px] font-semibold tracking-[-0.005em] text-ink">
                         {activity.title}
                       </h3>
 
                       <span
-                        className={`rounded-full px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider ${status.className}`}
+                        className={`rounded-full px-2.5 py-1 font-mono text-[8px] font-semibold uppercase tracking-[0.12em] ${status.className}`}
                       >
                         {status.label}
                       </span>
                     </div>
 
-                    <p className="mt-1.5 max-w-3xl text-sm leading-relaxed text-ink/50">
+                    <p className="mt-2 max-w-3xl text-[11px] leading-5 text-ink/45">
                       {activity.description}
                     </p>
 
-                    <p className="mt-2 font-mono text-[10px] text-ink/35">
-                      {activity.project}
-                    </p>
+                    <div className="mt-2.5 flex items-center gap-2">
+                      <span className="h-1 w-1 rounded-full bg-[#12613E]" />
+
+                      <span className="font-mono text-[9px] font-medium text-ink/35">
+                        {activity.project}
+                      </span>
+                    </div>
                   </div>
                 </div>
 
                 <button
                   type="button"
-                  className="flex shrink-0 items-center gap-1 text-xs text-ink/45 transition-colors hover:text-ink"
+                  className="inline-flex shrink-0 items-center gap-1.5 self-start text-[10px] font-semibold text-ink/35 transition group-hover:text-[#12613E]"
                 >
                   Details
-                  <ChevronRight className="h-3.5 w-3.5" />
+                  <ChevronRight
+                    className="h-3.5 w-3.5"
+                    strokeWidth={1.8}
+                  />
                 </button>
               </div>
             )
@@ -494,53 +657,88 @@ export function WeeklyReport() {
         </div>
       </Card>
 
-      {/* Next Week Priorities */}
-      <Card className="border border-teal/15 bg-teal/[0.025] p-5 sm:p-6">
-        <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-teal/10">
-            <TrendingUp className="h-5 w-5 text-teal" />
-          </div>
+      {/* Next week priorities */}
+      <Card className="overflow-hidden border-[#12613E]/10 bg-[#12613E]/[0.018]">
+        <div className="p-5 sm:p-6 lg:p-7">
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[13px] bg-[#12613E]/[0.08] text-[#12613E]">
+              <TrendingUp className="h-5 w-5" strokeWidth={1.7} />
+            </div>
 
-          <div className="flex-1">
-            <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-teal">
-              Next reporting period
-            </p>
+            <div className="min-w-0 flex-1">
+              <p className="font-mono text-[8px] font-semibold uppercase tracking-[0.17em] text-[#12613E]">
+                Next reporting period
+              </p>
 
-            <h2 className="mt-1 text-lg font-semibold text-ink">
-              Priorities for next week
-            </h2>
+              <h2 className="mt-1.5 font-display text-xl font-semibold tracking-[-0.035em] text-ink">
+                Priorities for next week
+              </h2>
 
-            <div className="mt-4 grid gap-3 sm:grid-cols-3">
-              <div className="rounded-lg bg-paper/70 p-3">
-                <p className="text-sm font-medium text-ink">
-                  Recover structural timeline
-                </p>
-                <p className="mt-1 text-xs text-ink/45">
-                  Address the identified schedule variance.
-                </p>
-              </div>
+              <p className="mt-2 max-w-2xl text-[11px] leading-5 text-ink/40">
+                Focus areas carried forward from the current delivery and
+                health position.
+              </p>
 
-              <div className="rounded-lg bg-paper/70 p-3">
-                <p className="text-sm font-medium text-ink">
-                  Verify material deliveries
-                </p>
-                <p className="mt-1 text-xs text-ink/45">
-                  Confirm procurement readiness.
-                </p>
-              </div>
+              <div className="mt-5 grid gap-3 md:grid-cols-3">
+                <PriorityCard
+                  number="01"
+                  title="Recover structural timeline"
+                  description="Address the identified schedule variance."
+                />
 
-              <div className="rounded-lg bg-paper/70 p-3">
-                <p className="text-sm font-medium text-ink">
-                  Complete quality inspection
-                </p>
-                <p className="mt-1 text-xs text-ink/45">
-                  Resolve outstanding evidence requirements.
-                </p>
+                <PriorityCard
+                  number="02"
+                  title="Verify material deliveries"
+                  description="Confirm procurement readiness before deployment."
+                />
+
+                <PriorityCard
+                  number="03"
+                  title="Complete quality inspection"
+                  description="Resolve outstanding evidence requirements."
+                />
               </div>
             </div>
           </div>
         </div>
+
+        <div className="border-t border-[#12613E]/[0.08] px-5 py-3.5 sm:px-6">
+          <span className="font-mono text-[8px] font-semibold uppercase tracking-[0.14em] text-ink/25">
+            Build OS · Weekly management cycle
+          </span>
+        </div>
       </Card>
+    </div>
+  )
+}
+
+function PriorityCard({
+  number,
+  title,
+  description,
+}: {
+  number: string
+  title: string
+  description: string
+}) {
+  return (
+    <div className="rounded-[14px] border border-ink/[0.05] bg-white/75 p-4 transition hover:border-[#12613E]/10 hover:bg-white">
+      <div className="flex items-center justify-between">
+        <span className="font-mono text-[8px] font-semibold tracking-[0.14em] text-[#12613E]">
+          {number}
+        </span>
+
+        <ArrowUpRight
+          className="h-3.5 w-3.5 text-ink/20"
+          strokeWidth={1.8}
+        />
+      </div>
+
+      <p className="mt-4 text-[11px] font-semibold text-ink">{title}</p>
+
+      <p className="mt-1.5 text-[10px] leading-5 text-ink/40">
+        {description}
+      </p>
     </div>
   )
 }

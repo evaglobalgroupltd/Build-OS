@@ -1,5 +1,7 @@
+
 import { useMemo, useState } from 'react'
 import {
+  ArrowUpRight,
   Calculator,
   CheckCircle2,
   Clock3,
@@ -7,7 +9,9 @@ import {
   Info,
   Plus,
   Send,
+  ShieldCheck,
   Trash2,
+  WalletCards,
 } from 'lucide-react'
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
@@ -80,6 +84,9 @@ export function BidSubmission() {
       0,
     )
   }, [milestones])
+
+  const milestoneIsValid = milestoneTotal === 100
+  const canSubmit = milestoneIsValid && totalCost > 0
 
   function updateCost(
     id: string,
@@ -163,41 +170,117 @@ export function BidSubmission() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
-        <div>
-          <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-ink/5">
-              <FileText className="h-5 w-5 text-ink/65" />
+    <form onSubmit={handleSubmit} className="space-y-7">
+      {/* ─────────────────────────────────────────────────────────────
+          PREMIUM HEADER
+      ───────────────────────────────────────────────────────────── */}
+      <section className="relative overflow-hidden rounded-[24px] bg-[#173629] px-6 py-7 text-white sm:px-8 sm:py-8">
+        <div className="absolute -right-24 -top-28 h-80 w-80 rounded-full bg-white/[0.035]" />
+        <div className="absolute -bottom-32 right-20 h-64 w-64 rounded-full bg-[#B85C12]/10" />
+        <div className="absolute left-[42%] top-1/2 h-40 w-40 -translate-y-1/2 rounded-full bg-white/[0.018]" />
+
+        <div className="relative flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-2xl">
+            <div className="flex items-center gap-2.5">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/[0.09] ring-1 ring-white/10">
+                <FileText className="h-4.5 w-4.5 text-white/80" />
+              </div>
+
+              <div>
+                <p className="text-[9px] font-bold uppercase tracking-[0.20em] text-white/35">
+                  Contractor marketplace
+                </p>
+                <p className="mt-0.5 text-[10px] font-medium text-white/55">
+                  Commercial proposal studio
+                </p>
+              </div>
             </div>
 
-            <span className="text-xs font-semibold uppercase tracking-[0.16em] text-ink/40">
-              Contractor bidding
-            </span>
+            <h1 className="mt-6 font-display text-[30px] font-semibold leading-[1.05] tracking-[-0.04em] sm:text-[38px]">
+              Build a proposal
+              <br className="hidden sm:block" /> worth considering.
+            </h1>
+
+            <p className="mt-4 max-w-xl text-[12px] leading-6 text-white/50 sm:text-[13px]">
+              Present your scope, commercial structure, delivery approach and
+              payment terms with complete clarity.
+            </p>
           </div>
 
-          <h1 className="mt-3 font-display text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
-            Submit a bid
-          </h1>
+          <div className="grid grid-cols-2 gap-2.5 sm:flex sm:items-stretch">
+            <div className="min-w-[128px] rounded-2xl bg-white/[0.07] px-4 py-3.5 ring-1 ring-white/[0.06]">
+              <div className="flex items-center gap-2">
+                <WalletCards className="h-3.5 w-3.5 text-[#D88A46]" />
+                <span className="text-[8px] font-bold uppercase tracking-[0.13em] text-white/35">
+                  Bid value
+                </span>
+              </div>
 
-          <p className="mt-1 max-w-2xl text-sm leading-6 text-ink/50">
-            Prepare a transparent commercial proposal covering scope,
-            quantities, costs, delivery timeline and payment milestones.
-          </p>
+              <p className="mt-2 font-display text-[19px] font-semibold tracking-[-0.02em]">
+                ₦{totalCost.toLocaleString()}
+              </p>
+            </div>
+
+            <div className="min-w-[128px] rounded-2xl bg-white/[0.07] px-4 py-3.5 ring-1 ring-white/[0.06]">
+              <div className="flex items-center gap-2">
+                <Clock3 className="h-3.5 w-3.5 text-white/45" />
+                <span className="text-[8px] font-bold uppercase tracking-[0.13em] text-white/35">
+                  Valid for
+                </span>
+              </div>
+
+              <p className="mt-2 font-display text-[19px] font-semibold tracking-[-0.02em]">
+                {bidValidity || '—'}
+                <span className="ml-1 text-[10px] font-medium text-white/40">
+                  days
+                </span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─────────────────────────────────────────────────────────────
+          PROPOSAL PROGRESS
+      ───────────────────────────────────────────────────────────── */}
+      <div className="flex flex-col gap-3 rounded-[20px] border border-ink/[0.07] bg-white px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+        <div className="flex items-center gap-3">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#EAF4EE]">
+            <ShieldCheck className="h-3.5 w-3.5 text-[#12613E]" />
+          </div>
+
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-ink/35">
+              Proposal readiness
+            </p>
+            <p className="mt-0.5 text-[11px] font-medium text-ink/55">
+              Complete each commercial section before submitting.
+            </p>
+          </div>
         </div>
 
-        <div className="inline-flex w-fit items-center gap-2 rounded-full border border-line bg-white px-3 py-2 text-xs font-medium text-ink/55">
-          <Clock3 className="h-4 w-4" />
-          Bid validity: {bidValidity || '—'} days
+        <div className="flex items-center gap-3">
+          <div className="h-1.5 w-28 overflow-hidden rounded-full bg-ink/[0.06]">
+            <div
+              className={`h-full rounded-full transition-all duration-500 ${
+                canSubmit ? 'w-full bg-[#12613E]' : 'w-1/2 bg-[#B85C12]'
+              }`}
+            />
+          </div>
+
+          <span className="text-[9px] font-bold uppercase tracking-[0.10em] text-ink/35">
+            {canSubmit ? 'Ready to submit' : 'In progress'}
+          </span>
         </div>
       </div>
 
-      {/* Project scope */}
-      <Card>
+      {/* ─────────────────────────────────────────────────────────────
+          PROJECT SCOPE
+      ───────────────────────────────────────────────────────────── */}
+      <Card className="overflow-hidden rounded-[22px] border-ink/[0.07]">
         <CardHeader
           title="Project scope"
-          subtitle="Define the work you are proposing to deliver."
+          subtitle="Define precisely what your proposal covers."
         />
 
         <CardBody>
@@ -220,7 +303,7 @@ export function BidSubmission() {
               </select>
             </Field>
 
-            <Field label="Timeline" required>
+            <Field label="Delivery timeline" required>
               <div className="relative">
                 <input
                   type="number"
@@ -234,7 +317,7 @@ export function BidSubmission() {
                   required
                 />
 
-                <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-ink/35">
+                <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-semibold uppercase tracking-wide text-ink/30">
                   weeks
                 </span>
               </div>
@@ -245,8 +328,8 @@ export function BidSubmission() {
                 <textarea
                   value={scope}
                   onChange={(event) => setScope(event.target.value)}
-                  placeholder="Describe the work, deliverables and responsibilities covered by this bid."
-                  className="textarea min-h-32"
+                  placeholder="Describe the work, deliverables, interfaces and responsibilities covered by this proposal."
+                  className="textarea min-h-36"
                   required
                 />
               </Field>
@@ -255,23 +338,25 @@ export function BidSubmission() {
         </CardBody>
       </Card>
 
-      {/* Cost breakdown */}
-      <Card>
+      {/* ─────────────────────────────────────────────────────────────
+          COST BREAKDOWN
+      ───────────────────────────────────────────────────────────── */}
+      <Card className="overflow-hidden rounded-[22px] border-ink/[0.07]">
         <CardHeader
-          title="Cost breakdown"
-          subtitle="Provide transparent quantities, rates and estimated costs."
+          title="Commercial schedule"
+          subtitle="Build a transparent cost structure from quantities and rates."
           action={
-            <div className="flex items-center gap-2 text-xs text-ink/40">
-              <Calculator className="h-4 w-4" />
-              Auto-calculated
+            <div className="inline-flex items-center gap-2 rounded-full bg-[#F6F8F5] px-3 py-1.5 text-[9px] font-bold uppercase tracking-[0.10em] text-ink/40">
+              <Calculator className="h-3 w-3" />
+              Live calculation
             </div>
           }
         />
 
         <CardBody>
           <div className="overflow-x-auto">
-            <div className="min-w-[760px]">
-              <div className="grid grid-cols-[2fr_1fr_1fr_1.2fr_40px] gap-3 border-b border-line pb-3 text-[10px] font-semibold uppercase tracking-wide text-ink/35">
+            <div className="min-w-[820px]">
+              <div className="grid grid-cols-[2fr_1fr_1fr_1.25fr_40px] gap-3 border-b border-ink/[0.07] pb-3 text-[8px] font-bold uppercase tracking-[0.13em] text-ink/30">
                 <span>Description</span>
                 <span>Quantity</span>
                 <span>Unit</span>
@@ -279,8 +364,8 @@ export function BidSubmission() {
                 <span />
               </div>
 
-              <div className="divide-y divide-line">
-                {costs.map((item) => {
+              <div className="divide-y divide-ink/[0.06]">
+                {costs.map((item, index) => {
                   const subtotal =
                     (Number(item.quantity) || 0) *
                     (Number(item.rate) || 0)
@@ -288,20 +373,26 @@ export function BidSubmission() {
                   return (
                     <div
                       key={item.id}
-                      className="grid grid-cols-[2fr_1fr_1fr_1.2fr_40px] items-center gap-3 py-3"
+                      className="group grid grid-cols-[2fr_1fr_1fr_1.25fr_40px] items-center gap-3 py-4"
                     >
-                      <input
-                        value={item.description}
-                        onChange={(event) =>
-                          updateCost(
-                            item.id,
-                            'description',
-                            event.target.value,
-                          )
-                        }
-                        placeholder="e.g. 12mm reinforcement bars"
-                        className="input"
-                      />
+                      <div className="flex items-center gap-3">
+                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#F6F8F5] font-mono text-[9px] font-semibold text-ink/30">
+                          {String(index + 1).padStart(2, '0')}
+                        </span>
+
+                        <input
+                          value={item.description}
+                          onChange={(event) =>
+                            updateCost(
+                              item.id,
+                              'description',
+                              event.target.value,
+                            )
+                          }
+                          placeholder="e.g. 12mm reinforcement bars"
+                          className="input"
+                        />
+                      </div>
 
                       <input
                         type="number"
@@ -339,40 +430,48 @@ export function BidSubmission() {
                         <option value="lot">lot</option>
                       </select>
 
-                      <div className="relative">
-                        <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs text-ink/35">
-                          ₦
-                        </span>
+                      <div>
+                        <div className="relative">
+                          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-semibold text-ink/30">
+                            ₦
+                          </span>
 
-                        <input
-                          type="number"
-                          min="0"
-                          value={item.rate}
-                          onChange={(event) =>
-                            updateCost(
-                              item.id,
-                              'rate',
-                              event.target.value,
-                            )
-                          }
-                          placeholder="0"
-                          className="input pl-7"
-                        />
+                          <input
+                            type="number"
+                            min="0"
+                            value={item.rate}
+                            onChange={(event) =>
+                              updateCost(
+                                item.id,
+                                'rate',
+                                event.target.value,
+                              )
+                            }
+                            placeholder="0"
+                            className="input pl-7"
+                          />
+                        </div>
 
                         {subtotal > 0 && (
-                          <span className="mt-1 block text-[10px] text-ink/35">
-                            ₦{subtotal.toLocaleString()}
-                          </span>
+                          <div className="mt-1.5 flex items-center justify-between px-1">
+                            <span className="text-[8px] font-semibold uppercase tracking-wide text-ink/25">
+                              Subtotal
+                            </span>
+
+                            <span className="font-mono text-[9px] font-semibold text-ink/45">
+                              ₦{subtotal.toLocaleString()}
+                            </span>
+                          </div>
                         )}
                       </div>
 
                       <button
                         type="button"
                         onClick={() => removeCostItem(item.id)}
-                        className="flex h-9 w-9 items-center justify-center rounded-lg text-ink/30 transition-colors hover:bg-red-500/10 hover:text-red-500"
+                        className="flex h-9 w-9 items-center justify-center rounded-xl text-ink/20 transition-all duration-200 hover:bg-red-500/[0.07] hover:text-red-500"
                         aria-label="Remove cost item"
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2 className="h-3.5 w-3.5" />
                       </button>
                     </div>
                   )
@@ -381,34 +480,40 @@ export function BidSubmission() {
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={addCostItem}
-            className="mt-4 inline-flex items-center gap-2 rounded-xl border border-line px-3 py-2 text-xs font-semibold text-ink/60 transition-colors hover:bg-ink/[0.03] hover:text-ink"
-          >
-            <Plus className="h-3.5 w-3.5" />
-            Add cost item
-          </button>
+          <div className="mt-5 flex flex-col gap-5 border-t border-ink/[0.06] pt-5 sm:flex-row sm:items-end sm:justify-between">
+            <button
+              type="button"
+              onClick={addCostItem}
+              className="group inline-flex w-fit items-center gap-2 rounded-full border border-ink/[0.09] bg-white px-4 py-2.5 text-[10px] font-bold uppercase tracking-[0.08em] text-ink/50 transition-all hover:border-[#173629]/20 hover:bg-[#F6F8F5] hover:text-ink"
+            >
+              <Plus className="h-3.5 w-3.5 transition-transform duration-200 group-hover:rotate-90" />
+              Add cost item
+            </button>
 
-          <div className="mt-6 flex justify-end">
-            <div className="rounded-xl bg-paper-2 px-5 py-4 text-right">
-              <p className="text-[10px] font-semibold uppercase tracking-wide text-ink/35">
-                Estimated bid value
-              </p>
+            <div className="relative overflow-hidden rounded-[18px] bg-[#173629] px-5 py-4 text-right text-white">
+              <div className="absolute -right-8 -top-8 h-20 w-20 rounded-full bg-white/[0.035]" />
 
-              <p className="mt-1 font-display text-2xl font-bold tracking-tight text-ink">
-                ₦{totalCost.toLocaleString()}
-              </p>
+              <div className="relative">
+                <p className="text-[8px] font-bold uppercase tracking-[0.15em] text-white/35">
+                  Estimated bid value
+                </p>
+
+                <p className="mt-1 font-display text-[25px] font-semibold tracking-[-0.025em]">
+                  ₦{totalCost.toLocaleString()}
+                </p>
+              </div>
             </div>
           </div>
         </CardBody>
       </Card>
 
-      {/* Approach */}
-      <Card>
+      {/* ─────────────────────────────────────────────────────────────
+          EXECUTION APPROACH
+      ───────────────────────────────────────────────────────────── */}
+      <Card className="overflow-hidden rounded-[22px] border-ink/[0.07]">
         <CardHeader
           title="Execution approach"
-          subtitle="Explain how you intend to execute and control the work."
+          subtitle="Show the client how you intend to deliver the work."
         />
 
         <CardBody>
@@ -417,123 +522,160 @@ export function BidSubmission() {
               value={approach}
               onChange={(event) => setApproach(event.target.value)}
               placeholder="Describe your execution methodology, workforce, quality controls, procurement approach, reporting and key delivery strategy."
-              className="textarea min-h-36"
+              className="textarea min-h-40"
               required
             />
           </Field>
+
+          <div className="mt-4 flex items-start gap-3 rounded-2xl bg-[#F6F8F5] px-4 py-3.5">
+            <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-ink/30" />
+
+            <p className="text-[10px] leading-5 text-ink/40">
+              Strong proposals make the delivery method easy to understand:
+              explain who will execute the work, how quality will be controlled
+              and how progress will be reported.
+            </p>
+          </div>
         </CardBody>
       </Card>
 
-      {/* Payment milestones */}
-      <Card>
+      {/* ─────────────────────────────────────────────────────────────
+          PAYMENT MILESTONES
+      ───────────────────────────────────────────────────────────── */}
+      <Card className="overflow-hidden rounded-[22px] border-ink/[0.07]">
         <CardHeader
           title="Payment milestones"
-          subtitle="Define when payment should become eligible for release."
+          subtitle="Structure the commercial release points across the project."
         />
 
         <CardBody>
           <div className="space-y-3">
-            {milestones.map((milestone, index) => (
-              <div
-                key={milestone.id}
-                className="grid gap-3 rounded-xl border border-line p-4 sm:grid-cols-[1fr_180px_40px] sm:items-center"
-              >
-                <div>
-                  <label className="text-[10px] font-semibold uppercase tracking-wide text-ink/35">
-                    Milestone {index + 1}
-                  </label>
+            {milestones.map((milestone, index) => {
+              const percentage = Number(milestone.percentage) || 0
 
-                  <input
-                    value={milestone.name}
-                    onChange={(event) =>
-                      updateMilestone(
-                        milestone.id,
-                        'name',
-                        event.target.value,
-                      )
-                    }
-                    placeholder="e.g. Foundation completed"
-                    className="input mt-1"
-                  />
-                </div>
+              return (
+                <div
+                  key={milestone.id}
+                  className="group relative overflow-hidden rounded-[18px] border border-ink/[0.07] bg-white p-4 transition-all duration-200 hover:border-ink/[0.12] hover:shadow-[0_10px_30px_rgba(20,40,30,0.04)]"
+                >
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+                    <div className="flex min-w-0 flex-1 items-center gap-3">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#F6F8F5] font-mono text-[9px] font-bold text-ink/35">
+                        {String(index + 1).padStart(2, '0')}
+                      </div>
 
-                <div>
-                  <label className="text-[10px] font-semibold uppercase tracking-wide text-ink/35">
-                    Percentage
-                  </label>
+                      <div className="min-w-0 flex-1">
+                        <label className="text-[8px] font-bold uppercase tracking-[0.12em] text-ink/30">
+                          Milestone {index + 1}
+                        </label>
 
-                  <div className="relative mt-1">
-                    <input
-                      type="number"
-                      min="0"
-                      max="100"
-                      value={milestone.percentage}
-                      onChange={(event) =>
-                        updateMilestone(
-                          milestone.id,
-                          'percentage',
-                          event.target.value,
-                        )
-                      }
-                      className="input pr-8"
-                    />
+                        <input
+                          value={milestone.name}
+                          onChange={(event) =>
+                            updateMilestone(
+                              milestone.id,
+                              'name',
+                              event.target.value,
+                            )
+                          }
+                          placeholder="e.g. Foundation completed"
+                          className="input mt-1"
+                        />
+                      </div>
+                    </div>
 
-                    <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-ink/35">
-                      %
-                    </span>
+                    <div className="w-full sm:w-[180px]">
+                      <label className="text-[8px] font-bold uppercase tracking-[0.12em] text-ink/30">
+                        Allocation
+                      </label>
+
+                      <div className="relative mt-1">
+                        <input
+                          type="number"
+                          min="0"
+                          max="100"
+                          value={milestone.percentage}
+                          onChange={(event) =>
+                            updateMilestone(
+                              milestone.id,
+                              'percentage',
+                              event.target.value,
+                            )
+                          }
+                          className="input pr-8"
+                        />
+
+                        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-semibold text-ink/30">
+                          %
+                        </span>
+                      </div>
+
+                      <div className="mt-2 h-1 overflow-hidden rounded-full bg-ink/[0.05]">
+                        <div
+                          className="h-full rounded-full bg-[#B85C12] transition-all duration-300"
+                          style={{
+                            width: `${Math.min(Math.max(percentage, 0), 100)}%`,
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => removeMilestone(milestone.id)}
+                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-ink/20 transition-all duration-200 hover:bg-red-500/[0.07] hover:text-red-500"
+                      aria-label="Remove milestone"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
                   </div>
                 </div>
-
-                <button
-                  type="button"
-                  onClick={() => removeMilestone(milestone.id)}
-                  className="flex h-9 w-9 items-center justify-center rounded-lg text-ink/30 transition-colors hover:bg-red-500/10 hover:text-red-500"
-                  aria-label="Remove milestone"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </button>
-              </div>
-            ))}
+              )
+            })}
           </div>
 
-          <div className="mt-4 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+          <div className="mt-5 flex flex-col gap-4 border-t border-ink/[0.06] pt-5 sm:flex-row sm:items-center sm:justify-between">
             <button
               type="button"
               onClick={addMilestone}
-              className="inline-flex w-fit items-center gap-2 rounded-xl border border-line px-3 py-2 text-xs font-semibold text-ink/60 transition-colors hover:bg-ink/[0.03] hover:text-ink"
+              className="group inline-flex w-fit items-center gap-2 rounded-full border border-ink/[0.09] bg-white px-4 py-2.5 text-[10px] font-bold uppercase tracking-[0.08em] text-ink/50 transition-all hover:border-[#173629]/20 hover:bg-[#F6F8F5] hover:text-ink"
             >
-              <Plus className="h-3.5 w-3.5" />
+              <Plus className="h-3.5 w-3.5 transition-transform duration-200 group-hover:rotate-90" />
               Add milestone
             </button>
 
             <div
-              className={
-                milestoneTotal === 100
-                  ? 'flex items-center gap-2 text-xs font-semibold text-emerald-600'
-                  : 'flex items-center gap-2 text-xs font-semibold text-amber-600'
-              }
+              className={`inline-flex items-center gap-2 rounded-full px-3.5 py-2 text-[10px] font-bold ${
+                milestoneIsValid
+                  ? 'bg-[#EAF4EE] text-[#12613E]'
+                  : 'bg-[#F8EEE6] text-[#9A4D0A]'
+              }`}
             >
-              {milestoneTotal === 100 ? (
-                <CheckCircle2 className="h-4 w-4" />
+              {milestoneIsValid ? (
+                <CheckCircle2 className="h-3.5 w-3.5" />
               ) : (
-                <Info className="h-4 w-4" />
+                <Info className="h-3.5 w-3.5" />
               )}
 
-              Milestones total: {milestoneTotal}%
+              {milestoneIsValid
+                ? 'Payment structure balanced'
+                : `Milestones total: ${milestoneTotal}%`}
             </div>
           </div>
         </CardBody>
       </Card>
 
-      {/* Assumptions + validity */}
-      <Card>
+      {/* ─────────────────────────────────────────────────────────────
+          TERMS + VALIDITY
+      ───────────────────────────────────────────────────────────── */}
+      <Card className="overflow-hidden rounded-[22px] border-ink/[0.07]">
         <CardHeader
           title="Terms & assumptions"
-          subtitle="Document the conditions attached to your proposal."
+          subtitle="Make commercial conditions clear before the client reviews your proposal."
         />
 
         <CardBody>
-          <div className="grid gap-5 lg:grid-cols-3">
+          <div className="grid gap-6 lg:grid-cols-3">
             <div className="lg:col-span-2">
               <Field label="Assumptions and exclusions">
                 <textarea
@@ -542,7 +684,7 @@ export function BidSubmission() {
                     setAssumptions(event.target.value)
                   }
                   placeholder="List assumptions, exclusions, client dependencies, site conditions, material assumptions or variation conditions."
-                  className="textarea min-h-32"
+                  className="textarea min-h-36"
                 />
               </Field>
             </div>
@@ -561,24 +703,76 @@ export function BidSubmission() {
                 <option value="90">90 days</option>
               </select>
 
-              <p className="mt-2 text-xs leading-5 text-ink/40">
-                Your quoted price and terms remain valid for this period.
-              </p>
+              <div className="mt-3 rounded-2xl bg-[#F6F8F5] p-3.5">
+                <div className="flex items-start gap-2.5">
+                  <Clock3 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-ink/30" />
+
+                  <p className="text-[10px] leading-5 text-ink/40">
+                    Your quoted price and commercial terms remain valid for
+                    this period.
+                  </p>
+                </div>
+              </div>
             </Field>
           </div>
         </CardBody>
       </Card>
 
-      {/* Submission notice */}
-      <div className="flex gap-3 rounded-xl border border-ink/10 bg-paper-2 p-4">
-        <Info className="mt-0.5 h-4 w-4 shrink-0 text-ink/45" />
+      {/* ─────────────────────────────────────────────────────────────
+          FINAL REVIEW
+      ───────────────────────────────────────────────────────────── */}
+      <section className="relative overflow-hidden rounded-[22px] bg-[#173629] px-5 py-6 text-white sm:px-7 sm:py-7">
+        <div className="absolute -right-16 -top-20 h-52 w-52 rounded-full bg-white/[0.035]" />
+        <div className="absolute -bottom-24 right-32 h-40 w-40 rounded-full bg-[#B85C12]/10" />
+
+        <div className="relative">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+            <div className="max-w-2xl">
+              <div className="flex items-center gap-2">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/[0.08]">
+                  <CheckCircle2 className="h-3.5 w-3.5 text-white/65" />
+                </div>
+
+                <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-white/35">
+                  Final review
+                </span>
+              </div>
+
+              <h2 className="mt-4 font-display text-[20px] font-semibold tracking-[-0.025em] sm:text-[23px]">
+                Your proposal is ready when the numbers are right.
+              </h2>
+
+              <p className="mt-2 max-w-xl text-[11px] leading-5 text-white/45">
+                Review your pricing, timeline, assumptions and payment
+                structure carefully before sending the proposal to the client.
+              </p>
+            </div>
+
+            <div className="shrink-0 rounded-2xl bg-white/[0.07] px-4 py-3 ring-1 ring-white/[0.06]">
+              <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-white/30">
+                Proposal value
+              </p>
+
+              <p className="mt-1 font-display text-[21px] font-semibold tracking-[-0.02em]">
+                ₦{totalCost.toLocaleString()}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─────────────────────────────────────────────────────────────
+          SUBMISSION NOTICE
+      ───────────────────────────────────────────────────────────── */}
+      <div className="flex gap-3 rounded-[18px] border border-[#B85C12]/15 bg-[#FBF6F1] px-4 py-4">
+        <Info className="mt-0.5 h-4 w-4 shrink-0 text-[#B85C12]/70" />
 
         <div>
-          <p className="text-sm font-semibold text-ink">
+          <p className="text-[11px] font-bold text-ink">
             Before you submit
           </p>
 
-          <p className="mt-1 text-xs leading-5 text-ink/45">
+          <p className="mt-1 text-[10px] leading-5 text-ink/45">
             Ensure your pricing, timeline, assumptions and payment milestones
             are accurate. Submitted bids may be reviewed by the client and
             compared with other verified contractor proposals.
@@ -586,22 +780,25 @@ export function BidSubmission() {
         </div>
       </div>
 
-      {/* Actions */}
-      <div className="flex flex-col-reverse justify-end gap-3 sm:flex-row">
+      {/* ─────────────────────────────────────────────────────────────
+          ACTIONS
+      ───────────────────────────────────────────────────────────── */}
+      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
         <button
           type="button"
-          className="rounded-xl border border-line px-5 py-2.5 text-xs font-semibold text-ink/60 transition-colors hover:bg-ink/[0.03] hover:text-ink"
+          className="inline-flex items-center justify-center rounded-full border border-ink/[0.09] bg-white px-5 py-3 text-[10px] font-bold uppercase tracking-[0.08em] text-ink/50 transition-all duration-200 hover:border-ink/[0.15] hover:bg-[#F6F8F5] hover:text-ink"
         >
           Save draft
         </button>
 
         <button
           type="submit"
-          disabled={milestoneTotal !== 100 || totalCost <= 0}
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-ink px-5 py-2.5 text-xs font-semibold text-white transition-opacity disabled:cursor-not-allowed disabled:opacity-40"
+          disabled={!canSubmit}
+          className="group inline-flex items-center justify-center gap-2 rounded-full bg-[#173629] px-6 py-3 text-[10px] font-bold uppercase tracking-[0.08em] text-white shadow-[0_10px_25px_rgba(23,54,41,0.12)] transition-all duration-200 hover:bg-[#214838] hover:shadow-[0_14px_30px_rgba(23,54,41,0.18)] disabled:cursor-not-allowed disabled:opacity-35 disabled:shadow-none"
         >
           <Send className="h-3.5 w-3.5" />
           Submit bid
+          <ArrowUpRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
         </button>
       </div>
     </form>
@@ -617,9 +814,9 @@ interface FieldProps {
 function Field({ label, required, children }: FieldProps) {
   return (
     <div>
-      <label className="mb-1.5 block text-xs font-semibold text-ink/65">
+      <label className="mb-2 block text-[10px] font-bold uppercase tracking-[0.10em] text-ink/45">
         {label}
-        {required && <span className="ml-1 text-red-500">*</span>}
+        {required && <span className="ml-1 text-[#B85C12]">*</span>}
       </label>
 
       {children}

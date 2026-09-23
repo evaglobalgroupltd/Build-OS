@@ -2,48 +2,65 @@
 //
 // BRD reference: Sec. 4.2
 //
-// Keep organization-specific types in this module.
-// Cross-cutting types such as User and UserRole should remain in
-// the root src/types directory.
+// This module owns organization-specific domain contracts.
+//
+// Architecture:
+// - Keep organization-specific types here.
+// - Cross-cutting types such as User, UserRole and Project remain in
+//   the root `src/types` directory.
+// - These types must remain framework-agnostic.
+// - UI-specific concerns such as icons, colors, labels, routes and
+//   presentation classes belong in config/components, not here.
 
-export type OrganizationStatus = 'active' | 'suspended' | 'pending'
 
-export type OrganizationMemberStatus =
+// ============================================================================
+// Organization
+// ============================================================================
+
+export type OrganizationStatus =
   | 'active'
-  | 'invited'
   | 'suspended'
-  | 'removed'
-
-export type OrganizationRoleType = 'system' | 'custom'
-
-export type OrganizationPermissionCategory =
-  | 'organization'
-  | 'projects'
-  | 'finance'
-  | 'procurement'
-  | 'reports'
-  | 'documents'
-  | 'members'
+  | 'pending'
 
 export interface Organization {
   id: string
+
+  /**
+   * Display and legal identity.
+   */
   name: string
   legalName?: string
   registrationNumber?: string
   description?: string
 
+  /**
+   * Organization branding.
+   */
   logoUrl?: string
   website?: string
+
+  /**
+   * Primary organization contact details.
+   */
   email?: string
   phone?: string
 
+  /**
+   * Registered/business location.
+   */
   address?: string
   city?: string
   state?: string
   country?: string
 
+  /**
+   * Current organization lifecycle state.
+   */
   status: OrganizationStatus
 
+  /**
+   * Aggregate organization metrics supplied by the API.
+   */
   memberCount: number
   projectCount: number
   activeProjectCount?: number
@@ -52,16 +69,34 @@ export interface Organization {
   updatedAt: string
 }
 
+
+// ============================================================================
+// Members
+// ============================================================================
+
+export type OrganizationMemberStatus =
+  | 'active'
+  | 'invited'
+  | 'suspended'
+  | 'removed'
+
 export interface OrganizationMember {
   id: string
   organizationId: string
-
   userId: string
+
+  /**
+   * Snapshot information returned for convenient organization views.
+   * The User entity remains the source of truth for global identity data.
+   */
   fullName: string
   email: string
   phone?: string
   avatarUrl?: string
 
+  /**
+   * Organization-specific access assignment.
+   */
   roleId: string
   roleName: string
 
@@ -72,6 +107,15 @@ export interface OrganizationMember {
   lastActiveAt?: string
 }
 
+
+// ============================================================================
+// Roles
+// ============================================================================
+
+export type OrganizationRoleType =
+  | 'system'
+  | 'custom'
+
 export interface OrganizationRole {
   id: string
   organizationId: string
@@ -79,11 +123,24 @@ export interface OrganizationRole {
   name: string
   description: string
 
+  /**
+   * System roles are controlled by the platform.
+   * Custom roles are configurable by authorized organization administrators.
+   */
   type: OrganizationRoleType
 
+  /**
+   * Permission identifiers assigned to this role.
+   *
+   * These values should correspond to OrganizationPermission.id.
+   */
   permissions: string[]
+
   memberCount: number
 
+  /**
+   * Optional policy metadata supplied by the backend.
+   */
   isDefault?: boolean
   isEditable?: boolean
   isDeletable?: boolean
@@ -92,16 +149,55 @@ export interface OrganizationRole {
   updatedAt: string
 }
 
+
+// ============================================================================
+// Permissions
+// ============================================================================
+
+export type OrganizationPermissionCategory =
+  | 'organization'
+  | 'projects'
+  | 'finance'
+  | 'procurement'
+  | 'reports'
+  | 'documents'
+  | 'members'
+
 export interface OrganizationPermission {
   id: string
+
+  /**
+   * Stable machine-readable permission identifier.
+   *
+   * Example:
+   * `organization.members.manage`
+   * `projects.milestones.verify`
+   * `finance.escrow.approve`
+   */
   key: string
+
+  /**
+   * Human-readable permission information.
+   */
   name: string
   description: string
 
   category: OrganizationPermissionCategory
 
+  /**
+   * Presentation/helper state returned when permissions are mapped
+   * against a selected role.
+   *
+   * This should not be interpreted as the user's effective authorization;
+   * the backend remains authoritative.
+   */
   enabled?: boolean
 }
+
+
+// ============================================================================
+// Organization Profile
+// ============================================================================
 
 export interface UpdateOrganizationProfileInput {
   name?: string
@@ -111,6 +207,7 @@ export interface UpdateOrganizationProfileInput {
 
   logoUrl?: string
   website?: string
+
   email?: string
   phone?: string
 
@@ -119,6 +216,11 @@ export interface UpdateOrganizationProfileInput {
   state?: string
   country?: string
 }
+
+
+// ============================================================================
+// Member Management
+// ============================================================================
 
 export interface InviteOrganizationMemberInput {
   email: string
@@ -131,6 +233,11 @@ export interface UpdateOrganizationMemberInput {
   status?: OrganizationMemberStatus
 }
 
+
+// ============================================================================
+// Role Management
+// ============================================================================
+
 export interface CreateOrganizationRoleInput {
   name: string
   description: string
@@ -141,4 +248,19 @@ export interface UpdateOrganizationRoleInput {
   name?: string
   description?: string
   permissionIds?: string[]
+}
+
+
+// ============================================================================
+// Permission Management
+// ============================================================================
+
+/**
+ * Payload used when replacing the complete permission set for a role.
+ *
+ * Kept separate from UpdateOrganizationRoleInput because the permissions
+ * endpoint is an independent authorization boundary.
+ */
+export interface UpdateOrganizationRolePermissionsInput {
+  permissionIds: string[]
 }

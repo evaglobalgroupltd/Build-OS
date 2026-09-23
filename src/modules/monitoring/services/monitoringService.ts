@@ -1,12 +1,13 @@
 // Monitoring module — API service layer
 // BRD references: Sec. 20.3 / 28.1 / 43
 //
-// This file is the single network boundary for the Monitoring module.
-// Pages and UI components should consume this service instead of calling
-// fetch/axios directly.
+// This module is the single network boundary for Monitoring.
+// UI components, hooks, and pages should consume this service rather
+// than calling fetch/axios directly.
 //
-// TODO: Replace the mock-ready contracts below with real HTTP calls once
-// the Monitoring backend API is available.
+// Backend integration:
+// Replace the request helper implementation with the application's
+// shared API client once the Monitoring backend is available.
 
 export type MonitoringReportType = 'daily' | 'weekly' | 'monthly'
 
@@ -29,7 +30,11 @@ export type InspectionOutcome =
   | 'failed'
   | 'pending'
 
-export type RiskSeverity = 'low' | 'medium' | 'high' | 'critical'
+export type RiskSeverity =
+  | 'low'
+  | 'medium'
+  | 'high'
+  | 'critical'
 
 export type RiskCategory =
   | 'budget'
@@ -39,7 +44,49 @@ export type RiskCategory =
   | 'procurement'
   | 'other'
 
-export type RiskStatus = 'open' | 'acknowledged' | 'mitigating' | 'resolved'
+export type RiskStatus =
+  | 'open'
+  | 'acknowledged'
+  | 'mitigating'
+  | 'resolved'
+
+/* -------------------------------------------------------------------------- */
+/* Shared primitives                                                          */
+/* -------------------------------------------------------------------------- */
+
+export interface MonitoringDateRange {
+  startDate?: string
+  endDate?: string
+}
+
+/**
+ * Standard pagination parameters.
+ *
+ * These are optional so the service remains compatible with endpoints
+ * that initially return complete collections.
+ */
+export interface MonitoringPagination {
+  page?: number
+  limit?: number
+}
+
+/**
+ * Generic paginated API response.
+ *
+ * The backend can adopt this shape later without requiring the UI
+ * layer to know about transport-specific details.
+ */
+export interface MonitoringPaginatedResponse<T> {
+  data: T[]
+  page: number
+  limit: number
+  total: number
+  totalPages: number
+}
+
+/* -------------------------------------------------------------------------- */
+/* Dashboard                                                                  */
+/* -------------------------------------------------------------------------- */
 
 /**
  * High-level monitoring information for a project.
@@ -62,16 +109,25 @@ export interface MonitoringDashboard {
   lastUpdated: string
 }
 
+/* -------------------------------------------------------------------------- */
+/* Progress                                                                   */
+/* -------------------------------------------------------------------------- */
+
 /**
- * Project progress tracking data.
+ * Project-level progress tracking.
  */
 export interface ProjectProgress {
   projectId: string
+
   overallProgress: number
 
   plannedProgress: number
   actualProgress: number
 
+  /**
+   * Positive values indicate actual progress is ahead of plan.
+   * Negative values indicate actual progress is behind plan.
+   */
   variance: number
 
   startDate: string
@@ -83,8 +139,12 @@ export interface ProjectProgress {
   updatedAt: string
 }
 
+/* -------------------------------------------------------------------------- */
+/* Monitoring reports                                                         */
+/* -------------------------------------------------------------------------- */
+
 /**
- * Daily, weekly, and monthly site report.
+ * Daily, weekly, or monthly monitoring report.
  */
 export interface MonitoringReport {
   id: string
@@ -115,6 +175,48 @@ export interface MonitoringReport {
 }
 
 /**
+ * Parameters used when requesting monitoring reports.
+ */
+export interface MonitoringReportFilters
+  extends MonitoringDateRange,
+    MonitoringPagination {
+  projectId?: string
+  type?: MonitoringReportType
+  status?: MonitoringReportStatus
+}
+
+/**
+ * Payload for creating a monitoring report.
+ */
+export interface CreateMonitoringReportPayload {
+  projectId: string
+  type: MonitoringReportType
+
+  title: string
+  summary: string
+
+  reportDate: string
+
+  progressPercentage: number
+
+  workCompleted?: string[]
+  workPlanned?: string[]
+
+  issues?: string[]
+  recommendations?: string[]
+}
+
+/**
+ * Payload for updating an existing monitoring report.
+ */
+export type UpdateMonitoringReportPayload =
+  Partial<CreateMonitoringReportPayload>
+
+/* -------------------------------------------------------------------------- */
+/* Inspections                                                                */
+/* -------------------------------------------------------------------------- */
+
+/**
  * Site inspection record.
  */
 export interface Inspection {
@@ -141,7 +243,35 @@ export interface Inspection {
 }
 
 /**
- * Budget, timeline, quality, or operational risk alert.
+ * Parameters used when requesting inspections.
+ */
+export interface InspectionFilters
+  extends MonitoringDateRange,
+    MonitoringPagination {
+  projectId?: string
+  status?: InspectionStatus
+  outcome?: InspectionOutcome
+}
+
+/**
+ * Payload for creating a site inspection.
+ */
+export interface CreateInspectionPayload {
+  projectId: string
+
+  title: string
+  description?: string
+
+  scheduledDate: string
+  inspectorId?: string
+}
+
+/* -------------------------------------------------------------------------- */
+/* Risk alerts                                                                */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Budget, timeline, quality, safety, procurement, or operational risk.
  */
 export interface RiskAlert {
   id: string
@@ -165,77 +295,13 @@ export interface RiskAlert {
 }
 
 /**
- * Parameters used when requesting reports.
- */
-export interface MonitoringReportFilters {
-  projectId?: string
-  type?: MonitoringReportType
-  status?: MonitoringReportStatus
-
-  startDate?: string
-  endDate?: string
-}
-
-/**
- * Parameters used when requesting inspections.
- */
-export interface InspectionFilters {
-  projectId?: string
-  status?: InspectionStatus
-  outcome?: InspectionOutcome
-
-  startDate?: string
-  endDate?: string
-}
-
-/**
  * Parameters used when requesting risk alerts.
  */
-export interface RiskAlertFilters {
+export interface RiskAlertFilters extends MonitoringPagination {
   projectId?: string
   category?: RiskCategory
   severity?: RiskSeverity
   status?: RiskStatus
-}
-
-/**
- * Payload for creating a monitoring report.
- */
-export interface CreateMonitoringReportPayload {
-  projectId: string
-  type: MonitoringReportType
-
-  title: string
-  summary: string
-
-  reportDate: string
-
-  progressPercentage: number
-
-  workCompleted?: string[]
-  workPlanned?: string[]
-
-  issues?: string[]
-  recommendations?: string[]
-}
-
-/**
- * Payload for updating a monitoring report.
- */
-export type UpdateMonitoringReportPayload =
-  Partial<CreateMonitoringReportPayload>
-
-/**
- * Payload for creating a site inspection.
- */
-export interface CreateInspectionPayload {
-  projectId: string
-
-  title: string
-  description?: string
-
-  scheduledDate: string
-  inspectorId?: string
 }
 
 /**
@@ -254,201 +320,233 @@ export interface CreateRiskAlertPayload {
   mitigation?: string
 }
 
+/* -------------------------------------------------------------------------- */
+/* API errors                                                                 */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Normalized error shape exposed by the Monitoring service.
+ *
+ * UI components should not need to understand whether the backend
+ * eventually uses fetch, Axios, or another HTTP client.
+ */
+export interface MonitoringApiError {
+  message: string
+  status?: number
+  code?: string
+  details?: unknown
+}
+
+/**
+ * Creates a consistent error for the current unconnected state.
+ *
+ * Keeping this centralized prevents every service method from having
+ * its own slightly different error message.
+ */
+const createNotConnectedError = (): Error =>
+  new Error(
+    'Monitoring API is not yet connected. Backend implementation pending.',
+  )
+
+/* -------------------------------------------------------------------------- */
+/* Monitoring service                                                         */
+/* -------------------------------------------------------------------------- */
+
 /**
  * Monitoring API service.
  *
- * Replace the TODO sections with the application's shared API client,
- * for example:
+ * This object intentionally contains no UI logic.
  *
- * import { api } from '@/lib/api'
+ * Recommended future integration:
  *
- * Then implement:
+ *   import { api } from '@/lib/api'
  *
- * getDashboard: (projectId) =>
- *   api.get<MonitoringDashboard>(`/monitoring/projects/${projectId}`)
+ * Example:
+ *
+ *   getDashboard: (projectId) =>
+ *     api.get<MonitoringDashboard>(
+ *       `/monitoring/projects/${projectId}`,
+ *     )
+ *
+ * Once the shared API client is connected, only this module should need
+ * to know the Monitoring endpoint structure.
  */
 export const monitoringService = {
+  /* ---------------------------------------------------------------------- */
+  /* Dashboard                                                              */
+  /* ---------------------------------------------------------------------- */
+
   /**
    * Get the complete monitoring overview for a project.
    */
-  getDashboard: async (
+  async getDashboard(
     projectId: string,
-  ): Promise<MonitoringDashboard> => {
+  ): Promise<MonitoringDashboard> {
     void projectId
 
-    throw new Error(
-      'Monitoring API is not yet connected. Backend implementation pending.',
-    )
+    throw createNotConnectedError()
   },
+
+  /* ---------------------------------------------------------------------- */
+  /* Progress                                                               */
+  /* ---------------------------------------------------------------------- */
 
   /**
    * Get progress information for a project.
    */
-  getProgress: async (
+  async getProgress(
     projectId: string,
-  ): Promise<ProjectProgress> => {
+  ): Promise<ProjectProgress> {
     void projectId
 
-    throw new Error(
-      'Monitoring API is not yet connected. Backend implementation pending.',
-    )
+    throw createNotConnectedError()
   },
 
+  /* ---------------------------------------------------------------------- */
+  /* Reports                                                                */
+  /* ---------------------------------------------------------------------- */
+
   /**
-   * Get all monitoring reports.
+   * Get monitoring reports.
    */
-  listReports: async (
+  async listReports(
     filters?: MonitoringReportFilters,
-  ): Promise<MonitoringReport[]> => {
+  ): Promise<MonitoringReport[]> {
     void filters
 
-    throw new Error(
-      'Monitoring API is not yet connected. Backend implementation pending.',
-    )
+    throw createNotConnectedError()
   },
 
   /**
    * Get a single monitoring report.
    */
-  getReport: async (
+  async getReport(
     reportId: string,
-  ): Promise<MonitoringReport> => {
+  ): Promise<MonitoringReport> {
     void reportId
 
-    throw new Error(
-      'Monitoring API is not yet connected. Backend implementation pending.',
-    )
+    throw createNotConnectedError()
   },
 
   /**
    * Create a monitoring report.
    */
-  createReport: async (
+  async createReport(
     payload: CreateMonitoringReportPayload,
-  ): Promise<MonitoringReport> => {
+  ): Promise<MonitoringReport> {
     void payload
 
-    throw new Error(
-      'Monitoring API is not yet connected. Backend implementation pending.',
-    )
+    throw createNotConnectedError()
   },
 
   /**
    * Update a monitoring report.
    */
-  updateReport: async (
+  async updateReport(
     reportId: string,
     payload: UpdateMonitoringReportPayload,
-  ): Promise<MonitoringReport> => {
+  ): Promise<MonitoringReport> {
     void reportId
     void payload
 
-    throw new Error(
-      'Monitoring API is not yet connected. Backend implementation pending.',
-    )
+    throw createNotConnectedError()
   },
 
+  /* ---------------------------------------------------------------------- */
+  /* Inspections                                                            */
+  /* ---------------------------------------------------------------------- */
+
   /**
-   * Get all inspections.
+   * Get inspections.
    */
-  listInspections: async (
+  async listInspections(
     filters?: InspectionFilters,
-  ): Promise<Inspection[]> => {
+  ): Promise<Inspection[]> {
     void filters
 
-    throw new Error(
-      'Monitoring API is not yet connected. Backend implementation pending.',
-    )
+    throw createNotConnectedError()
   },
 
   /**
    * Get a single inspection.
    */
-  getInspection: async (
+  async getInspection(
     inspectionId: string,
-  ): Promise<Inspection> => {
+  ): Promise<Inspection> {
     void inspectionId
 
-    throw new Error(
-      'Monitoring API is not yet connected. Backend implementation pending.',
-    )
+    throw createNotConnectedError()
   },
 
   /**
-   * Create a new site inspection.
+   * Create a site inspection.
    */
-  createInspection: async (
+  async createInspection(
     payload: CreateInspectionPayload,
-  ): Promise<Inspection> => {
+  ): Promise<Inspection> {
     void payload
 
-    throw new Error(
-      'Monitoring API is not yet connected. Backend implementation pending.',
-    )
+    throw createNotConnectedError()
   },
 
+  /* ---------------------------------------------------------------------- */
+  /* Risk alerts                                                            */
+  /* ---------------------------------------------------------------------- */
+
   /**
-   * Get all active and historical risk alerts.
+   * Get active and historical risk alerts.
    */
-  listRiskAlerts: async (
+  async listRiskAlerts(
     filters?: RiskAlertFilters,
-  ): Promise<RiskAlert[]> => {
+  ): Promise<RiskAlert[]> {
     void filters
 
-    throw new Error(
-      'Monitoring API is not yet connected. Backend implementation pending.',
-    )
+    throw createNotConnectedError()
   },
 
   /**
    * Get a single risk alert.
    */
-  getRiskAlert: async (
+  async getRiskAlert(
     riskId: string,
-  ): Promise<RiskAlert> => {
+  ): Promise<RiskAlert> {
     void riskId
 
-    throw new Error(
-      'Monitoring API is not yet connected. Backend implementation pending.',
-    )
+    throw createNotConnectedError()
   },
 
   /**
    * Create a risk alert.
    */
-  createRiskAlert: async (
+  async createRiskAlert(
     payload: CreateRiskAlertPayload,
-  ): Promise<RiskAlert> => {
+  ): Promise<RiskAlert> {
     void payload
 
-    throw new Error(
-      'Monitoring API is not yet connected. Backend implementation pending.',
-    )
+    throw createNotConnectedError()
   },
 
   /**
-   * Mark a risk alert as acknowledged.
+   * Acknowledge a risk alert.
    */
-  acknowledgeRiskAlert: async (
+  async acknowledgeRiskAlert(
     riskId: string,
-  ): Promise<RiskAlert> => {
+  ): Promise<RiskAlert> {
     void riskId
 
-    throw new Error(
-      'Monitoring API is not yet connected. Backend implementation pending.',
-    )
+    throw createNotConnectedError()
   },
 
   /**
    * Resolve a risk alert.
    */
-  resolveRiskAlert: async (
+  async resolveRiskAlert(
     riskId: string,
-  ): Promise<RiskAlert> => {
+  ): Promise<RiskAlert> {
     void riskId
 
-    throw new Error(
-      'Monitoring API is not yet connected. Backend implementation pending.',
-    )
+    throw createNotConnectedError()
   },
-}
+} as const
+
+export type MonitoringService = typeof monitoringService

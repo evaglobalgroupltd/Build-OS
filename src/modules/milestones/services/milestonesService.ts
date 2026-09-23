@@ -1,9 +1,20 @@
 // Milestones module — API service layer
-// BRD references: Sec. 18.4, Sec. 18.2, Sec. 20.1, Sec. 22, Sec. 24
 //
-// This file is the single network boundary for milestone operations.
-// Components and pages should consume milestonesService rather than
-// calling fetch/axios directly.
+// BRD references:
+// - Sec. 15.1 Verification, evidence & audit trail
+// - Sec. 18.2 Payment / dispute controls
+// - Sec. 18.4 Milestone approval rules
+// - Sec. 19.1 Change control
+// - Sec. 20.1 Documents & evidence
+// - Sec. 22 Financial controls
+// - Sec. 23 Client / PM dashboards
+// - Sec. 24 Governance & administration
+//
+// Architecture:
+// - This is the single network boundary for milestone operations.
+// - Pages, components and hooks must consume milestonesService.
+// - No component should call fetch/axios directly for milestone data.
+// - API-specific implementation details should remain inside this module.
 
 import type {
   CreateMilestoneInput,
@@ -13,10 +24,19 @@ import type {
   MilestoneStatus,
 } from './types'
 
-// Import your configured API client here.
-// Adjust the import path to match the project's existing API setup.
-// Example:
-// import { api } from '@/lib/api'
+/**
+ * Import the project's configured API client here.
+ *
+ * Example:
+ * import { api } from '@/lib/api'
+ *
+ * Keep the import isolated to this service so the rest of the
+ * milestones module remains independent of the HTTP implementation.
+ */
+
+// -----------------------------------------------------------------------------
+// Query types
+// -----------------------------------------------------------------------------
 
 export interface MilestoneListParams {
   projectId: string
@@ -33,6 +53,186 @@ export interface MilestoneEvidenceInput {
   evidence: MilestoneEvidence
 }
 
+// -----------------------------------------------------------------------------
+// Review / workflow types
+// -----------------------------------------------------------------------------
+
+export interface MilestoneRejectionInput {
+  reason: string
+}
+
+export interface MilestoneEvidenceRequestInput {
+  message: string
+}
+
+export interface MilestoneDisputeInput {
+  reason: string
+}
+
+export type MilestoneAuditAction =
+  | 'created'
+  | 'updated'
+  | 'evidence_submitted'
+  | 'review_requested'
+  | 'reviewed'
+  | 'approved'
+  | 'rejected'
+  | 'evidence_requested'
+  | 'disputed'
+  | 'status_changed'
+  | 'payment_released'
+  | 'payment_frozen'
+
+export interface MilestoneAuditEntry {
+  id: string
+  milestoneId: string
+  action: MilestoneAuditAction
+  actorId: string
+  actorName?: string
+  actorRole?: string
+  timestamp: string
+  previousStatus?: MilestoneStatus
+  newStatus?: MilestoneStatus
+  comment?: string
+  metadata?: Record<string, unknown>
+}
+
+// -----------------------------------------------------------------------------
+// Service error
+// -----------------------------------------------------------------------------
+
+export class MilestonesServiceError extends Error {
+  readonly code?: string
+  readonly status?: number
+
+  constructor(
+    message: string,
+    options?: {
+      code?: string
+      status?: number
+    },
+  ) {
+    super(message)
+
+    this.name = 'MilestonesServiceError'
+    this.code = options?.code
+    this.status = options?.status
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Endpoint map
+// -----------------------------------------------------------------------------
+
+const endpoints = {
+  collection: '/milestones',
+
+  byId: (id: string) => `/milestones/${encodeURIComponent(id)}`,
+
+  evidence: (id: string) =>
+    `/milestones/${encodeURIComponent(id)}/evidence`,
+
+  review: (id: string) =>
+    `/milestones/${encodeURIComponent(id)}/review`,
+
+  approve: (id: string) =>
+    `/milestones/${encodeURIComponent(id)}/approve`,
+
+  reject: (id: string) =>
+    `/milestones/${encodeURIComponent(id)}/reject`,
+
+  requestEvidence: (id: string) =>
+    `/milestones/${encodeURIComponent(id)}/request-evidence`,
+
+  dispute: (id: string) =>
+    `/milestones/${encodeURIComponent(id)}/dispute`,
+
+  audit: (id: string) =>
+    `/milestones/${encodeURIComponent(id)}/audit`,
+} as const
+
+// -----------------------------------------------------------------------------
+// API client contract
+// -----------------------------------------------------------------------------
+
+/**
+ * Minimal contract expected from the application's API client.
+ *
+ * This keeps the milestone service decoupled from Axios, fetch wrappers,
+ * React Query clients, etc.
+ *
+ * Replace the local type with your project's shared API client when available.
+ */
+interface ApiClient {
+  get<T>(
+    url: string,
+    options?: {
+      params?: Record<string, unknown>
+    },
+  ): Promise<T>
+
+  post<T>(
+    url: string,
+    body?: unknown,
+  ): Promise<T>
+
+  patch<T>(
+    url: string,
+    body?: unknown,
+  ): Promise<T>
+}
+
+// -----------------------------------------------------------------------------
+// API client placeholder
+// -----------------------------------------------------------------------------
+
+/**
+ * Connect this to the project's configured API client.
+ *
+ * Example:
+ *
+ * import { api } from '@/lib/api'
+ *
+ * const apiClient = api
+ *
+ * The cast below exists only so this service remains structurally ready
+ * while the project's actual API client is being wired.
+ */
+const apiClient = null as unknown as ApiClient
+
+// -----------------------------------------------------------------------------
+// Internal guards
+// -----------------------------------------------------------------------------
+
+function assertId(id: string, resource = 'milestone'): void {
+  if (!id.trim()) {
+    throw new MilestonesServiceError(
+      `${resource} ID is required.`,
+      {
+        code: 'INVALID_ID',
+      },
+    )
+  }
+}
+
+function assertRequiredText(
+  value: string,
+  field: string,
+): void {
+  if (!value.trim()) {
+    throw new MilestonesServiceError(
+      `${field} is required.`,
+      {
+        code: 'INVALID_INPUT',
+      },
+    )
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Service
+// -----------------------------------------------------------------------------
+
 export const milestonesService = {
   /**
    * Get all milestones belonging to a project.
@@ -40,165 +240,247 @@ export const milestonesService = {
    * BRD:
    * - Sec. 18.4 Milestone Approval Rules
    * - Sec. 23 Client / PM dashboards
+   *
+   * Supports optional status filtering while keeping project scope mandatory.
    */
   async list(
     params: MilestoneListParams,
   ): Promise<MilestoneListResponse> {
-    // return api.get<MilestoneListResponse>('/milestones', { params })
-    throw new Error('Milestones API not implemented')
+    assertRequiredText(params.projectId, 'Project ID')
+
+    return apiClient.get<MilestoneListResponse>(
+      endpoints.collection,
+      {
+        params: {
+          projectId: params.projectId,
+          ...(params.status
+            ? {
+                status: params.status,
+              }
+            : {}),
+        },
+      },
+    )
   },
 
   /**
-   * Get a single milestone and its current approval state.
+   * Get a single milestone and its current workflow state.
+   *
+   * The returned milestone should represent the authoritative server state,
+   * including approval, evidence and payment-readiness information.
    */
   async get(id: string): Promise<Milestone> {
-    // return api.get<Milestone>(`/milestones/${id}`)
-    throw new Error('Milestone API not implemented')
+    assertId(id)
+
+    return apiClient.get<Milestone>(
+      endpoints.byId(id),
+    )
   },
 
   /**
    * Create a new milestone for a project.
    *
    * BRD:
-   * - Sec. 18.4
+   * - Sec. 18.4 Milestone approval rules
    * - Sec. 19.1 Change control
    */
-  async create(input: CreateMilestoneInput): Promise<Milestone> {
-    // return api.post<Milestone>('/milestones', input)
-    throw new Error('Create milestone API not implemented')
+  async create(
+    input: CreateMilestoneInput,
+  ): Promise<Milestone> {
+    return apiClient.post<Milestone>(
+      endpoints.collection,
+      input,
+    )
   },
 
   /**
-   * Update a milestone before it enters a locked/approved state.
+   * Update a milestone before it enters a locked / approved state.
+   *
+   * The backend remains responsible for enforcing workflow restrictions.
+   * The frontend should never be treated as the authority for determining
+   * whether an update is permitted.
    */
   async update(
     id: string,
     input: Partial<CreateMilestoneInput>,
   ): Promise<Milestone> {
-    // return api.patch<Milestone>(`/milestones/${id}`, input)
-    throw new Error('Update milestone API not implemented')
+    assertId(id)
+
+    return apiClient.patch<Milestone>(
+      endpoints.byId(id),
+      input,
+    )
   },
 
   /**
    * Submit milestone evidence.
    *
-   * Evidence can include:
-   * - photos
+   * Evidence may include:
+   * - photographs
    * - videos
    * - completion notes
-   * - material usage summary
-   * - labour summary
+   * - material usage summaries
+   * - labour summaries
    * - receipts
-   * - professional sign-off
+   * - professional documentation
+   * - supporting reports
    *
    * BRD Sec. 18.4:
-   * Evidence must support milestone approval and payment.
+   * Evidence must support milestone verification and payment.
    */
   async submitEvidence(
     input: MilestoneEvidenceInput,
   ): Promise<Milestone> {
-    // return api.post<Milestone>(
-    //   `/milestones/${input.milestoneId}/evidence`,
-    //   input.evidence,
-    // )
-    throw new Error('Milestone evidence API not implemented')
+    assertId(input.milestoneId)
+
+    return apiClient.post<Milestone>(
+      endpoints.evidence(input.milestoneId),
+      input.evidence,
+    )
   },
 
   /**
    * Request milestone review.
    *
-   * Moves a completed milestone into the verification workflow.
+   * Moves a completed milestone into the formal verification workflow.
+   *
+   * Review should only become available when the milestone has satisfied
+   * the applicable submission requirements. The backend remains authoritative.
    */
-  async requestReview(id: string): Promise<Milestone> {
-    // return api.post<Milestone>(`/milestones/${id}/review`)
-    throw new Error('Milestone review API not implemented')
+  async requestReview(
+    id: string,
+  ): Promise<Milestone> {
+    assertId(id)
+
+    return apiClient.post<Milestone>(
+      endpoints.review(id),
+    )
   },
 
   /**
    * PM / Professional milestone review.
    *
-   * A milestone cannot proceed to payment based on contractor evidence alone.
+   * A milestone must not proceed toward payment based solely on
+   * contractor-submitted evidence.
    *
    * BRD Sec. 15.1:
-   * - Independent verification
-   * - Evidence before payment
-   * - Client approval
+   * - independent verification
+   * - evidence before payment
+   * - client approval
    */
   async review(
     id: string,
     input: MilestoneReviewInput,
   ): Promise<Milestone> {
-    // return api.post<Milestone>(
-    //   `/milestones/${id}/review`,
-    //   input,
-    // )
-    throw new Error('Milestone review API not implemented')
+    assertId(id)
+
+    return apiClient.post<Milestone>(
+      endpoints.review(id),
+      input,
+    )
   },
 
   /**
    * Client approval of a verified milestone.
    *
-   * Major payments and milestone approval require client approval.
+   * Major milestone payments require client approval in addition to
+   * the applicable professional / project verification workflow.
    */
-  async approve(id: string): Promise<Milestone> {
-    // return api.post<Milestone>(`/milestones/${id}/approve`)
-    throw new Error('Milestone approval API not implemented')
+  async approve(
+    id: string,
+  ): Promise<Milestone> {
+    assertId(id)
+
+    return apiClient.post<Milestone>(
+      endpoints.approve(id),
+    )
   },
 
   /**
    * Reject a milestone after review.
    *
-   * Rejection should normally include a reason and may request
-   * additional evidence or corrective work.
+   * Rejection should include a meaningful reason and may result in:
+   * - corrective work
+   * - additional evidence
+   * - another verification cycle
    */
   async reject(
     id: string,
     reason: string,
   ): Promise<Milestone> {
-    // return api.post<Milestone>(`/milestones/${id}/reject`, {
-    //   reason,
-    // })
-    throw new Error('Milestone rejection API not implemented')
+    assertId(id)
+    assertRequiredText(reason, 'Rejection reason')
+
+    const input: MilestoneRejectionInput = {
+      reason: reason.trim(),
+    }
+
+    return apiClient.post<Milestone>(
+      endpoints.reject(id),
+      input,
+    )
   },
 
   /**
    * Request additional evidence.
+   *
+   * This keeps the milestone inside the verification workflow rather than
+   * treating missing evidence as an automatic rejection.
    */
   async requestMoreEvidence(
     id: string,
     message: string,
   ): Promise<Milestone> {
-    // return api.post<Milestone>(
-    //   `/milestones/${id}/request-evidence`,
-    //   { message },
-    // )
-    throw new Error('Request evidence API not implemented')
+    assertId(id)
+    assertRequiredText(message, 'Evidence request message')
+
+    const input: MilestoneEvidenceRequestInput = {
+      message: message.trim(),
+    }
+
+    return apiClient.post<Milestone>(
+      endpoints.requestEvidence(id),
+      input,
+    )
   },
 
   /**
    * Mark a milestone as disputed.
    *
    * BRD Sec. 18.2:
-   * disputed payment lines must be frozen.
+   * Disputed payment lines must be frozen until the dispute is resolved.
    */
   async dispute(
     id: string,
     reason: string,
   ): Promise<Milestone> {
-    // return api.post<Milestone>(`/milestones/${id}/dispute`, {
-    //   reason,
-    // })
-    throw new Error('Milestone dispute API not implemented')
+    assertId(id)
+    assertRequiredText(reason, 'Dispute reason')
+
+    const input: MilestoneDisputeInput = {
+      reason: reason.trim(),
+    }
+
+    return apiClient.post<Milestone>(
+      endpoints.dispute(id),
+      input,
+    )
   },
 
   /**
-   * Get the evidence attached to a milestone.
+   * Get all evidence attached to a milestone.
+   *
+   * Evidence should be returned from the server as the authoritative
+   * verification record.
    */
-  async getEvidence(id: string): Promise<MilestoneEvidence[]> {
-    // return api.get<MilestoneEvidence[]>(
-    //   `/milestones/${id}/evidence`,
-    // )
-    throw new Error('Milestone evidence API not implemented')
+  async getEvidence(
+    id: string,
+  ): Promise<MilestoneEvidence[]> {
+    assertId(id)
+
+    return apiClient.get<MilestoneEvidence[]>(
+      endpoints.evidence(id),
+    )
   },
 
   /**
@@ -206,10 +488,17 @@ export const milestonesService = {
    *
    * BRD Sec. 15.1:
    * Every approval, rejection, status change and financial action
-   * must be logged.
+   * must be auditable.
    */
-  async getAuditHistory(id: string) {
-    // return api.get(`/milestones/${id}/audit`)
-    throw new Error('Milestone audit API not implemented')
+  async getAuditHistory(
+    id: string,
+  ): Promise<MilestoneAuditEntry[]> {
+    assertId(id)
+
+    return apiClient.get<MilestoneAuditEntry[]>(
+      endpoints.audit(id),
+    )
   },
 }
+
+export type MilestonesService = typeof milestonesService

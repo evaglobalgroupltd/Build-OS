@@ -1,3 +1,4 @@
+
 import {
   ArrowRight,
   CheckCircle2,
@@ -75,102 +76,123 @@ function formatAmount(amount: number) {
 
 export function Resolution() {
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
-        <div>
-          <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-ink/5">
-              <Scale className="h-5 w-5 text-ink/65" />
-            </div>
+    <div className="space-y-7">
+      {/* ------------------------------------------------------------------ */}
+      {/* Executive header                                                    */}
+      {/* ------------------------------------------------------------------ */}
+      <section className="relative overflow-hidden rounded-[28px] bg-[#173629] px-6 py-7 text-white shadow-[0_24px_70px_rgba(23,54,41,0.16)] sm:px-8 sm:py-8">
+        <div className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full border border-white/[0.06]" />
+        <div className="pointer-events-none absolute -right-5 -top-10 h-40 w-40 rounded-full border border-white/[0.05]" />
+        <div className="pointer-events-none absolute -bottom-24 left-1/3 h-52 w-52 rounded-full bg-[#B85C12]/10 blur-3xl" />
 
-            <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-ink/40">
-              Dispute Resolution
-            </span>
+        <div className="relative">
+          <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/45">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#D58A52]" />
+            Dispute resolution
           </div>
 
-          <h1 className="mt-3 font-display text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
-            Resolution
-          </h1>
-
-          <p className="mt-1 max-w-2xl text-sm leading-6 text-ink/50">
-            Review the proposed outcome, financial action and corrective
-            measures before the dispute is formally closed.
-          </p>
-        </div>
-
-        <Badge tone="amber">
-          <span className="inline-flex items-center gap-1.5">
-            <LockKeyhole className="h-3.5 w-3.5" />
-            Awaiting final decision
-          </span>
-        </Badge>
-      </div>
-
-      {/* Case summary */}
-      <Card className="overflow-hidden">
-        <div className="border-b border-line px-6 py-5">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-            <div className="flex gap-3">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-ink/5">
-                <Gavel className="h-5 w-5 text-ink/60" />
-              </div>
-
-              <div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <h2 className="font-display text-lg font-semibold text-ink">
-                    {resolution.category}
-                  </h2>
-
-                  <Badge tone="amber">Recommendation issued</Badge>
+          <div className="mt-4 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-2xl">
+              <div className="flex items-center gap-3">
+                <div className="flex h-12 w-12 items-center justify-center rounded-[15px] border border-white/10 bg-white/[0.07]">
+                  <Scale className="h-5 w-5 text-[#D58A52]" />
                 </div>
 
-                <p className="mt-1 text-xs text-ink/45">
-                  {resolution.project}
-                </p>
+                <h1 className="font-display text-3xl font-semibold tracking-[-0.035em] sm:text-4xl">
+                  Resolution
+                </h1>
               </div>
+
+              <p className="mt-4 text-sm leading-6 text-white/55">
+                Review the proposed outcome, financial action and corrective
+                measures before the dispute is formally closed.
+              </p>
             </div>
 
-            <span className="rounded-full border border-line bg-paper-2 px-3 py-1.5 font-mono text-[10px] font-medium text-ink/45">
-              {resolution.disputeId}
-            </span>
+            <div className="flex w-fit items-center gap-2 rounded-full border border-[#D58A52]/20 bg-[#D58A52]/10 px-3.5 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#E0A878]">
+              <LockKeyhole className="h-3.5 w-3.5" />
+              Awaiting final decision
+            </div>
+          </div>
+
+          <div className="mt-7 grid gap-3 border-t border-white/[0.08] pt-5 sm:grid-cols-3">
+            <div>
+              <p className="text-[9px] font-semibold uppercase tracking-[0.15em] text-white/30">
+                Case
+              </p>
+              <p className="mt-1 font-mono text-xs font-medium text-white/70">
+                {resolution.disputeId}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-[9px] font-semibold uppercase tracking-[0.15em] text-white/30">
+                Project
+              </p>
+              <p className="mt-1 truncate text-xs font-medium text-white/70">
+                {resolution.project}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-[9px] font-semibold uppercase tracking-[0.15em] text-white/30">
+                Affected value
+              </p>
+              <p className="mt-1 font-mono text-xs font-semibold text-[#E0A878]">
+                {formatAmount(resolution.amount)}
+              </p>
+            </div>
           </div>
         </div>
+      </section>
+
+      {/* ------------------------------------------------------------------ */}
+      {/* Case snapshot                                                       */}
+      {/* ------------------------------------------------------------------ */}
+      <Card className="overflow-hidden rounded-[24px] border-ink/[0.07] bg-white shadow-[0_14px_45px_rgba(0,0,0,0.04)]">
+        <CardHeader
+          title="Case snapshot"
+          subtitle="Core information attached to the proposed resolution"
+        />
 
         <CardBody>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-ink/35">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="rounded-[16px] border border-ink/[0.06] bg-paper-2/60 p-4">
+              <p className="text-[9px] font-semibold uppercase tracking-[0.14em] text-ink/30">
                 Raised by
               </p>
-              <p className="mt-1.5 text-sm font-semibold text-ink">
+
+              <p className="mt-2 text-sm font-semibold text-ink">
                 {resolution.raisedBy}
               </p>
             </div>
 
-            <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-ink/35">
+            <div className="rounded-[16px] border border-ink/[0.06] bg-paper-2/60 p-4">
+              <p className="text-[9px] font-semibold uppercase tracking-[0.14em] text-ink/30">
                 Respondent
               </p>
-              <p className="mt-1.5 text-sm font-semibold text-ink">
+
+              <p className="mt-2 text-sm font-semibold text-ink">
                 {resolution.respondent}
               </p>
             </div>
 
-            <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-ink/35">
+            <div className="rounded-[16px] border border-[#B85C12]/10 bg-[#F7EFE8]/60 p-4">
+              <p className="text-[9px] font-semibold uppercase tracking-[0.14em] text-ink/30">
                 Affected amount
               </p>
-              <p className="mt-1.5 font-mono text-sm font-semibold text-ink">
+
+              <p className="mt-2 font-mono text-sm font-semibold text-ink">
                 {formatAmount(resolution.amount)}
               </p>
             </div>
 
-            <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-ink/35">
+            <div className="rounded-[16px] border border-ink/[0.06] bg-paper-2/60 p-4">
+              <p className="text-[9px] font-semibold uppercase tracking-[0.14em] text-ink/30">
                 Last updated
               </p>
-              <p className="mt-1.5 text-sm font-semibold text-ink">
+
+              <p className="mt-2 text-sm font-semibold text-ink">
                 {resolution.lastUpdated}
               </p>
             </div>
@@ -178,80 +200,114 @@ export function Resolution() {
         </CardBody>
       </Card>
 
-      {/* Resolution workflow */}
-      <Card className="p-6">
-        <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-ink/40">
-            Resolution workflow
-          </p>
+      {/* ------------------------------------------------------------------ */}
+      {/* Resolution workflow                                                 */}
+      {/* ------------------------------------------------------------------ */}
+      <Card className="rounded-[24px] border-ink/[0.07] bg-white p-6 shadow-[0_14px_45px_rgba(0,0,0,0.035)] sm:p-7">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.17em] text-ink/35">
+              Resolution workflow
+            </p>
 
-          <h2 className="mt-1 font-display text-lg font-semibold text-ink">
-            Case progress
-          </h2>
+            <h2 className="mt-1.5 font-display text-xl font-semibold tracking-[-0.025em] text-ink">
+              Case progress
+            </h2>
+          </div>
+
+          <span className="text-[10px] font-medium uppercase tracking-[0.12em] text-ink/30">
+            4 of 5 stages complete
+          </span>
         </div>
 
-        <div className="mt-7">
-          <div className="grid gap-5 md:grid-cols-5">
-            {resolutionSteps.map((step, index) => (
-              <div key={step.label} className="relative">
-                {index < resolutionSteps.length - 1 && (
-                  <div
-                    className={`absolute left-8 right-[-20px] top-4 hidden h-px md:block ${
-                      step.complete ? 'bg-ink/20' : 'bg-line'
-                    }`}
-                  />
-                )}
+        <div className="mt-8">
+          <div className="grid gap-7 md:grid-cols-5 md:gap-4">
+            {resolutionSteps.map((step, index) => {
+              const isCurrent = !step.complete
+              const isLast = index === resolutionSteps.length - 1
 
-                <div className="relative">
-                  <div
-                    className={`flex h-8 w-8 items-center justify-center rounded-full border ${
-                      step.complete
-                        ? 'border-ink bg-ink text-white'
-                        : 'border-line bg-paper-2 text-ink/30'
-                    }`}
-                  >
-                    {step.complete ? (
-                      <CheckCircle2 className="h-4 w-4" />
-                    ) : (
-                      <span className="h-2 w-2 rounded-full bg-ink/20" />
-                    )}
+              return (
+                <div key={step.label} className="relative">
+                  {!isLast && (
+                    <div
+                      className={`absolute left-8 right-[-16px] top-4 hidden h-px md:block ${
+                        step.complete
+                          ? 'bg-[#173629]/20'
+                          : 'bg-ink/[0.07]'
+                      }`}
+                    />
+                  )}
+
+                  <div className="relative">
+                    <div
+                      className={`flex h-8 w-8 items-center justify-center rounded-full border ${
+                        step.complete
+                          ? 'border-[#173629] bg-[#173629] text-white shadow-[0_5px_15px_rgba(23,54,41,0.12)]'
+                          : 'border-[#B85C12]/30 bg-[#F7EFE8] text-[#B85C12]'
+                      }`}
+                    >
+                      {step.complete ? (
+                        <CheckCircle2 className="h-4 w-4" />
+                      ) : (
+                        <span className="h-2 w-2 rounded-full bg-[#B85C12]" />
+                      )}
+                    </div>
+
+                    <p
+                      className={`mt-3 text-xs font-semibold ${
+                        isCurrent ? 'text-[#B85C12]' : 'text-ink'
+                      }`}
+                    >
+                      {step.label}
+                    </p>
+
+                    <p className="mt-1 max-w-[150px] text-[11px] leading-4 text-ink/40">
+                      {step.description}
+                    </p>
                   </div>
-
-                  <p className="mt-3 text-xs font-semibold text-ink">
-                    {step.label}
-                  </p>
-
-                  <p className="mt-1 text-[11px] leading-4 text-ink/40">
-                    {step.description}
-                  </p>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       </Card>
 
-      {/* Recommendation + financial action */}
+      {/* ------------------------------------------------------------------ */}
+      {/* Recommendation + authority                                          */}
+      {/* ------------------------------------------------------------------ */}
       <div className="grid gap-6 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
+        <Card className="overflow-hidden rounded-[24px] border-ink/[0.07] bg-white shadow-[0_14px_45px_rgba(0,0,0,0.04)] lg:col-span-2">
           <CardHeader
             title="Resolution recommendation"
             subtitle="Proposed outcome based on the evidence and review"
           />
 
           <CardBody>
-            <div className="rounded-2xl border border-amber-500/15 bg-amber-500/[0.04] p-5">
-              <div className="flex gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/10">
-                  <ClipboardCheck className="h-5 w-5 text-amber-700" />
+            <div className="relative overflow-hidden rounded-[20px] bg-[#173629] p-5 text-white sm:p-6">
+              <div className="pointer-events-none absolute -right-12 -top-16 h-40 w-40 rounded-full border border-white/[0.05]" />
+              <div className="pointer-events-none absolute -bottom-20 left-1/2 h-40 w-40 rounded-full bg-[#B85C12]/10 blur-3xl" />
+
+              <div className="relative flex gap-4">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] border border-white/10 bg-white/[0.07]">
+                  <ClipboardCheck className="h-[19px] w-[19px] text-[#D58A52]" />
                 </div>
 
-                <div>
-                  <p className="text-sm font-semibold text-ink">
-                    {resolution.outcome}
-                  </p>
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-white/35">
+                      Recommended outcome
+                    </p>
 
-                  <p className="mt-2 text-sm leading-6 text-ink/55">
+                    <span className="rounded-full bg-[#D58A52]/10 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.1em] text-[#E0A878]">
+                      Recommendation issued
+                    </span>
+                  </div>
+
+                  <h3 className="mt-2 font-display text-xl font-semibold tracking-[-0.02em] text-white">
+                    {resolution.outcome}
+                  </h3>
+
+                  <p className="mt-3 max-w-2xl text-sm leading-6 text-white/55">
                     {resolution.recommendation}
                   </p>
                 </div>
@@ -259,28 +315,38 @@ export function Resolution() {
             </div>
 
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
-              <div className="rounded-xl border border-line p-4">
-                <div className="flex items-center gap-2">
-                  <WalletCards className="h-4 w-4 text-ink/50" />
+              <div className="group rounded-[18px] border border-ink/[0.07] bg-paper-2/60 p-5 transition-all duration-300 hover:border-ink/10 hover:bg-white hover:shadow-[0_10px_30px_rgba(0,0,0,0.04)]">
+                <div className="flex items-center gap-2.5">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#F7EFE8]">
+                    <WalletCards className="h-4 w-4 text-[#B85C12]" />
+                  </div>
+
                   <p className="text-xs font-semibold text-ink">
                     Financial action
                   </p>
                 </div>
 
-                <p className="mt-2 text-sm font-medium text-ink/65">
+                <p className="mt-4 font-display text-xl font-semibold tracking-[-0.02em] text-ink">
                   {resolution.financialAction}
+                </p>
+
+                <p className="mt-1.5 text-[11px] leading-5 text-ink/40">
+                  Payment treatment associated with this recommendation.
                 </p>
               </div>
 
-              <div className="rounded-xl border border-line p-4">
-                <div className="flex items-center gap-2">
-                  <FileCheck2 className="h-4 w-4 text-ink/50" />
+              <div className="group rounded-[18px] border border-ink/[0.07] bg-paper-2/60 p-5 transition-all duration-300 hover:border-ink/10 hover:bg-white hover:shadow-[0_10px_30px_rgba(0,0,0,0.04)]">
+                <div className="flex items-center gap-2.5">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-ink/[0.045]">
+                    <FileCheck2 className="h-4 w-4 text-ink/55" />
+                  </div>
+
                   <p className="text-xs font-semibold text-ink">
                     Corrective action
                   </p>
                 </div>
 
-                <p className="mt-2 text-sm leading-5 text-ink/55">
+                <p className="mt-4 text-sm leading-5 text-ink/60">
                   {resolution.correctiveAction}
                 </p>
               </div>
@@ -289,48 +355,57 @@ export function Resolution() {
         </Card>
 
         {/* Review authority */}
-        <Card>
+        <Card className="rounded-[24px] border-ink/[0.07] bg-white shadow-[0_14px_45px_rgba(0,0,0,0.04)]">
           <CardHeader
             title="Review authority"
             subtitle="Participants responsible for the resolution"
           />
 
-          <CardBody className="space-y-4">
-            <div className="rounded-xl bg-paper-2 p-4">
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="h-4 w-4 text-ink/50" />
+          <CardBody className="space-y-3">
+            <div className="rounded-[17px] border border-ink/[0.06] bg-paper-2/60 p-4">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-ink/[0.045]">
+                  <ShieldCheck className="h-4 w-4 text-ink/50" />
+                </div>
+
                 <p className="text-xs font-semibold text-ink">
                   Administrative review
                 </p>
               </div>
 
-              <p className="mt-2 text-sm font-medium text-ink">
+              <p className="mt-3 text-sm font-semibold text-ink">
                 {resolution.reviewedBy}
               </p>
             </div>
 
-            <div className="rounded-xl bg-paper-2 p-4">
-              <div className="flex items-center gap-2">
-                <Landmark className="h-4 w-4 text-ink/50" />
+            <div className="rounded-[17px] border border-ink/[0.06] bg-paper-2/60 p-4">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-ink/[0.045]">
+                  <Landmark className="h-4 w-4 text-ink/50" />
+                </div>
+
                 <p className="text-xs font-semibold text-ink">
                   Expert review
                 </p>
               </div>
 
-              <p className="mt-2 text-sm font-medium text-ink">
+              <p className="mt-3 text-sm font-semibold text-ink">
                 {resolution.expertReview}
               </p>
             </div>
 
-            <div className="rounded-xl bg-paper-2 p-4">
-              <div className="flex items-center gap-2">
-                <LockKeyhole className="h-4 w-4 text-ink/50" />
+            <div className="rounded-[17px] border border-[#B85C12]/10 bg-[#F7EFE8]/55 p-4">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#B85C12]/10">
+                  <LockKeyhole className="h-4 w-4 text-[#B85C12]" />
+                </div>
+
                 <p className="text-xs font-semibold text-ink">
                   Payment protection
                 </p>
               </div>
 
-              <p className="mt-2 text-sm leading-5 text-ink/55">
+              <p className="mt-3 text-xs leading-5 text-ink/55">
                 Affected funds remain protected until the authorized
                 resolution action is completed.
               </p>
@@ -339,63 +414,95 @@ export function Resolution() {
         </Card>
       </div>
 
-      {/* Decision area */}
-      <Card>
+      {/* ------------------------------------------------------------------ */}
+      {/* Final decision                                                      */}
+      {/* ------------------------------------------------------------------ */}
+      <Card className="overflow-hidden rounded-[24px] border-ink/[0.07] bg-white shadow-[0_14px_45px_rgba(0,0,0,0.04)]">
         <CardHeader
           title="Final decision"
           subtitle="Authorized users can approve the recommendation or return the case for further review"
         />
 
         <CardBody>
-          <div className="flex flex-col gap-4 rounded-2xl border border-line bg-paper-2 p-5 lg:flex-row lg:items-center lg:justify-between">
-            <div>
-              <p className="text-sm font-semibold text-ink">
-                Ready for authorized decision
-              </p>
+          <div className="relative overflow-hidden rounded-[20px] bg-paper-2 p-5 sm:p-6">
+            <div className="pointer-events-none absolute -right-12 -top-16 h-36 w-36 rounded-full bg-[#B85C12]/[0.035] blur-2xl" />
 
-              <p className="mt-1 max-w-2xl text-xs leading-5 text-ink/45">
-                Final resolution should only be applied after all required
-                evidence has been reviewed and the affected payment line has
-                been confirmed.
-              </p>
-            </div>
+            <div className="relative flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+              <div className="flex gap-3.5">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[13px] bg-white shadow-sm ring-1 ring-ink/[0.05]">
+                  <Gavel className="h-[18px] w-[18px] text-ink/55" />
+                </div>
 
-            <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                className="inline-flex items-center gap-2 rounded-xl border border-line bg-white px-4 py-2.5 text-xs font-semibold text-ink/65 transition-colors hover:bg-ink/5 hover:text-ink"
-              >
-                Request further review
-              </button>
+                <div>
+                  <p className="text-sm font-semibold text-ink">
+                    Ready for authorized decision
+                  </p>
 
-              <button
-                type="button"
-                className="inline-flex items-center gap-2 rounded-xl bg-ink px-4 py-2.5 text-xs font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-ink/90"
-              >
-                Approve resolution
-                <ArrowRight className="h-3.5 w-3.5" />
-              </button>
+                  <p className="mt-1 max-w-2xl text-xs leading-5 text-ink/45">
+                    Final resolution should only be applied after all required
+                    evidence has been reviewed and the affected payment line
+                    has been confirmed.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex shrink-0 flex-wrap gap-2">
+                <button
+                  type="button"
+                  className="inline-flex items-center gap-2 rounded-xl border border-ink/[0.08] bg-white px-4 py-2.5 text-xs font-semibold text-ink/60 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-ink/15 hover:bg-ink/[0.025] hover:text-ink"
+                >
+                  Request further review
+                </button>
+
+                <button
+                  type="button"
+                  className="inline-flex items-center gap-2 rounded-xl bg-[#173629] px-4 py-2.5 text-xs font-semibold text-white shadow-[0_8px_20px_rgba(23,54,41,0.12)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#204736] hover:shadow-[0_12px_25px_rgba(23,54,41,0.18)]"
+                >
+                  Approve resolution
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </button>
+              </div>
             </div>
           </div>
         </CardBody>
       </Card>
 
-      {/* Audit note */}
-      <div className="flex gap-3 rounded-2xl border border-line bg-paper-2 p-4">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-ink/5">
-          <ShieldCheck className="h-4 w-4 text-ink/55" />
-        </div>
+      {/* ------------------------------------------------------------------ */}
+      {/* Audit protection                                                    */}
+      {/* ------------------------------------------------------------------ */}
+      <div className="relative overflow-hidden rounded-[20px] bg-[#173629] p-5 text-white shadow-[0_14px_40px_rgba(23,54,41,0.09)] sm:p-6">
+        <div className="pointer-events-none absolute -right-12 -top-16 h-36 w-36 rounded-full border border-white/[0.05]" />
 
-        <div>
-          <p className="text-xs font-semibold text-ink">
-            Resolution audit trail
-          </p>
+        <div className="relative flex gap-4">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[13px] border border-white/10 bg-white/[0.07]">
+            <ShieldCheck className="h-[18px] w-[18px] text-[#D58A52]" />
+          </div>
 
-          <p className="mt-1 text-xs leading-5 text-ink/45">
-            Every recommendation, approval, payment action, correction and
-            closure event should remain permanently associated with the
-            dispute record for audit and compliance purposes.
-          </p>
+          <div>
+            <p className="text-xs font-semibold text-white">
+              Resolution audit trail
+            </p>
+
+            <p className="mt-1.5 max-w-3xl text-xs leading-5 text-white/50">
+              Every recommendation, approval, payment action, correction and
+              closure event should remain permanently associated with the
+              dispute record for audit and compliance purposes.
+            </p>
+
+            <div className="mt-4 flex flex-wrap gap-2">
+              <span className="rounded-full border border-white/[0.08] bg-white/[0.05] px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.1em] text-white/40">
+                Decision traceable
+              </span>
+
+              <span className="rounded-full border border-white/[0.08] bg-white/[0.05] px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.1em] text-white/40">
+                Payment protected
+              </span>
+
+              <span className="rounded-full border border-white/[0.08] bg-white/[0.05] px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.1em] text-white/40">
+                Audit retained
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </div>

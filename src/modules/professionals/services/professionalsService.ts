@@ -1,11 +1,19 @@
 // Professionals module — API service layer
-// BRD reference: Sec. 28.1 / Sec. 40.7
+// BRD references:
+// - Sec. 28.1 — Professional Services
+// - Sec. 40.7 — Professional API / Service Integration
 //
-// Keep this file as the single place this module talks to the network.
-// Pages/components should never call fetch/axios directly.
+// Architecture rule:
+// This is the single network boundary for the Professionals module.
+// Pages, hooks, and components should not call fetch/axios directly.
 //
-// TODO: replace the request helper with the project's shared API client
-// once the backend contract is available.
+// TODO:
+// Replace the local request helper with the project's shared API client
+// once the backend contract/client is available.
+
+/* -------------------------------------------------------------------------- */
+/* Domain types                                                               */
+/* -------------------------------------------------------------------------- */
 
 export type ProfessionalType =
   | 'architect'
@@ -20,6 +28,11 @@ export type ProfessionalVerificationStatus =
   | 'verified'
   | 'rejected'
   | 'suspended'
+
+export type ProfessionalAvailability =
+  | 'available'
+  | 'busy'
+  | 'unavailable'
 
 export type ProposalStatus =
   | 'submitted'
@@ -42,6 +55,10 @@ export type DeliverableStatus =
   | 'approved'
   | 'rejected'
 
+/* -------------------------------------------------------------------------- */
+/* Professionals                                                              */
+/* -------------------------------------------------------------------------- */
+
 export interface Professional {
   id: string
   name: string
@@ -54,7 +71,7 @@ export interface Professional {
   reviewCount?: number
   projectCount?: number
   verificationStatus: ProfessionalVerificationStatus
-  availability?: 'available' | 'busy' | 'unavailable'
+  availability?: ProfessionalAvailability
   bio?: string
   verifiedSince?: string
 }
@@ -65,6 +82,10 @@ export interface ProfessionalService {
   name: string
   description?: string
 }
+
+/* -------------------------------------------------------------------------- */
+/* Service invitations                                                        */
+/* -------------------------------------------------------------------------- */
 
 export interface ServiceInvitation {
   id: string
@@ -86,6 +107,10 @@ export interface ServiceInvitation {
   requirements?: string[]
 }
 
+/* -------------------------------------------------------------------------- */
+/* Proposals                                                                  */
+/* -------------------------------------------------------------------------- */
+
 export interface Proposal {
   id: string
   professionalId: string
@@ -104,6 +129,10 @@ export interface Proposal {
   clientName?: string
 }
 
+/* -------------------------------------------------------------------------- */
+/* Deliverables                                                               */
+/* -------------------------------------------------------------------------- */
+
 export interface Deliverable {
   id: string
   professionalId: string
@@ -117,6 +146,10 @@ export interface Deliverable {
   reviewComment?: string
   fileUrl?: string
 }
+
+/* -------------------------------------------------------------------------- */
+/* Query parameters                                                           */
+/* -------------------------------------------------------------------------- */
 
 export interface ProfessionalListParams {
   search?: string
@@ -150,6 +183,10 @@ export interface DeliverableListParams {
   limit?: number
 }
 
+/* -------------------------------------------------------------------------- */
+/* API response types                                                         */
+/* -------------------------------------------------------------------------- */
+
 export interface PaginatedResponse<T> {
   data: T[]
   page: number
@@ -157,6 +194,10 @@ export interface PaginatedResponse<T> {
   total: number
   totalPages: number
 }
+
+/* -------------------------------------------------------------------------- */
+/* Mutation inputs                                                            */
+/* -------------------------------------------------------------------------- */
 
 export interface CreateProposalInput {
   invitationId: string
@@ -175,25 +216,61 @@ export interface CreateDeliverableInput {
   fileUrl?: string
 }
 
+/* -------------------------------------------------------------------------- */
+/* Request infrastructure                                                     */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Error returned by the Professionals API.
+ *
+ * Keeping this as a dedicated error type makes it easier for UI layers
+ * and future global error boundaries to distinguish API failures from
+ * ordinary JavaScript errors.
+ */
+export class ProfessionalsApiError extends Error {
+  readonly status: number
+  readonly statusText: string
+
+  constructor(
+    message: string,
+    status: number,
+    statusText: string,
+  ) {
+    super(message)
+
+    this.name = 'ProfessionalsApiError'
+    this.status = status
+    this.statusText = statusText
+  }
+}
+
+/**
+ * Shared request helper.
+ *
+ * All Professionals network traffic passes through this function.
+ */
 async function request<T>(
   input: RequestInfo | URL,
-  init?: RequestInit,
+  init: RequestInit = {},
 ): Promise<T> {
   const response = await fetch(input, {
     ...init,
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json',
-      ...init?.headers,
+      ...init.headers,
     },
   })
 
   if (!response.ok) {
-    throw new Error(
+    throw new ProfessionalsApiError(
       `Professionals API request failed: ${response.status} ${response.statusText}`,
+      response.status,
+      response.statusText,
     )
   }
 
+  // No-content responses are valid for actions that do not return a body.
   if (response.status === 204) {
     return undefined as T
   }
@@ -201,15 +278,21 @@ async function request<T>(
   return response.json() as Promise<T>
 }
 
+/**
+ * Serializes supported query parameters while omitting undefined,
+ * null-like, and empty-string values.
+ */
 function toQueryString(
   params: Record<string, string | number | undefined>,
-) {
+): string {
   const searchParams = new URLSearchParams()
 
   Object.entries(params).forEach(([key, value]) => {
-    if (value !== undefined && value !== '') {
-      searchParams.set(key, String(value))
+    if (value === undefined || value === '') {
+      return
     }
+
+    searchParams.set(key, String(value))
   })
 
   const query = searchParams.toString()
@@ -217,96 +300,133 @@ function toQueryString(
   return query ? `?${query}` : ''
 }
 
+/* -------------------------------------------------------------------------- */
+/* Professionals API                                                          */
+/* -------------------------------------------------------------------------- */
+
 export const professionalsService = {
-  /**
-   * Professionals
-   */
-  list: (
+  /* ------------------------------------------------------------------------ */
+  /* Professionals                                                             */
+  /* ------------------------------------------------------------------------ */
+
+  list(
     params: ProfessionalListParams = {},
-  ) =>
-    request<PaginatedResponse<Professional>>(
+  ) {
+    return request<PaginatedResponse<Professional>>(
       `/api/professionals${toQueryString(params)}`,
-    ),
+    )
+  },
 
-  get: (id: string) =>
-    request<Professional>(`/api/professionals/${id}`),
+  get(id: string) {
+    return request<Professional>(
+      `/api/professionals/${id}`,
+    )
+  },
 
-  services: (id: string) =>
-    request<ProfessionalService[]>(
+  services(id: string) {
+    return request<ProfessionalService[]>(
       `/api/professionals/${id}/services`,
-    ),
+    )
+  },
 
-  /**
-   * Service invitations
-   */
-  invitations: (
+  /* ------------------------------------------------------------------------ */
+  /* Service invitations                                                       */
+  /* ------------------------------------------------------------------------ */
+
+  invitations(
     params: InvitationListParams = {},
-  ) =>
-    request<PaginatedResponse<ServiceInvitation>>(
+  ) {
+    return request<PaginatedResponse<ServiceInvitation>>(
       `/api/professional-invitations${toQueryString(params)}`,
-    ),
+    )
+  },
 
-  getInvitation: (id: string) =>
-    request<ServiceInvitation>(
+  getInvitation(id: string) {
+    return request<ServiceInvitation>(
       `/api/professional-invitations/${id}`,
-    ),
+    )
+  },
 
-  acceptInvitation: (id: string) =>
-    request<ServiceInvitation>(
+  acceptInvitation(id: string) {
+    return request<ServiceInvitation>(
       `/api/professional-invitations/${id}/accept`,
       {
         method: 'POST',
       },
-    ),
+    )
+  },
 
-  declineInvitation: (id: string) =>
-    request<ServiceInvitation>(
+  declineInvitation(id: string) {
+    return request<ServiceInvitation>(
       `/api/professional-invitations/${id}/decline`,
       {
         method: 'POST',
       },
-    ),
+    )
+  },
 
-  /**
-   * Proposals
-   */
-  proposals: (
+  /* ------------------------------------------------------------------------ */
+  /* Proposals                                                                 */
+  /* ------------------------------------------------------------------------ */
+
+  proposals(
     params: ProposalListParams = {},
-  ) =>
-    request<PaginatedResponse<Proposal>>(
+  ) {
+    return request<PaginatedResponse<Proposal>>(
       `/api/proposals${toQueryString(params)}`,
-    ),
+    )
+  },
 
-  getProposal: (id: string) =>
-    request<Proposal>(`/api/proposals/${id}`),
+  getProposal(id: string) {
+    return request<Proposal>(
+      `/api/proposals/${id}`,
+    )
+  },
 
-  createProposal: (input: CreateProposalInput) =>
-    request<Proposal>('/api/proposals', {
-      method: 'POST',
-      body: JSON.stringify(input),
-    }),
+  createProposal(input: CreateProposalInput) {
+    return request<Proposal>(
+      '/api/proposals',
+      {
+        method: 'POST',
+        body: JSON.stringify(input),
+      },
+    )
+  },
 
-  withdrawProposal: (id: string) =>
-    request<Proposal>(`/api/proposals/${id}/withdraw`, {
-      method: 'POST',
-    }),
+  withdrawProposal(id: string) {
+    return request<Proposal>(
+      `/api/proposals/${id}/withdraw`,
+      {
+        method: 'POST',
+      },
+    )
+  },
 
-  /**
-   * Deliverables
-   */
-  deliverables: (
+  /* ------------------------------------------------------------------------ */
+  /* Deliverables                                                              */
+  /* ------------------------------------------------------------------------ */
+
+  deliverables(
     params: DeliverableListParams = {},
-  ) =>
-    request<PaginatedResponse<Deliverable>>(
+  ) {
+    return request<PaginatedResponse<Deliverable>>(
       `/api/deliverables${toQueryString(params)}`,
-    ),
+    )
+  },
 
-  getDeliverable: (id: string) =>
-    request<Deliverable>(`/api/deliverables/${id}`),
+  getDeliverable(id: string) {
+    return request<Deliverable>(
+      `/api/deliverables/${id}`,
+    )
+  },
 
-  createDeliverable: (input: CreateDeliverableInput) =>
-    request<Deliverable>('/api/deliverables', {
-      method: 'POST',
-      body: JSON.stringify(input),
-    }),
-}
+  createDeliverable(input: CreateDeliverableInput) {
+    return request<Deliverable>(
+      '/api/deliverables',
+      {
+        method: 'POST',
+        body: JSON.stringify(input),
+      },
+    )
+  },
+} as const

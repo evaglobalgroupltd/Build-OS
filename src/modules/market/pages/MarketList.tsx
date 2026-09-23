@@ -1,3 +1,5 @@
+import type { ComponentType } from 'react'
+
 import {
   BadgeCheck,
   ChevronRight,
@@ -60,51 +62,86 @@ export function MarketList() {
 
   return (
     <div className="space-y-6">
-      {/* Marketplace header */}
-      <Card className="overflow-hidden">
-        <div className="border-b border-line bg-paper-2 px-6 py-7 sm:px-8">
-          <div className="flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
-            <div>
+      {/* ================================================================
+          MARKETPLACE HERO
+      ================================================================ */}
+      <Card className="group relative overflow-hidden border-0 bg-[#0B1220] text-white shadow-[0_20px_60px_rgba(11,18,32,0.12)]">
+        {/* Ambient lighting */}
+        <div className="pointer-events-none absolute -right-24 -top-32 h-80 w-80 rounded-full bg-[#1657FF]/20 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-40 left-1/3 h-72 w-72 rounded-full bg-[#34A6FF]/10 blur-3xl" />
+
+        {/* Fine grid texture */}
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.035]"
+          style={{
+            backgroundImage:
+              'linear-gradient(rgba(255,255,255,0.7) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.7) 1px, transparent 1px)',
+            backgroundSize: '34px 34px',
+          }}
+        />
+
+        <div className="relative px-6 py-7 sm:px-8 sm:py-8">
+          <div className="flex flex-col gap-8 xl:flex-row xl:items-end xl:justify-between">
+            <div className="max-w-3xl">
               <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-ink text-white">
-                  <Warehouse className="h-5 w-5" />
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.07] shadow-inner">
+                  <Warehouse className="h-5 w-5 text-[#34A6FF]" />
                 </div>
 
                 <div>
-                  <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-ink/40">
-                    Build OS marketplace
+                  <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-white/40">
+                    Build OS · Procurement Network
                   </p>
 
-                  <h1 className="font-display text-2xl font-semibold tracking-tight text-ink">
+                  <h1 className="mt-1 font-display text-2xl font-semibold tracking-tight text-white sm:text-3xl">
                     Supplier Market
                   </h1>
                 </div>
               </div>
 
-              <p className="mt-4 max-w-2xl text-sm leading-6 text-ink/50">
-                Discover verified construction material suppliers, compare
-                marketplace reliability and explore approved catalogues for
-                project procurement.
+              <p className="mt-5 max-w-2xl text-sm leading-6 text-white/55 sm:text-[15px]">
+                Discover verified construction material suppliers, evaluate
+                procurement reliability and source approved materials across
+                the Build OS ecosystem.
               </p>
+
+              <div className="mt-6 flex flex-wrap items-center gap-2.5">
+                <HeroSignal
+                  icon={BadgeCheck}
+                  label={`${verifiedSuppliers.length} verified suppliers`}
+                />
+
+                <HeroSignal
+                  icon={Package}
+                  label={`${listedMaterials} listed materials`}
+                />
+
+                <HeroSignal
+                  icon={ShieldCheck}
+                  label={`${averageTrust}/100 average trust`}
+                />
+              </div>
             </div>
 
             <button
               type="button"
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-ink px-4 py-2.5 text-xs font-semibold text-white transition-opacity hover:opacity-90"
+              className="group/button inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-white px-4 py-3 text-xs font-semibold text-[#0B1220] shadow-lg shadow-black/10 transition-all hover:-translate-y-0.5 hover:bg-white/95"
             >
               <Package className="h-4 w-4" />
               Browse materials
+              <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover/button:translate-x-0.5" />
             </button>
           </div>
         </div>
 
         {/* Marketplace metrics */}
-        <div className="grid divide-y divide-line sm:grid-cols-2 sm:divide-x sm:divide-y-0 xl:grid-cols-4">
+        <div className="relative grid border-t border-white/10 sm:grid-cols-2 xl:grid-cols-4">
           <MarketplaceMetric
             icon={Users}
             label="Marketplace suppliers"
             value={suppliers.length.toString()}
             description="Active supplier profiles"
+            dark
           />
 
           <MarketplaceMetric
@@ -112,6 +149,7 @@ export function MarketList() {
             label="Verified suppliers"
             value={verifiedSuppliers.length.toString()}
             description="Approved for procurement"
+            dark
           />
 
           <MarketplaceMetric
@@ -119,6 +157,7 @@ export function MarketList() {
             label="Listed materials"
             value={listedMaterials.toString()}
             description="Across supplier catalogues"
+            dark
           />
 
           <MarketplaceMetric
@@ -126,28 +165,31 @@ export function MarketList() {
             label="Average trust"
             value={`${averageTrust}/100`}
             description="Marketplace reliability score"
+            dark
           />
         </div>
       </Card>
 
-      {/* Search and filters */}
-      <Card>
+      {/* ================================================================
+          SEARCH & DISCOVERY
+      ================================================================ */}
+      <Card className="border-line/80 shadow-[0_8px_30px_rgba(11,18,32,0.035)]">
         <CardBody>
           <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-            <div className="relative w-full xl:max-w-xl">
-              <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/35" />
+            <div className="relative w-full xl:max-w-2xl">
+              <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/30" />
 
               <input
                 type="search"
                 placeholder="Search suppliers, materials, categories or locations..."
-                className="h-11 w-full rounded-xl border border-line bg-white pl-10 pr-4 text-sm text-ink outline-none transition-colors placeholder:text-ink/30 focus:border-ink/25"
+                className="h-12 w-full rounded-2xl border border-line bg-paper-2/70 pl-11 pr-4 text-sm text-ink outline-none transition-all placeholder:text-ink/30 hover:border-ink/15 focus:border-[#1657FF]/40 focus:bg-white focus:ring-4 focus:ring-[#1657FF]/5"
               />
             </div>
 
             <div className="flex flex-wrap gap-2">
               <button
                 type="button"
-                className="inline-flex items-center gap-2 rounded-xl border border-line bg-white px-3.5 py-2.5 text-xs font-medium text-ink/60 transition-colors hover:bg-paper-2"
+                className="inline-flex h-11 items-center gap-2 rounded-xl border border-line bg-white px-4 text-xs font-semibold text-ink/60 transition-all hover:border-ink/15 hover:bg-paper-2 hover:text-ink"
               >
                 <Filter className="h-3.5 w-3.5" />
                 Filters
@@ -155,7 +197,7 @@ export function MarketList() {
 
               <button
                 type="button"
-                className="inline-flex items-center gap-2 rounded-xl border border-line bg-white px-3.5 py-2.5 text-xs font-medium text-ink/60 transition-colors hover:bg-paper-2"
+                className="inline-flex h-11 items-center gap-2 rounded-xl border border-line bg-white px-4 text-xs font-semibold text-ink/60 transition-all hover:border-ink/15 hover:bg-paper-2 hover:text-ink"
               >
                 <SlidersHorizontal className="h-3.5 w-3.5" />
                 Sort by trust
@@ -163,31 +205,39 @@ export function MarketList() {
             </div>
           </div>
 
-          <div className="mt-5 flex gap-2 overflow-x-auto pb-1">
-            {categories.map((category, index) => (
-              <button
-                key={category}
-                type="button"
-                className={
-                  index === 0
-                    ? 'shrink-0 rounded-full bg-ink px-3.5 py-2 text-xs font-semibold text-white'
-                    : 'shrink-0 rounded-full border border-line bg-white px-3.5 py-2 text-xs font-medium text-ink/50 transition-colors hover:bg-paper-2 hover:text-ink'
-                }
-              >
-                {category}
-              </button>
-            ))}
+          <div className="mt-5 border-t border-line pt-4">
+            <div className="flex items-center gap-2 overflow-x-auto pb-1">
+              {categories.map((category, index) => (
+                <button
+                  key={category}
+                  type="button"
+                  className={
+                    index === 0
+                      ? 'shrink-0 rounded-full bg-[#0B1220] px-4 py-2 text-xs font-semibold text-white shadow-sm transition-all hover:bg-[#111b2f]'
+                      : 'shrink-0 rounded-full border border-line bg-white px-4 py-2 text-xs font-medium text-ink/50 transition-all hover:border-ink/15 hover:bg-paper-2 hover:text-ink'
+                  }
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
           </div>
         </CardBody>
       </Card>
 
-      {/* Marketplace content */}
+      {/* ================================================================
+          CONTENT
+      ================================================================ */}
       <div className="grid gap-6 xl:grid-cols-3">
         {/* Supplier grid */}
-        <div className="space-y-4 xl:col-span-2">
-          <div className="flex items-center justify-between">
+        <div className="space-y-5 xl:col-span-2">
+          <div className="flex items-end justify-between gap-4 px-1">
             <div>
-              <h2 className="font-display text-lg font-semibold text-ink">
+              <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-[#1657FF]/70">
+                Supplier network
+              </p>
+
+              <h2 className="mt-1 font-display text-xl font-semibold tracking-tight text-ink">
                 Marketplace suppliers
               </h2>
 
@@ -196,7 +246,7 @@ export function MarketList() {
               </p>
             </div>
 
-            <span className="rounded-full bg-paper-2 px-3 py-1.5 text-xs font-medium text-ink/50">
+            <span className="shrink-0 rounded-full border border-line bg-white px-3 py-1.5 text-[10px] font-semibold text-ink/50 shadow-sm">
               {suppliers.length} suppliers
             </span>
           </div>
@@ -213,14 +263,16 @@ export function MarketList() {
           ) : (
             <Card>
               <CardBody>
-                <div className="py-10 text-center">
-                  <Package className="mx-auto h-8 w-8 text-ink/20" />
+                <div className="py-12 text-center">
+                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-paper-2">
+                    <Package className="h-5 w-5 text-ink/25" />
+                  </div>
 
-                  <h3 className="mt-3 text-sm font-semibold text-ink">
+                  <h3 className="mt-4 text-sm font-semibold text-ink">
                     No suppliers available
                   </h3>
 
-                  <p className="mt-1 text-xs text-ink/40">
+                  <p className="mx-auto mt-1 max-w-sm text-xs leading-5 text-ink/40">
                     Supplier profiles will appear here once they are
                     available.
                   </p>
@@ -230,33 +282,43 @@ export function MarketList() {
           )}
         </div>
 
-        {/* Marketplace intelligence */}
+        {/* ================================================================
+            MARKETPLACE INTELLIGENCE
+        ================================================================ */}
         <div className="space-y-6">
-          <Card>
-            <CardHeader
-              title="Marketplace trust"
-              subtitle="Supplier reliability indicators"
-            />
+          {/* Trust */}
+          <Card className="overflow-hidden">
+            <div className="border-b border-line bg-paper-2 px-6 py-5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-ink/35">
+                    Network intelligence
+                  </p>
 
-            <CardBody>
-              <div className="flex items-center justify-center">
-                <div className="flex h-32 w-32 items-center justify-center rounded-full border-[9px] border-ink/10">
-                  <div className="text-center">
-                    <p className="font-display text-3xl font-bold tracking-tight text-ink">
-                      {averageTrust}
-                    </p>
+                  <h2 className="mt-1 font-display text-lg font-semibold text-ink">
+                    Marketplace trust
+                  </h2>
+                </div>
 
-                    <p className="text-[10px] font-medium text-ink/40">
-                      AVG TRUST
-                    </p>
-                  </div>
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#1657FF]/8 text-[#1657FF]">
+                  <TrendingUp className="h-4 w-4" />
                 </div>
               </div>
 
+              <p className="mt-1 text-xs text-ink/40">
+                Supplier reliability indicators
+              </p>
+            </div>
+
+            <CardBody>
+              <div className="flex justify-center">
+                <TrustRing score={averageTrust} />
+              </div>
+
               <div className="mt-5 flex justify-center">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-700">
-                  <TrendingUp className="h-3.5 w-3.5" />
-                  Strong marketplace
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/15 bg-emerald-500/8 px-3 py-1.5 text-[10px] font-semibold text-emerald-700">
+                  <TrendingUp className="h-3 w-3" />
+                  Strong marketplace standing
                 </span>
               </div>
 
@@ -267,6 +329,7 @@ export function MarketList() {
             </CardBody>
           </Card>
 
+          {/* Procurement protection */}
           <Card>
             <CardHeader
               title="Procurement protection"
@@ -274,26 +337,30 @@ export function MarketList() {
             />
 
             <CardBody>
-              <div className="space-y-4">
+              <div className="space-y-1">
                 <ProtectionStep
+                  number="01"
                   icon={BadgeCheck}
                   title="Verified suppliers"
                   description="Business credentials are reviewed before marketplace participation."
                 />
 
                 <ProtectionStep
+                  number="02"
                   icon={Package}
                   title="Approved catalogue"
                   description="Materials and supplier availability support procurement requests."
                 />
 
                 <ProtectionStep
+                  number="03"
                   icon={Truck}
                   title="Delivery evidence"
                   description="Material delivery is verified before payment can proceed."
                 />
 
                 <ProtectionStep
+                  number="04"
                   icon={ShieldCheck}
                   title="Controlled release"
                   description="Funds follow Build OS procurement and verification rules."
@@ -302,6 +369,7 @@ export function MarketList() {
             </CardBody>
           </Card>
 
+          {/* Activity */}
           <Card>
             <CardHeader
               title="Marketplace activity"
@@ -338,6 +406,32 @@ export function MarketList() {
   )
 }
 
+/* ==========================================================================
+   HERO SIGNAL
+========================================================================== */
+
+function HeroSignal({
+  icon: Icon,
+  label,
+}: {
+  icon: ComponentType<{ className?: string }>
+  label: string
+}) {
+  return (
+    <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.055] px-3 py-1.5 backdrop-blur-sm">
+      <Icon className="h-3.5 w-3.5 text-[#34A6FF]" />
+
+      <span className="text-[10px] font-medium text-white/55">
+        {label}
+      </span>
+    </div>
+  )
+}
+
+/* ==========================================================================
+   SUPPLIER CARD
+========================================================================== */
+
 function SupplierCard({
   supplier,
 }: {
@@ -346,26 +440,32 @@ function SupplierCard({
   const verified = supplier.status === 'Verified'
 
   return (
-    <Card className="group overflow-hidden transition-all hover:-translate-y-0.5 hover:shadow-md">
-      <CardBody>
+    <Card className="group relative overflow-hidden border-line/80 transition-all duration-300 hover:-translate-y-1 hover:border-[#1657FF]/15 hover:shadow-[0_18px_45px_rgba(11,18,32,0.08)]">
+      {/* Hover accent */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#1657FF]/40 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+
+      <CardBody className="p-5 sm:p-6">
+        {/* Identity */}
         <div className="flex items-start justify-between gap-4">
-          <div className="flex min-w-0 items-start gap-3">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-ink text-sm font-bold text-white">
+          <div className="flex min-w-0 items-start gap-3.5">
+            <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#0B1220] text-xs font-bold tracking-wide text-white shadow-[0_8px_20px_rgba(11,18,32,0.15)]">
               {supplier.initials}
+
+              {verified && (
+                <span className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full border-2 border-white bg-[#1657FF]">
+                  <BadgeCheck className="h-2.5 w-2.5 text-white" />
+                </span>
+              )}
             </div>
 
-            <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-1.5">
-                <h3 className="truncate text-sm font-semibold text-ink">
+            <div className="min-w-0 pt-0.5">
+              <div className="flex items-center gap-1.5">
+                <h3 className="truncate text-sm font-semibold tracking-[-0.01em] text-ink">
                   {supplier.name}
                 </h3>
-
-                {verified && (
-                  <BadgeCheck className="h-4 w-4 shrink-0 text-emerald-600" />
-                )}
               </div>
 
-              <p className="mt-1 text-xs text-ink/45">
+              <p className="mt-1 text-xs text-ink/40">
                 {supplier.category}
               </p>
             </div>
@@ -374,12 +474,17 @@ function SupplierCard({
           <TrustBadge score={supplier.trustScore} />
         </div>
 
-        <div className="mt-4 flex items-center gap-1.5 text-xs text-ink/45">
-          <MapPin className="h-3.5 w-3.5" />
-          {supplier.location}
+        {/* Location */}
+        <div className="mt-5 flex items-center gap-2 text-xs text-ink/45">
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-paper-2">
+            <MapPin className="h-3.5 w-3.5 text-ink/40" />
+          </div>
+
+          <span>{supplier.location}</span>
         </div>
 
-        <div className="mt-5 grid grid-cols-3 border-y border-line py-4">
+        {/* Metrics */}
+        <div className="mt-5 grid grid-cols-3 rounded-2xl border border-line bg-paper-2/55 py-3.5">
           <SupplierMetric
             label="Rating"
             value={supplier.rating.toString()}
@@ -399,16 +504,25 @@ function SupplierCard({
           />
         </div>
 
-        <div className="mt-4">
-          <p className="text-[10px] font-semibold uppercase tracking-wide text-ink/35">
-            Specialties
-          </p>
+        {/* Specialties */}
+        <div className="mt-5">
+          <div className="flex items-center justify-between">
+            <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-ink/30">
+              Specialties
+            </p>
 
-          <div className="mt-2 flex flex-wrap gap-1.5">
+            {supplier.specialties.length > 4 && (
+              <span className="text-[9px] font-medium text-ink/30">
+                +{supplier.specialties.length - 4} more
+              </span>
+            )}
+          </div>
+
+          <div className="mt-2.5 flex flex-wrap gap-1.5">
             {supplier.specialties.slice(0, 4).map((specialty) => (
               <span
                 key={specialty}
-                className="rounded-full bg-paper-2 px-2.5 py-1 text-[10px] font-medium text-ink/55"
+                className="rounded-full border border-line bg-white px-2.5 py-1.5 text-[10px] font-medium text-ink/50 transition-colors group-hover:border-ink/10"
               >
                 {specialty}
               </span>
@@ -416,17 +530,21 @@ function SupplierCard({
           </div>
         </div>
 
+        {/* Footer */}
         <div className="mt-5 flex items-center justify-between border-t border-line pt-4">
-          <div className="flex items-center gap-1.5 text-xs text-ink/45">
-            <Truck className="h-3.5 w-3.5" />
-            {supplier.deliveryCoverage}
+          <div className="flex min-w-0 items-center gap-1.5 text-[10px] font-medium text-ink/40">
+            <Truck className="h-3.5 w-3.5 shrink-0" />
+            <span className="truncate">
+              {supplier.deliveryCoverage}
+            </span>
           </div>
 
           <button
             type="button"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-ink/60 transition-colors hover:text-ink"
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-lg px-2 py-1 text-[10px] font-semibold text-ink/55 transition-all hover:bg-paper-2 hover:text-ink"
           >
             View supplier
+
             <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
           </button>
         </div>
@@ -435,41 +553,118 @@ function SupplierCard({
   )
 }
 
+/* ==========================================================================
+   TRUST RING
+========================================================================== */
+
+function TrustRing({
+  score,
+}: {
+  score: number
+}) {
+  const safeScore = Math.min(Math.max(score, 0), 100)
+
+  return (
+    <div
+      className="relative flex h-36 w-36 items-center justify-center rounded-full"
+      style={{
+        background: `conic-gradient(#1657FF ${safeScore}%, rgba(11,18,32,0.06) ${safeScore}% 100%)`,
+      }}
+    >
+      <div className="absolute inset-[9px] flex flex-col items-center justify-center rounded-full bg-white shadow-inner">
+        <p className="font-display text-3xl font-bold tracking-tight text-ink">
+          {safeScore}
+        </p>
+
+        <p className="mt-0.5 font-mono text-[8px] font-semibold uppercase tracking-[0.15em] text-ink/35">
+          Average trust
+        </p>
+      </div>
+    </div>
+  )
+}
+
+/* ==========================================================================
+   MARKETPLACE METRIC
+========================================================================== */
+
 function MarketplaceMetric({
   icon: Icon,
   label,
   value,
   description,
+  dark = false,
 }: {
-  icon: React.ComponentType<{ className?: string }>
+  icon: ComponentType<{ className?: string }>
   label: string
   value: string
   description: string
+  dark?: boolean
 }) {
   return (
-    <div className="px-6 py-5 sm:px-7">
+    <div
+      className={
+        dark
+          ? 'border-b border-white/10 px-6 py-5 last:border-b-0 sm:px-7 sm:nth-[3]:border-b-0 xl:border-b-0 xl:border-r xl:last:border-r-0'
+          : 'px-6 py-5 sm:px-7'
+      }
+    >
       <div className="flex items-center gap-3">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-ink/5">
-          <Icon className="h-4 w-4 text-ink/55" />
+        <div
+          className={
+            dark
+              ? 'flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/[0.06]'
+              : 'flex h-9 w-9 items-center justify-center rounded-xl bg-ink/5'
+          }
+        >
+          <Icon
+            className={
+              dark
+                ? 'h-4 w-4 text-[#34A6FF]'
+                : 'h-4 w-4 text-ink/55'
+            }
+          />
         </div>
 
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-wide text-ink/35">
+          <p
+            className={
+              dark
+                ? 'text-[9px] font-semibold uppercase tracking-[0.14em] text-white/30'
+                : 'text-[10px] font-semibold uppercase tracking-wide text-ink/35'
+            }
+          >
             {label}
           </p>
 
-          <p className="mt-0.5 font-display text-xl font-semibold text-ink">
+          <p
+            className={
+              dark
+                ? 'mt-0.5 font-display text-xl font-semibold text-white'
+                : 'mt-0.5 font-display text-xl font-semibold text-ink'
+            }
+          >
             {value}
           </p>
         </div>
       </div>
 
-      <p className="mt-3 text-xs text-ink/40">
+      <p
+        className={
+          dark
+            ? 'mt-3 text-[10px] text-white/35'
+            : 'mt-3 text-xs text-ink/40'
+        }
+      >
         {description}
       </p>
     </div>
   )
 }
+
+/* ==========================================================================
+   SUPPLIER METRIC
+========================================================================== */
 
 function SupplierMetric({
   label,
@@ -478,14 +673,14 @@ function SupplierMetric({
 }: {
   label: string
   value: string
-  icon: React.ComponentType<{ className?: string }>
+  icon: ComponentType<{ className?: string }>
 }) {
   return (
-    <div className="border-r border-line px-3 first:pl-0 last:border-r-0 last:pr-0">
-      <div className="flex items-center gap-1 text-ink/35">
+    <div className="border-r border-line px-3 first:pl-3 last:border-r-0 last:pr-3">
+      <div className="flex items-center gap-1 text-ink/30">
         <Icon className="h-3 w-3" />
 
-        <span className="text-[9px] font-semibold uppercase tracking-wide">
+        <span className="text-[8px] font-semibold uppercase tracking-[0.12em]">
           {label}
         </span>
       </div>
@@ -497,6 +692,10 @@ function SupplierMetric({
   )
 }
 
+/* ==========================================================================
+   TRUST BADGE
+========================================================================== */
+
 function TrustBadge({
   score,
 }: {
@@ -504,53 +703,67 @@ function TrustBadge({
 }) {
   const className =
     score >= 90
-      ? 'bg-emerald-500/10 text-emerald-700'
+      ? 'border-emerald-500/15 bg-emerald-500/8 text-emerald-700'
       : score >= 75
-        ? 'bg-amber-500/10 text-amber-700'
-        : 'bg-rose-500/10 text-rose-700'
+        ? 'border-amber-500/15 bg-amber-500/8 text-amber-700'
+        : 'border-rose-500/15 bg-rose-500/8 text-rose-700'
 
   return (
     <div
-      className={`shrink-0 rounded-lg px-2.5 py-1.5 text-center ${className}`}
+      className={`shrink-0 rounded-xl border px-2.5 py-2 text-center ${className}`}
     >
-      <p className="text-[9px] font-semibold uppercase tracking-wide">
+      <p className="text-[8px] font-semibold uppercase tracking-[0.12em]">
         Trust
       </p>
 
-      <p className="mt-0.5 text-sm font-bold">
+      <p className="mt-0.5 font-display text-sm font-bold">
         {score}
       </p>
     </div>
   )
 }
 
+/* ==========================================================================
+   PROTECTION STEP
+========================================================================== */
+
 function ProtectionStep({
+  number,
   icon: Icon,
   title,
   description,
 }: {
-  icon: React.ComponentType<{ className?: string }>
+  number: string
+  icon: ComponentType<{ className?: string }>
   title: string
   description: string
 }) {
   return (
-    <div className="flex gap-3">
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-ink/5">
-        <Icon className="h-4 w-4 text-ink/55" />
+    <div className="group/step flex gap-3.5 rounded-2xl px-2 py-3 transition-colors hover:bg-paper-2/70">
+      <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[#1657FF]/10 bg-[#1657FF]/5">
+        <Icon className="h-4 w-4 text-[#1657FF]" />
+
+        <span className="absolute -right-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full border border-white bg-[#0B1220] px-1 font-mono text-[7px] font-bold text-white">
+          {number}
+        </span>
       </div>
 
-      <div>
+      <div className="min-w-0">
         <p className="text-xs font-semibold text-ink">
           {title}
         </p>
 
-        <p className="mt-1 text-xs leading-5 text-ink/45">
+        <p className="mt-1 text-[11px] leading-5 text-ink/45">
           {description}
         </p>
       </div>
     </div>
   )
 }
+
+/* ==========================================================================
+   ACTIVITY METRIC
+========================================================================== */
 
 function ActivityMetric({
   label,
@@ -565,7 +778,7 @@ function ActivityMetric({
         {label}
       </span>
 
-      <span className="text-sm font-semibold text-ink">
+      <span className="font-display text-sm font-semibold text-ink">
         {value}
       </span>
     </div>

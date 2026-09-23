@@ -1,11 +1,69 @@
-export function ProgressBar({ percent, tone = 'amber' }: { percent: number; tone?: 'amber' | 'teal' }) {
-  const barColor = tone === 'amber' ? 'bg-amber' : 'bg-teal'
+const barColors = {
+  amber: 'bg-[#B85C12]',
+  teal: 'bg-[#12613E]',
+} as const
+
+const heights = {
+  sm: 'h-1',
+  md: 'h-1.5',
+} as const
+
+export function ProgressBar({
+  percent,
+  tone = 'amber',
+  size = 'md',
+  label = 'Progress',
+}: {
+  percent: number
+  tone?: keyof typeof barColors
+  size?: keyof typeof heights
+
+  /** Accessible name, e.g. "Milestone 2 of 5". */
+  label?: string
+}) {
+  const value = Number.isFinite(percent)
+    ? Math.min(100, Math.max(0, percent))
+    : 0
+
+  const roundedValue = Math.round(value)
+
   return (
-    <div className="h-1.5 w-full overflow-hidden rounded-full bg-ink/8">
+    <div
+      role="progressbar"
+      aria-label={label}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={roundedValue}
+      className={[
+        'relative w-full overflow-hidden rounded-full',
+        'bg-ink/[0.065]',
+        'ring-1 ring-inset ring-ink/[0.025]',
+        heights[size],
+      ].join(' ')}
+    >
       <div
-        className={`h-full rounded-full ${barColor} transition-all duration-500`}
-        style={{ width: `${Math.min(100, Math.max(0, percent))}%` }}
-      />
+        className={[
+          'relative h-full overflow-hidden rounded-full',
+          barColors[tone],
+          'shadow-[inset_0_1px_0_rgba(255,255,255,0.24)]',
+          'transition-[width] duration-700',
+          'ease-[cubic-bezier(0.22,1,0.36,1)]',
+          'motion-reduce:transition-none',
+        ].join(' ')}
+        style={{ width: `${value}%` }}
+      >
+        {/* Very subtle highlight for a more polished finish */}
+        {value > 0 && (
+          <span
+            aria-hidden="true"
+            className="
+              absolute inset-x-0 top-0
+              h-px
+              bg-white/25
+            "
+          />
+        )}
+      </div>
     </div>
   )
 }

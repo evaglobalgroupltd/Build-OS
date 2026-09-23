@@ -4,6 +4,7 @@ import { Home } from '@/pages/public/Home'
 import { Login } from '@/pages/auth/Login'
 import { Join } from '@/pages/auth/Join'
 import { Register } from '@/pages/auth/Register'
+import { ProjectQuestionnaire } from '@/components/ProjectQuestionnaire'
 
 import { ClientDashboard } from '@/pages/client/Dashboard'
 import { ProjectsPage as ClientProjectsPage } from '@/pages/client/Projects'
@@ -64,6 +65,11 @@ export function AppRoutes() {
       <Route path="/login" element={<Login />} />
       <Route path="/join" element={<Join />} />
       <Route path="/register" element={<Register />} />
+
+      {/* Onboarding — runs right after account creation (see Register.tsx).
+          One shared questionnaire that branches its questions by the
+          logged-in user's role, then routes to that role's dashboard. */}
+      <Route path="/onboarding" element={<ProjectQuestionnaire />} />
 
       {/* Client */}
       <Route path="/app/client" element={<ClientDashboard />} />

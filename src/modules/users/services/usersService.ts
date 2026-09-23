@@ -9,15 +9,24 @@
 // - Sec. 24 — Registration / Login / MFA / Device Recognition
 //
 // Architecture:
-// Keep this file as the single place where the Users module communicates
-// with the backend. Pages and components should never call fetch/axios
-// directly.
+// - This is the single network boundary for the Users module.
+// - UI components, pages and hooks must not call fetch/axios directly.
+// - Domain types live in ./types and remain the source of truth.
+// - Authentication, verification, security and session operations are
+//   exposed through explicit, typed service methods.
+//
+// Backend contract:
+// - Endpoint paths are centralized below.
+// - HTTP transport is delegated to the shared API client.
+// - The backend remains authoritative for identity, verification,
+//   MFA state, sessions and account security.
 //
 // TODO:
-// - Connect these methods to the shared API client once Sec. 28.1 backend
-//   endpoints are available.
-// - Replace placeholder Promise returns with real HTTP requests.
-// - Add request/response validation once the backend contract is finalized.
+// - Confirm endpoint paths against the final backend contract.
+// - Add request/response validation once the backend schemas are finalized.
+// - Add multipart-specific API client support if not already available.
+
+import { api } from '@/lib/api'
 
 import type {
   AccountStatus,
@@ -31,11 +40,15 @@ import type {
   VerificationStatus,
 } from './types'
 
+/* ========================================================================== */
+/* Response contracts                                                         */
+/* ========================================================================== */
+
 /**
- * Generic API response shape.
+ * Generic API response envelope.
  *
- * Keep this local until the project's shared API response contract
- * is finalized.
+ * Keep this local until the shared API client's response contract
+ * becomes the application-wide standard.
  */
 export interface ApiResponse<T> {
   data: T
@@ -43,7 +56,7 @@ export interface ApiResponse<T> {
 }
 
 /**
- * Pagination metadata used by list endpoints.
+ * Pagination metadata used by future Users list endpoints.
  */
 export interface PaginationMeta {
   page: number
@@ -53,7 +66,7 @@ export interface PaginationMeta {
 }
 
 /**
- * Paginated API response.
+ * Generic paginated response.
  */
 export interface PaginatedResponse<T> {
   data: T[]
@@ -61,29 +74,84 @@ export interface PaginatedResponse<T> {
 }
 
 /**
- * Users service.
+ * MFA setup response.
  *
- * All user/account-related network operations should live here.
+ * `secret` should only be exposed during the MFA enrollment flow.
+ * The backend should never return it as part of normal user/profile data.
  */
+export interface MfaSetupResponse {
+  secret: string
+  qrCodeUrl?: string
+}
+
+/**
+ * Current account status response.
+ */
+export interface AccountStatusResponse {
+  status: AccountStatus
+  verificationStatus: VerificationStatus
+}
+
+/* ========================================================================== */
+/* Endpoint map                                                               */
+/* ========================================================================== */
+
+const USERS_BASE = '/users'
+
+const endpoints = {
+  currentUser: `${USERS_BASE}/me`,
+  user: (id: string) => `${USERS_BASE}/${id}`,
+
+  verification: `${USERS_BASE}/me/verification`,
+
+  documents: `${USERS_BASE}/me/documents`,
+  document: (documentId: string) =>
+    `${USERS_BASE}/me/documents/${documentId}`,
+
+  security: `${USERS_BASE}/me/security`,
+  password: `${USERS_BASE}/me/security/password`,
+
+  mfaSetup: `${USERS_BASE}/me/security/mfa/setup`,
+  mfaVerify: `${USERS_BASE}/me/security/mfa/verify`,
+  mfaDisable: `${USERS_BASE}/me/security/mfa/disable`,
+
+  sessions: `${USERS_BASE}/me/sessions`,
+  session: (sessionId: string) =>
+    `${USERS_BASE}/me/sessions/${sessionId}`,
+  revokeOtherSessions: `${USERS_BASE}/me/sessions/revoke-others`,
+
+  securityEvents: `${USERS_BASE}/me/security/events`,
+
+  status: `${USERS_BASE}/me/status`,
+} as const
+
+/* ========================================================================== */
+/* Users service                                                              */
+/* ========================================================================== */
+
 export const usersService = {
+  /* ------------------------------------------------------------------------ */
+  /* Identity                                                                 */
+  /* ------------------------------------------------------------------------ */
+
   /**
    * Get the currently authenticated user's profile.
    *
    * GET /users/me
    */
   getCurrentUser: async (): Promise<User> => {
-    // TODO: return api.get<User>('/users/me')
-    throw new Error('usersService.getCurrentUser is not implemented')
+    return api.get<User>(endpoints.currentUser)
   },
 
   /**
    * Get a user by ID.
    *
    * GET /users/:id
+   *
+   * Authorization is enforced by the backend.
    */
   getById: async (id: string): Promise<User> => {
-    // TODO: return api.get<User>(`/users/${id}`)
-    throw new Error('usersService.getById is not implemented')
+    return api.get<User>(endpoints.user(id))
   },
 
   /**
@@ -94,33 +162,36 @@ export const usersService = {
   updateProfile: async (
     payload: UpdateProfilePayload,
   ): Promise<User> => {
-    // TODO:
-    // return api.patch<User>('/users/me', payload)
-    throw new Error('usersService.updateProfile is not implemented')
+    return api.patch<User>(
+      endpoints.currentUser,
+      payload,
+    )
   },
 
+  /* ------------------------------------------------------------------------ */
+  /* Verification                                                             */
+  /* ------------------------------------------------------------------------ */
+
   /**
-   * Get the user's verification status.
+   * Get the authenticated user's verification status.
    *
    * GET /users/me/verification
    */
   getVerificationStatus: async (): Promise<UserVerification> => {
-    // TODO:
-    // return api.get<UserVerification>('/users/me/verification')
-    throw new Error(
-      'usersService.getVerificationStatus is not implemented',
+    return api.get<UserVerification>(
+      endpoints.verification,
     )
   },
 
   /**
-   * Get documents submitted for verification.
+   * Get documents submitted for identity/account verification.
    *
    * GET /users/me/documents
    */
   getDocuments: async (): Promise<UserDocument[]> => {
-    // TODO:
-    // return api.get<UserDocument[]>('/users/me/documents')
-    throw new Error('usersService.getDocuments is not implemented')
+    return api.get<UserDocument[]>(
+      endpoints.documents,
+    )
   },
 
   /**
@@ -128,27 +199,22 @@ export const usersService = {
    *
    * POST /users/me/documents
    *
-   * The actual multipart/form-data implementation should be handled
-   * by the shared API client.
+   * The shared API client is responsible for handling the
+   * multipart/form-data request.
    */
   uploadDocument: async (
     file: File,
     documentType: string,
   ): Promise<UserDocument> => {
-    // TODO:
-    // const formData = new FormData()
-    // formData.append('file', file)
-    // formData.append('documentType', documentType)
-    //
-    // return api.post<UserDocument>(
-    //   '/users/me/documents',
-    //   formData,
-    // )
+    const formData = new FormData()
 
-    void file
-    void documentType
+    formData.append('file', file)
+    formData.append('documentType', documentType)
 
-    throw new Error('usersService.uploadDocument is not implemented')
+    return api.post<UserDocument>(
+      endpoints.documents,
+      formData,
+    )
   },
 
   /**
@@ -159,27 +225,30 @@ export const usersService = {
   deleteDocument: async (
     documentId: string,
   ): Promise<void> => {
-    // TODO:
-    // await api.delete(`/users/me/documents/${documentId}`)
-
-    void documentId
-
-    throw new Error('usersService.deleteDocument is not implemented')
+    await api.delete(
+      endpoints.document(documentId),
+    )
   },
 
+  /* ------------------------------------------------------------------------ */
+  /* Security                                                                 */
+  /* ------------------------------------------------------------------------ */
+
   /**
-   * Get the user's security summary.
+   * Get the authenticated user's security posture.
    *
-   * Includes security score, MFA status, password strength,
-   * active session count, etc.
+   * Includes:
+   * - security score
+   * - password strength
+   * - MFA status
+   * - active session count
+   * - other backend-defined security indicators
    *
    * GET /users/me/security
    */
   getSecuritySummary: async (): Promise<SecuritySummary> => {
-    // TODO:
-    // return api.get<SecuritySummary>('/users/me/security')
-    throw new Error(
-      'usersService.getSecuritySummary is not implemented',
+    return api.get<SecuritySummary>(
+      endpoints.security,
     )
   },
 
@@ -192,49 +261,47 @@ export const usersService = {
     currentPassword: string,
     newPassword: string,
   ): Promise<void> => {
-    // TODO:
-    // await api.post('/users/me/security/password', {
-    //   currentPassword,
-    //   newPassword,
-    // })
+    await api.post(
+      endpoints.password,
+      {
+        currentPassword,
+        newPassword,
+      },
+    )
+  },
 
-    void currentPassword
-    void newPassword
+  /* ------------------------------------------------------------------------ */
+  /* MFA                                                                      */
+  /* ------------------------------------------------------------------------ */
 
-    throw new Error(
-      'usersService.changePassword is not implemented',
+  /**
+   * Start MFA enrollment.
+   *
+   * POST /users/me/security/mfa/setup
+   *
+   * The backend may return:
+   * - a secret
+   * - a QR code URL
+   * - additional enrollment metadata in future versions
+   */
+  setupMfa: async (): Promise<MfaSetupResponse> => {
+    return api.post<MfaSetupResponse>(
+      endpoints.mfaSetup,
     )
   },
 
   /**
-   * Enable MFA.
-   *
-   * The backend should return the MFA setup information required
-   * by the client, such as a QR code or secret.
-   *
-   * POST /users/me/security/mfa/setup
-   */
-  setupMfa: async (): Promise<{
-    secret: string
-    qrCodeUrl?: string
-  }> => {
-    // TODO:
-    // return api.post('/users/me/security/mfa/setup')
-    throw new Error('usersService.setupMfa is not implemented')
-  },
-
-  /**
-   * Confirm MFA setup.
+   * Confirm MFA enrollment using a verification code.
    *
    * POST /users/me/security/mfa/verify
    */
-  verifyMfa: async (code: string): Promise<void> => {
-    // TODO:
-    // await api.post('/users/me/security/mfa/verify', { code })
-
-    void code
-
-    throw new Error('usersService.verifyMfa is not implemented')
+  verifyMfa: async (
+    code: string,
+  ): Promise<void> => {
+    await api.post(
+      endpoints.mfaVerify,
+      { code },
+    )
   },
 
   /**
@@ -242,41 +309,40 @@ export const usersService = {
    *
    * POST /users/me/security/mfa/disable
    */
-  disableMfa: async (code: string): Promise<void> => {
-    // TODO:
-    // await api.post('/users/me/security/mfa/disable', { code })
-
-    void code
-
-    throw new Error('usersService.disableMfa is not implemented')
+  disableMfa: async (
+    code: string,
+  ): Promise<void> => {
+    await api.post(
+      endpoints.mfaDisable,
+      { code },
+    )
   },
 
+  /* ------------------------------------------------------------------------ */
+  /* Sessions / devices                                                       */
+  /* ------------------------------------------------------------------------ */
+
   /**
-   * Get all active sessions/devices.
+   * Get all active authenticated sessions/devices.
    *
    * GET /users/me/sessions
    */
   getSessions: async (): Promise<Session[]> => {
-    // TODO:
-    // return api.get<Session[]>('/users/me/sessions')
-    throw new Error('usersService.getSessions is not implemented')
+    return api.get<Session[]>(
+      endpoints.sessions,
+    )
   },
 
   /**
-   * Revoke a specific session.
+   * Revoke a specific authenticated session.
    *
    * DELETE /users/me/sessions/:sessionId
    */
   revokeSession: async (
     sessionId: string,
   ): Promise<void> => {
-    // TODO:
-    // await api.delete(`/users/me/sessions/${sessionId}`)
-
-    void sessionId
-
-    throw new Error(
-      'usersService.revokeSession is not implemented',
+    await api.delete(
+      endpoints.session(sessionId),
     )
   },
 
@@ -286,39 +352,46 @@ export const usersService = {
    * POST /users/me/sessions/revoke-others
    */
   revokeOtherSessions: async (): Promise<void> => {
-    // TODO:
-    // await api.post('/users/me/sessions/revoke-others')
-    throw new Error(
-      'usersService.revokeOtherSessions is not implemented',
+    await api.post(
+      endpoints.revokeOtherSessions,
     )
   },
 
+  /* ------------------------------------------------------------------------ */
+  /* Security activity                                                        */
+  /* ------------------------------------------------------------------------ */
+
   /**
-   * Get recent security activity.
+   * Get recent security and authentication activity.
    *
    * GET /users/me/security/events
    */
   getSecurityEvents: async (): Promise<SecurityEvent[]> => {
-    // TODO:
-    // return api.get<SecurityEvent[]>('/users/me/security/events')
-    throw new Error(
-      'usersService.getSecurityEvents is not implemented',
+    return api.get<SecurityEvent[]>(
+      endpoints.securityEvents,
     )
   },
 
+  /* ------------------------------------------------------------------------ */
+  /* Account status                                                           */
+  /* ------------------------------------------------------------------------ */
+
   /**
-   * Get the current account status.
+   * Get the current account and verification status.
    *
    * GET /users/me/status
    */
-  getAccountStatus: async (): Promise<{
-    status: AccountStatus
-    verificationStatus: VerificationStatus
-  }> => {
-    // TODO:
-    // return api.get('/users/me/status')
-    throw new Error(
-      'usersService.getAccountStatus is not implemented',
+  getAccountStatus: async (): Promise<AccountStatusResponse> => {
+    return api.get<AccountStatusResponse>(
+      endpoints.status,
     )
   },
-}
+} as const
+
+/**
+ * Public service type.
+ *
+ * Useful for dependency injection, testing and typed hooks without
+ * duplicating the service contract.
+ */
+export type UsersService = typeof usersService

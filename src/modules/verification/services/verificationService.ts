@@ -1,11 +1,17 @@
 // Verification module — API service layer
-// BRD references: Sec. 15.2, 15.3, 22
 //
-// This is the single network boundary for verification-related operations.
-// Pages and components should use this service instead of calling fetch/axios
-// directly.
+// BRD references:
+// - Sec. 15.2 — Verification Status Lifecycle
+// - Sec. 15.3 — Verification Documents
+// - Sec. 22 — User Management & Identity
 //
-// Backend endpoints are structured around the Build OS verification lifecycle:
+// This module is the single network boundary for verification-related
+// operations.
+//
+// Pages and components should use this service instead of calling
+// fetch/axios directly.
+//
+// Verification lifecycle:
 //
 // Draft
 //   → Submitted
@@ -17,12 +23,85 @@
 import type {
   Verification,
   VerificationDocument,
-  VerificationStatus,
   VerificationReview,
+  VerificationStatus,
 } from './types'
 
-// Replace with the project's configured API client once available.
+// -----------------------------------------------------------------------------
+// API client
+// -----------------------------------------------------------------------------
+//
+// Replace this fallback with the project's configured API client when the
+// backend integration is enabled.
+//
+// Example:
 // import { api } from '@/lib/api'
+//
+// The service intentionally remains isolated from the UI layer so that pages
+// and components do not need to know whether the application uses Axios,
+// fetch, or another HTTP client.
+// -----------------------------------------------------------------------------
+
+// import { api } from '@/lib/api'
+
+// -----------------------------------------------------------------------------
+// Shared request types
+// -----------------------------------------------------------------------------
+
+export interface VerificationQueueParams {
+  status?: VerificationStatus
+  role?: string
+  search?: string
+  page?: number
+  limit?: number
+}
+
+export interface CreateVerificationPayload {
+  role: string
+  country?: string
+}
+
+export type UpdateVerificationPayload = Record<string, unknown>
+
+export interface RequestVerificationInformationPayload {
+  comment: string
+  documentTypes?: string[]
+}
+
+export interface RejectVerificationPayload {
+  reason: string
+  comment?: string
+}
+
+export interface SuspendVerificationPayload {
+  reason: string
+}
+
+// -----------------------------------------------------------------------------
+// Validation helpers
+// -----------------------------------------------------------------------------
+
+function requireId(
+  id: string,
+  label = 'Verification ID',
+): void {
+  if (!id?.trim()) {
+    throw new Error(`${label} is required`)
+  }
+}
+
+function requireText(
+  value: string | undefined,
+  message: string,
+): void {
+  if (!value?.trim()) {
+    throw new Error(message)
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Verification service
+// -----------------------------------------------------------------------------
 
 export const verificationService = {
   /**
@@ -44,12 +123,12 @@ export const verificationService = {
   /**
    * Get a specific verification record.
    *
-   * Primarily used by admins when opening a verification request.
+   * Primarily used by administrators when opening a verification request.
    */
-  get: async (id: string): Promise<Verification> => {
-    if (!id) {
-      throw new Error('Verification ID is required')
-    }
+  get: async (
+    id: string,
+  ): Promise<Verification> => {
+    requireId(id)
 
     throw new Error(
       'verificationService.get: API client not configured',
@@ -59,22 +138,24 @@ export const verificationService = {
   },
 
   /**
-   * Get the verification queue for Build OS administrators.
+   * Get the Build OS verification queue.
    *
-   * Supports filtering by:
-   * - status
-   * - user type / role
-   * - submission date
+   * Supports:
+   * - verification status
+   * - applicant role
    * - search
+   * - pagination
    */
-  listQueue: async (params?: {
-    status?: VerificationStatus
-    role?: string
-    search?: string
-    page?: number
-    limit?: number
-  }): Promise<Verification[]> => {
-    void params
+  listQueue: async (
+    params?: VerificationQueueParams,
+  ): Promise<Verification[]> => {
+    if (params?.page !== undefined && params.page < 1) {
+      throw new Error('Verification page must be greater than 0')
+    }
+
+    if (params?.limit !== undefined && params.limit < 1) {
+      throw new Error('Verification limit must be greater than 0')
+    }
 
     throw new Error(
       'verificationService.listQueue: API client not configured',
@@ -90,50 +171,56 @@ export const verificationService = {
    *
    * Creates the initial Draft verification record.
    */
-  create: async (payload: {
-    role: string
-    country?: string
-  }): Promise<Verification> => {
-    if (!payload.role) {
-      throw new Error('Verification role is required')
-    }
-
-    void payload
+  create: async (
+    payload: CreateVerificationPayload,
+  ): Promise<Verification> => {
+    requireText(
+      payload.role,
+      'Verification role is required',
+    )
 
     throw new Error(
       'verificationService.create: API client not configured',
     )
 
-    // return api.post<Verification>('/verification', payload)
+    // return api.post<Verification>(
+    //   '/verification',
+    //   payload,
+    // )
   },
 
   /**
    * Update verification profile information.
    *
-   * Only editable information should be accepted by the backend
-   * according to the current verification status.
+   * The backend is responsible for determining which fields are editable
+   * according to the current verification lifecycle state.
    */
   update: async (
     id: string,
-    payload: Record<string, unknown>,
+    payload: UpdateVerificationPayload,
   ): Promise<Verification> => {
-    if (!id) {
-      throw new Error('Verification ID is required')
-    }
+    requireId(id)
 
-    void payload
+    if (!payload || Object.keys(payload).length === 0) {
+      throw new Error(
+        'Verification update payload cannot be empty',
+      )
+    }
 
     throw new Error(
       'verificationService.update: API client not configured',
     )
 
-    // return api.patch<Verification>(`/verification/${id}`, payload)
+    // return api.patch<Verification>(
+    //   `/verification/${id}`,
+    //   payload,
+    // )
   },
 
   /**
    * Upload a verification document.
    *
-   * Examples:
+   * Supported examples include:
    * - Government ID
    * - NIN
    * - BVN
@@ -149,26 +236,25 @@ export const verificationService = {
     file: File,
     documentType: string,
   ): Promise<VerificationDocument> => {
-    if (!verificationId) {
-      throw new Error('Verification ID is required')
-    }
+    requireId(verificationId)
 
     if (!file) {
-      throw new Error('Verification document is required')
+      throw new Error(
+        'Verification document is required',
+      )
     }
 
-    if (!documentType) {
-      throw new Error('Document type is required')
-    }
-
-    void file
-    void documentType
+    requireText(
+      documentType,
+      'Document type is required',
+    )
 
     throw new Error(
       'verificationService.uploadDocument: API client not configured',
     )
 
     // const formData = new FormData()
+    //
     // formData.append('file', file)
     // formData.append('documentType', documentType)
     //
@@ -186,20 +272,15 @@ export const verificationService = {
   /**
    * Remove a verification document.
    *
-   * The backend should enforce whether the document is still editable
+   * The backend should determine whether the document remains editable
    * based on the verification lifecycle.
    */
   deleteDocument: async (
     verificationId: string,
     documentId: string,
   ): Promise<void> => {
-    if (!verificationId) {
-      throw new Error('Verification ID is required')
-    }
-
-    if (!documentId) {
-      throw new Error('Document ID is required')
-    }
+    requireId(verificationId)
+    requireId(documentId, 'Document ID')
 
     throw new Error(
       'verificationService.deleteDocument: API client not configured',
@@ -213,41 +294,39 @@ export const verificationService = {
   /**
    * Submit a completed verification application for admin review.
    *
+   * Lifecycle:
    * Draft → Submitted
    */
-  submit: async (id: string): Promise<Verification> => {
-    if (!id) {
-      throw new Error('Verification ID is required')
-    }
+  submit: async (
+    id: string,
+  ): Promise<Verification> => {
+    requireId(id)
 
     throw new Error(
       'verificationService.submit: API client not configured',
     )
 
-    // return api.post<Verification>(`/verification/${id}/submit`)
+    // return api.post<Verification>(
+    //   `/verification/${id}/submit`,
+    // )
   },
 
   /**
    * Request additional information from the applicant.
    *
+   * Lifecycle:
    * Submitted → Need More Information
    */
   requestInformation: async (
     id: string,
-    payload: {
-      comment: string
-      documentTypes?: string[]
-    },
+    payload: RequestVerificationInformationPayload,
   ): Promise<VerificationReview> => {
-    if (!id) {
-      throw new Error('Verification ID is required')
-    }
+    requireId(id)
 
-    if (!payload.comment.trim()) {
-      throw new Error('A review comment is required')
-    }
-
-    void payload
+    requireText(
+      payload.comment,
+      'A review comment is required',
+    )
 
     throw new Error(
       'verificationService.requestInformation: API client not configured',
@@ -260,19 +339,16 @@ export const verificationService = {
   },
 
   /**
-   * Approve a verification.
+   * Approve a verification application.
    *
+   * Lifecycle:
    * Submitted → Verified
    */
   approve: async (
     id: string,
     comment?: string,
   ): Promise<VerificationReview> => {
-    if (!id) {
-      throw new Error('Verification ID is required')
-    }
-
-    void comment
+    requireId(id)
 
     throw new Error(
       'verificationService.approve: API client not configured',
@@ -280,31 +356,28 @@ export const verificationService = {
 
     // return api.post<VerificationReview>(
     //   `/admin/verification/${id}/approve`,
-    //   { comment },
+    //   {
+    //     comment: comment?.trim() || undefined,
+    //   },
     // )
   },
 
   /**
-   * Reject a verification.
+   * Reject a verification application.
    *
-   * The backend should retain the full audit trail and rejection reason.
+   * The backend should preserve the complete audit trail, including the
+   * rejection reason and optional reviewer comment.
    */
   reject: async (
     id: string,
-    payload: {
-      reason: string
-      comment?: string
-    },
+    payload: RejectVerificationPayload,
   ): Promise<VerificationReview> => {
-    if (!id) {
-      throw new Error('Verification ID is required')
-    }
+    requireId(id)
 
-    if (!payload.reason.trim()) {
-      throw new Error('A rejection reason is required')
-    }
-
-    void payload
+    requireText(
+      payload.reason,
+      'A rejection reason is required',
+    )
 
     throw new Error(
       'verificationService.reject: API client not configured',
@@ -312,32 +385,32 @@ export const verificationService = {
 
     // return api.post<VerificationReview>(
     //   `/admin/verification/${id}/reject`,
-    //   payload,
+    //   {
+    //     reason: payload.reason.trim(),
+    //     comment: payload.comment?.trim() || undefined,
+    //   },
     // )
   },
 
   /**
    * Suspend an already verified user.
    *
+   * Lifecycle:
    * Verified → Suspended
    *
-   * Used for fraud, compliance, dispute or misconduct concerns.
+   * Used for compliance, fraud, dispute, or misconduct-related
+   * restrictions.
    */
   suspend: async (
     id: string,
-    payload: {
-      reason: string
-    },
+    payload: SuspendVerificationPayload,
   ): Promise<VerificationReview> => {
-    if (!id) {
-      throw new Error('Verification ID is required')
-    }
+    requireId(id)
 
-    if (!payload.reason.trim()) {
-      throw new Error('Suspension reason is required')
-    }
-
-    void payload
+    requireText(
+      payload.reason,
+      'Suspension reason is required',
+    )
 
     throw new Error(
       'verificationService.suspend: API client not configured',
@@ -345,21 +418,25 @@ export const verificationService = {
 
     // return api.post<VerificationReview>(
     //   `/admin/verification/${id}/suspend`,
-    //   payload,
+    //   {
+    //     reason: payload.reason.trim(),
+    //   },
     // )
   },
 
   /**
    * Get verification review history.
    *
-   * Provides the audit trail for admin decisions and applicant updates.
+   * Provides the audit trail for:
+   * - reviewer decisions
+   * - applicant updates
+   * - information requests
+   * - approval / rejection actions
    */
   getReviewHistory: async (
     id: string,
   ): Promise<VerificationReview[]> => {
-    if (!id) {
-      throw new Error('Verification ID is required')
-    }
+    requireId(id)
 
     throw new Error(
       'verificationService.getReviewHistory: API client not configured',
@@ -371,14 +448,12 @@ export const verificationService = {
   },
 
   /**
-   * Get verification documents attached to an application.
+   * Get all verification documents attached to an application.
    */
   getDocuments: async (
     id: string,
   ): Promise<VerificationDocument[]> => {
-    if (!id) {
-      throw new Error('Verification ID is required')
-    }
+    requireId(id)
 
     throw new Error(
       'verificationService.getDocuments: API client not configured',

@@ -68,6 +68,17 @@ const evidenceStatusTone: Record<
   rejected: 'brick',
 }
 
+const evidenceStatusLabels: Record<
+  EvidenceStatus,
+  string
+> = {
+  submitted: 'Submitted',
+  under_review: 'Under review',
+  verified: 'Verified',
+  blocked: 'Blocked',
+  rejected: 'Rejected',
+}
+
 const evidenceTypeLabels: Record<EvidenceType, string> = {
   milestone: 'Milestone',
   monitoring: 'Monitoring',
@@ -195,60 +206,92 @@ export function EvidenceLibrary() {
   ).length
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col justify-between gap-5 xl:flex-row xl:items-end">
+    <div className="space-y-7">
+      {/* =========================================================
+          HEADER
+      ========================================================= */}
+      <header className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-ink/5">
-              <FileCheck2 className="h-5 w-5 text-ink/55" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-[13px] border border-ink/[0.07] bg-white shadow-[0_6px_20px_rgba(20,30,25,0.035)]">
+              <FileCheck2 className="h-[18px] w-[18px] text-ink/55" />
             </div>
 
-            <span className="rounded-full bg-paper-2 px-2.5 py-1 font-mono text-[9px] font-semibold text-ink/40">
-              EVIDENCE
+            <span className="h-px w-7 bg-ink/10" />
+
+            <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-ink/35">
+              Evidence governance
             </span>
           </div>
 
-          <h1 className="mt-4 font-display text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
-            Evidence Library
-          </h1>
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <h1 className="font-display text-[30px] font-semibold tracking-[-0.035em] text-ink sm:text-[34px]">
+              Evidence Library
+            </h1>
+
+            <span className="inline-flex items-center gap-2 rounded-full border border-amber/[0.16] bg-[#F7F1E7] px-3 py-1.5 text-[10px] font-semibold text-amber-dark">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#C28A2C]" />
+              {reviewCount} awaiting review
+            </span>
+          </div>
 
           <p className="mt-2 max-w-2xl text-sm leading-6 text-ink/50">
-            Review and track evidence submitted across projects,
-            milestones, procurement, monitoring and disputes.
+            A controlled record of evidence supporting project
+            verification, procurement acceptance, monitoring,
+            disputes and payment decisions.
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            className="inline-flex items-center gap-2 rounded-xl border border-line bg-white px-4 py-2.5 text-xs font-semibold text-ink/55 transition hover:border-ink/20 hover:text-ink"
-          >
-            <Filter className="h-4 w-4" />
-            Filters
-          </button>
+        <button
+          type="button"
+          className="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-full border border-ink/[0.08] bg-white px-4 text-xs font-semibold text-ink/65 shadow-[0_6px_20px_rgba(20,30,25,0.035)] transition-all duration-200 hover:-translate-y-0.5 hover:border-ink/[0.15] hover:text-ink hover:shadow-[0_10px_26px_rgba(20,30,25,0.055)]"
+        >
+          <Filter className="h-3.5 w-3.5" />
+          Filters
+        </button>
+      </header>
+
+      {/* =========================================================
+          GOVERNANCE BANNER
+      ========================================================= */}
+      <div className="relative overflow-hidden rounded-[20px] border border-[#12613E]/[0.10] bg-[#F4F7F4] shadow-[0_8px_30px_rgba(20,30,25,0.035)]">
+        <div className="absolute inset-y-0 left-0 w-1 bg-[#12613E]" />
+
+        <div className="flex flex-col gap-4 p-4 pl-5 sm:flex-row sm:items-start sm:p-5 sm:pl-6">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[13px] border border-[#12613E]/[0.08] bg-white shadow-[0_4px_16px_rgba(20,30,25,0.04)]">
+            <ShieldCheck className="h-[18px] w-[18px] text-[#12613E]" />
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="text-sm font-semibold text-[#12613E]">
+                Evidence is part of the payment control layer
+              </p>
+
+              <span className="rounded-full bg-[#12613E]/[0.08] px-2 py-1 text-[9px] font-semibold text-[#12613E]">
+                Controlled
+              </span>
+            </div>
+
+            <p className="mt-1 max-w-4xl text-xs leading-5 text-ink/50">
+              Submitted evidence supports milestone verification,
+              procurement acceptance, monitoring and payment
+              decisions. Contractor or supplier claims are not
+              treated as verified until the required review chain
+              is completed.
+            </p>
+          </div>
+
+          <div className="hidden shrink-0 items-center gap-2 rounded-full border border-[#12613E]/[0.08] bg-white px-3 py-2 text-[9px] font-semibold text-ink/45 sm:flex">
+            <CheckCircle2 className="h-3.5 w-3.5 text-[#12613E]" />
+            Audit trail preserved
+          </div>
         </div>
       </div>
 
-      {/* Trust message */}
-      <div className="flex items-start gap-3 rounded-2xl border border-teal/15 bg-teal-light p-4">
-        <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-teal" />
-
-        <div>
-          <p className="text-sm font-semibold text-teal">
-            Evidence is part of the payment control layer
-          </p>
-
-          <p className="mt-1 text-xs leading-5 text-ink/50">
-            Submitted evidence supports milestone verification,
-            procurement acceptance, monitoring and payment decisions.
-            Contractor or supplier claims are not treated as verified
-            until the required review chain is completed.
-          </p>
-        </div>
-      </div>
-
-      {/* Summary */}
+      {/* =========================================================
+          SUMMARY
+      ========================================================= */}
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <EvidenceStat
           label="Total evidence"
@@ -282,21 +325,23 @@ export function EvidenceLibrary() {
         />
       </div>
 
-      {/* Search and filters */}
-      <Card>
-        <CardBody>
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+      {/* =========================================================
+          SEARCH / FILTERS
+      ========================================================= */}
+      <Card className="overflow-hidden">
+        <CardBody className="p-3 sm:p-4">
+          <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
             <div className="relative min-w-0 flex-1">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/30" />
+              <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/25" />
 
               <input
                 type="search"
                 placeholder="Search evidence, project, milestone or submitter..."
-                className="h-10 w-full rounded-xl border border-line bg-paper-2 pl-9 pr-4 text-xs text-ink outline-none transition placeholder:text-ink/30 focus:border-ink/20 focus:bg-white"
+                className="h-11 w-full rounded-[13px] border border-ink/[0.07] bg-[#F7F8F6] pl-10 pr-4 text-xs text-ink outline-none transition-all placeholder:text-ink/30 focus:border-[#12613E]/[0.20] focus:bg-white focus:ring-4 focus:ring-[#12613E]/[0.04]"
               />
             </div>
 
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5">
               <FilterChip label="All" active />
               <FilterChip label="Under review" />
               <FilterChip label="Verified" />
@@ -306,15 +351,17 @@ export function EvidenceLibrary() {
         </CardBody>
       </Card>
 
-      {/* Evidence records */}
+      {/* =========================================================
+          RECORDS
+      ========================================================= */}
       <Card className="overflow-hidden">
         <CardHeader
           title="Evidence records"
-          subtitle={`${totalEvidence} evidence submissions across active and completed projects`}
+          subtitle={`${totalEvidence} submissions across active and completed projects`}
         />
 
-        <CardBody>
-          <div className="space-y-3">
+        <CardBody className="p-3 sm:p-4">
+          <div className="space-y-2.5">
             {evidence.map((item) => (
               <EvidenceRecordRow
                 key={item.id}
@@ -325,25 +372,37 @@ export function EvidenceLibrary() {
         </CardBody>
       </Card>
 
-      {/* Evidence principles */}
-      <div className="grid gap-3 md:grid-cols-3">
-        <EvidencePrinciple
-          icon={ShieldCheck}
-          title="Verified before payment"
-          description="Evidence must pass the required verification chain before associated funds can be released."
-        />
+      {/* =========================================================
+          PRINCIPLES
+      ========================================================= */}
+      <div>
+        <div className="mb-3 flex items-center gap-3">
+          <span className="text-[9px] font-semibold uppercase tracking-[0.18em] text-ink/30">
+            Evidence principles
+          </span>
 
-        <EvidencePrinciple
-          icon={FileCheck2}
-          title="Audit preserved"
-          description="Submission, review, verification and rejection decisions remain attached to the evidence record."
-        />
+          <span className="h-px flex-1 bg-ink/[0.06]" />
+        </div>
 
-        <EvidencePrinciple
-          icon={LockKeyholeIcon}
-          title="Dispute protected"
-          description="Evidence linked to a disputed payment remains available while the affected payment line is frozen."
-        />
+        <div className="grid gap-3 md:grid-cols-3">
+          <EvidencePrinciple
+            icon={ShieldCheck}
+            title="Verified before payment"
+            description="Evidence must pass the required verification chain before associated funds can be released."
+          />
+
+          <EvidencePrinciple
+            icon={FileCheck2}
+            title="Audit preserved"
+            description="Submission, review, verification and rejection decisions remain attached to the evidence record."
+          />
+
+          <EvidencePrinciple
+            icon={LockKeyholeIcon}
+            title="Dispute protected"
+            description="Evidence linked to a disputed payment remains available while the affected payment line is frozen."
+          />
+        </div>
       </div>
     </div>
   )
@@ -362,23 +421,39 @@ function EvidenceStat({
   description: string
   tone?: 'neutral' | 'teal' | 'amber' | 'brick'
 }) {
-  const iconStyles = {
-    neutral: 'bg-ink/5 text-ink/50',
-    teal: 'bg-teal-light text-teal',
-    amber: 'bg-amber/10 text-amber-dark',
-    brick: 'bg-brick/[0.06] text-brick',
+  const styles = {
+    neutral: {
+      icon: 'bg-ink/[0.045] text-ink/50',
+      accent: 'bg-ink/20',
+    },
+    teal: {
+      icon: 'bg-[#F4F7F4] text-[#12613E]',
+      accent: 'bg-[#12613E]/60',
+    },
+    amber: {
+      icon: 'bg-[#F7F1E7] text-[#C28A2C]',
+      accent: 'bg-[#C28A2C]/60',
+    },
+    brick: {
+      icon: 'bg-[#F8EEE6] text-[#B85C12]',
+      accent: 'bg-[#B85C12]/60',
+    },
   }
 
   return (
-    <Card>
-      <CardBody>
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-wide text-ink/35">
+    <Card className="group relative overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_34px_rgba(20,30,25,0.055)]">
+      <div
+        className={`absolute inset-x-0 bottom-0 h-px ${styles[tone].accent}`}
+      />
+
+      <CardBody className="p-4 sm:p-5">
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-ink/35">
               {label}
             </p>
 
-            <p className="mt-2 font-display text-2xl font-semibold tracking-tight text-ink">
+            <p className="mt-2 font-display text-[27px] font-semibold tracking-[-0.03em] text-ink">
               {value}
             </p>
 
@@ -388,7 +463,7 @@ function EvidenceStat({
           </div>
 
           <div
-            className={`flex h-9 w-9 items-center justify-center rounded-xl ${iconStyles[tone]}`}
+            className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-[11px] ${styles[tone].icon}`}
           >
             <Icon className="h-4 w-4" />
           </div>
@@ -408,10 +483,10 @@ function FilterChip({
   return (
     <button
       type="button"
-      className={`rounded-full px-3 py-1.5 text-[10px] font-semibold transition ${
+      className={`rounded-full px-3 py-2 text-[10px] font-semibold transition-all ${
         active
-          ? 'bg-ink text-white'
-          : 'bg-paper-2 text-ink/40 hover:bg-ink/5 hover:text-ink/70'
+          ? 'bg-ink text-white shadow-[0_4px_12px_rgba(20,30,25,0.10)]'
+          : 'bg-[#F7F8F6] text-ink/40 hover:bg-ink/[0.05] hover:text-ink/70'
       }`}
     >
       {label}
@@ -424,27 +499,47 @@ function EvidenceRecordRow({
 }: {
   evidence: EvidenceRecord
 }) {
-  const statusLabel = evidence.status
-    .replaceAll('_', ' ')
-    .replace(/\b\w/g, (letter) =>
-      letter.toUpperCase(),
-    )
+  const statusLabel =
+    evidenceStatusLabels[evidence.status]
+
+  const statusRail = {
+    submitted: 'bg-ink/20',
+    under_review: 'bg-[#C28A2C]/60',
+    verified: 'bg-[#12613E]/60',
+    blocked: 'bg-[#B85C12]/60',
+    rejected: 'bg-[#B85C12]/60',
+  }[evidence.status]
+
+  const typeTone = {
+    milestone: 'bg-[#F4F7F4]',
+    monitoring: 'bg-[#F7F8F6]',
+    procurement: 'bg-[#F7F1E7]',
+    document: 'bg-ink/[0.045]',
+    dispute: 'bg-[#F8EEE6]',
+  }[evidence.type]
 
   return (
     <button
       type="button"
-      className="group w-full rounded-2xl border border-line bg-white p-4 text-left transition hover:border-ink/15 hover:shadow-sm"
+      className="group relative w-full overflow-hidden rounded-[18px] border border-ink/[0.07] bg-white p-4 text-left shadow-[0_4px_18px_rgba(20,30,25,0.025)] transition-all duration-200 hover:-translate-y-0.5 hover:border-ink/[0.12] hover:shadow-[0_12px_34px_rgba(20,30,25,0.055)] sm:p-5"
     >
+      {/* Bottom status rail */}
+      <div
+        className={`absolute inset-x-0 bottom-0 h-[2px] ${statusRail}`}
+      />
+
       <div className="flex flex-col gap-4 xl:flex-row xl:items-center">
-        {/* Icon */}
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-paper-2">
+        {/* Type icon */}
+        <div
+          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-[13px] ${typeTone}`}
+        >
           <EvidenceTypeIcon type={evidence.type} />
         </div>
 
         {/* Main information */}
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <p className="truncate text-sm font-semibold text-ink">
+            <p className="min-w-0 truncate text-sm font-semibold text-ink">
               {evidence.title}
             </p>
 
@@ -456,63 +551,104 @@ function EvidenceRecordRow({
               {statusLabel}
             </Badge>
 
-            <span className="rounded-full bg-paper-2 px-2 py-1 text-[9px] font-semibold text-ink/40">
+            <span className="rounded-full bg-[#F7F8F6] px-2 py-1 text-[9px] font-semibold text-ink/40">
               {evidenceTypeLabels[evidence.type]}
             </span>
           </div>
 
-          <p className="mt-1 text-xs leading-5 text-ink/45">
+          <div className="mt-1 flex flex-wrap items-center gap-x-2">
+            <span className="font-mono text-[9px] font-medium text-ink/25">
+              {evidence.id}
+            </span>
+
+            <span className="h-1 w-1 rounded-full bg-ink/15" />
+
+            <span className="text-[10px] text-ink/35">
+              {evidence.submittedRole}
+            </span>
+          </div>
+
+          <p className="mt-2 max-w-3xl text-xs leading-5 text-ink/45">
             {evidence.description}
           </p>
 
-          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-[10px] text-ink/35">
-            <span className="inline-flex items-center gap-1.5">
-              <FileText className="h-3 w-3" />
-              {evidence.projectName}
-            </span>
+          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+            <MetaItem
+              icon={FileText}
+              value={evidence.projectName}
+            />
 
             {evidence.milestone && (
-              <span className="inline-flex items-center gap-1.5">
-                <FileCheck2 className="h-3 w-3" />
-                {evidence.milestone}
-              </span>
+              <MetaItem
+                icon={FileCheck2}
+                value={evidence.milestone}
+              />
             )}
 
-            <span className="inline-flex items-center gap-1.5">
-              <User className="h-3 w-3" />
-              {evidence.submittedBy}
-            </span>
+            <MetaItem
+              icon={User}
+              value={evidence.submittedBy}
+            />
 
-            <span className="inline-flex items-center gap-1.5 font-mono">
-              <CalendarDays className="h-3 w-3" />
-              {evidence.submittedAt}
-            </span>
+            <MetaItem
+              icon={CalendarDays}
+              value={evidence.submittedAt}
+              mono
+            />
           </div>
         </div>
 
-        {/* File information */}
-        <div className="flex items-center gap-4 xl:w-[170px] xl:justify-end">
-          <div className="hidden text-right sm:block">
-            <p className="text-xs font-semibold text-ink">
-              {evidence.fileCount} files
-            </p>
+        {/* Files / action */}
+        <div className="flex items-center justify-between gap-4 border-t border-ink/[0.06] pt-3 xl:w-[190px] xl:justify-end xl:border-t-0 xl:pt-0">
+          <div className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-[#F7F8F6]">
+              <Eye className="h-3.5 w-3.5 text-ink/35" />
+            </div>
 
-            <div className="mt-1 flex justify-end gap-1">
-              {evidence.fileTypes.map((type) => (
-                <FileTypeIcon
-                  key={type}
-                  type={type}
-                />
-              ))}
+            <div>
+              <p className="text-xs font-semibold text-ink">
+                {evidence.fileCount} files
+              </p>
+
+              <div className="mt-1 flex gap-1">
+                {evidence.fileTypes.map((type) => (
+                  <FileTypeIcon
+                    key={type}
+                    type={type}
+                  />
+                ))}
+              </div>
             </div>
           </div>
 
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-line text-ink/35 transition group-hover:border-ink/20 group-hover:text-ink">
-            <ChevronRight className="h-4 w-4" />
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[11px] border border-ink/[0.07] text-ink/30 transition-all duration-200 group-hover:border-ink/[0.14] group-hover:bg-[#F7F8F6] group-hover:text-ink">
+            <ChevronRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
           </div>
         </div>
       </div>
     </button>
+  )
+}
+
+function MetaItem({
+  icon: Icon,
+  value,
+  mono = false,
+}: {
+  icon: typeof FileText
+  value: string
+  mono?: boolean
+}) {
+  return (
+    <span
+      className={`inline-flex min-w-0 items-center gap-1.5 text-[10px] text-ink/35 ${
+        mono ? 'font-mono' : ''
+      }`}
+    >
+      <Icon className="h-3 w-3 shrink-0 text-ink/25" />
+
+      <span className="truncate">{value}</span>
+    </span>
   )
 }
 
@@ -532,7 +668,7 @@ function EvidenceTypeIcon({
             ? FileText
             : AlertTriangle
 
-  return <Icon className="h-5 w-5 text-ink/45" />
+  return <Icon className="h-[18px] w-[18px] text-ink/45" />
 }
 
 function FileTypeIcon({
@@ -547,9 +683,18 @@ function FileTypeIcon({
         ? Video
         : FileText
 
+  const tone =
+    type === 'image'
+      ? 'bg-[#F4F7F4] text-[#12613E]'
+      : type === 'video'
+        ? 'bg-[#F7F1E7] text-[#C28A2C]'
+        : 'bg-[#F7F8F6] text-ink/35'
+
   return (
-    <span className="flex h-5 w-5 items-center justify-center rounded-md bg-paper-2">
-      <Icon className="h-3 w-3 text-ink/35" />
+    <span
+      className={`flex h-5 w-5 items-center justify-center rounded-[6px] ${tone}`}
+    >
+      <Icon className="h-2.5 w-2.5" />
     </span>
   )
 }
@@ -564,18 +709,18 @@ function EvidencePrinciple({
   description: string
 }) {
   return (
-    <div className="rounded-2xl border border-line bg-paper-2 p-4">
+    <div className="group relative overflow-hidden rounded-[16px] border border-ink/[0.06] bg-[#F7F8F6] p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-ink/[0.10] hover:bg-white hover:shadow-[0_10px_28px_rgba(20,30,25,0.04)] sm:p-5">
       <div className="flex items-start gap-3">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[11px] border border-ink/[0.05] bg-white">
           <Icon className="h-4 w-4 text-ink/45" />
         </div>
 
-        <div>
+        <div className="min-w-0">
           <p className="text-xs font-semibold text-ink">
             {title}
           </p>
 
-          <p className="mt-1 text-[10px] leading-5 text-ink/40">
+          <p className="mt-1.5 text-[10px] leading-5 text-ink/40">
             {description}
           </p>
         </div>

@@ -42,7 +42,6 @@ import {
 } from 'lucide-react'
 
 import { PublicLayout } from '@/layouts/PublicLayout'
-import { ProjectQuestionnaire } from '@/components/ProjectQuestionnaire'
 
 /* =========================================================
    DATA
@@ -1035,12 +1034,6 @@ export function Home() {
   {/* Bottom transition */}
   <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-paper to-transparent" />
 </section>
-
-      {/* =====================================================
-          INTRO / QUESTIONNAIRE
-      ===================================================== */}
-
-      <ProjectQuestionnaire />
 
       {/* =====================================================
           HOW IT WORKS

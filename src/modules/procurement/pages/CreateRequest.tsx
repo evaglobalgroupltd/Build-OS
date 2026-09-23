@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import {
+  CalendarDays,
+  ChevronDown,
   FileText,
+  MapPin,
   Package,
   Plus,
   Send,
@@ -99,34 +102,69 @@ export function CreateRequest() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-7">
+      {/* ===================================================== */}
+      {/* Page introduction */}
+      {/* ===================================================== */}
+
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <div className="mb-2 flex items-center gap-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#B85C12]" />
+
+            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-ink/40">
+              Procurement request
+            </p>
+          </div>
+
+          <h1 className="font-display text-[27px] font-semibold leading-tight tracking-[-0.035em] text-ink sm:text-[31px]">
+            Create material request
+          </h1>
+
+          <p className="mt-1.5 max-w-2xl text-[12px] leading-5 text-ink/45">
+            Define the materials required for an approved project scope and
+            route the request through procurement review.
+          </p>
+        </div>
+
+        <div className="hidden items-center gap-2 rounded-full border border-ink/[0.07] bg-white px-3 py-2 sm:flex">
+          <span className="h-1.5 w-1.5 rounded-full bg-[#12613E]" />
+
+          <span className="text-[10px] font-semibold text-ink/55">
+            Draft request
+          </span>
+        </div>
+      </div>
+
+      {/* ===================================================== */}
+      {/* Project context */}
+      {/* ===================================================== */}
+
       <Card className="overflow-hidden">
         <CardHeader
-          title="Create material request"
-          subtitle="Request materials against an approved project scope or BOQ."
+          title="Project context"
+          subtitle="Identify where these materials are required and connect the request to the approved scope."
         />
 
-        <CardBody>
-          <div className="grid gap-5 sm:grid-cols-2">
+        <CardBody className="p-5 sm:p-6">
+          <div className="grid gap-x-6 gap-y-6 sm:grid-cols-2">
             <Field
               label="Project"
               required
               description="Select the project requiring these materials."
             >
-              <select
-                required
+              <SelectField
                 value={projectId}
-                onChange={(event) => setProjectId(event.target.value)}
-                className={inputClass}
+                onChange={setProjectId}
+                placeholder="Select project"
               >
-                <option value="">Select project</option>
                 <option value="project-001">
                   Gwarinpa Residential Development
                 </option>
                 <option value="project-002">
                   Maitama Duplex Construction
                 </option>
-              </select>
+              </SelectField>
             </Field>
 
             <Field
@@ -134,20 +172,18 @@ export function CreateRequest() {
               required
               description="Link the request to the relevant construction phase."
             >
-              <select
-                required
+              <SelectField
                 value={phase}
-                onChange={(event) => setPhase(event.target.value)}
-                className={inputClass}
+                onChange={setPhase}
+                placeholder="Select phase"
               >
-                <option value="">Select phase</option>
                 <option value="foundation">Foundation</option>
                 <option value="structure">Structure</option>
                 <option value="roofing">Roofing</option>
                 <option value="mep">MEP</option>
                 <option value="finishing">Finishing</option>
                 <option value="external-works">External works</option>
-              </select>
+              </SelectField>
             </Field>
 
             <Field
@@ -155,7 +191,7 @@ export function CreateRequest() {
               description="Optional reference to the approved BOQ item or scope."
             >
               <div className="relative">
-                <FileText className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/30" />
+                <FileText className="pointer-events-none absolute left-3.5 top-1/2 h-[15px] w-[15px] -translate-y-1/2 text-ink/30" />
 
                 <input
                   value={boqReference}
@@ -171,38 +207,52 @@ export function CreateRequest() {
               required
               description="When the materials are required on site."
             >
-              <input
-                required
-                type="date"
-                value={requiredDate}
-                onChange={(event) => setRequiredDate(event.target.value)}
-                className={inputClass}
-              />
+              <div className="relative">
+                <CalendarDays className="pointer-events-none absolute left-3.5 top-1/2 h-[15px] w-[15px] -translate-y-1/2 text-ink/30" />
+
+                <input
+                  required
+                  type="date"
+                  value={requiredDate}
+                  onChange={(event) => setRequiredDate(event.target.value)}
+                  className={`${inputClass} pl-10`}
+                />
+              </div>
             </Field>
 
-            <Field
-              label="Delivery location"
-              required
-              description="Site address or approved delivery point."
-            >
-              <input
+            <div className="sm:col-span-2">
+              <Field
+                label="Delivery location"
                 required
-                value={deliveryLocation}
-                onChange={(event) =>
-                  setDeliveryLocation(event.target.value)
-                }
-                placeholder="Enter site delivery location"
-                className={`${inputClass} sm:col-span-2`}
-              />
-            </Field>
+                description="Site address or approved delivery point."
+              >
+                <div className="relative">
+                  <MapPin className="pointer-events-none absolute left-3.5 top-1/2 h-[15px] w-[15px] -translate-y-1/2 text-ink/30" />
+
+                  <input
+                    required
+                    value={deliveryLocation}
+                    onChange={(event) =>
+                      setDeliveryLocation(event.target.value)
+                    }
+                    placeholder="Enter site delivery location"
+                    className={`${inputClass} pl-10`}
+                  />
+                </div>
+              </Field>
+            </div>
           </div>
         </CardBody>
       </Card>
 
+      {/* ===================================================== */}
+      {/* Material requirements */}
+      {/* ===================================================== */}
+
       <Card className="overflow-hidden">
         <CardHeader
           title="Material requirements"
-          subtitle="Add each material, specification and required quantity."
+          subtitle="Specify every material, technical requirement and quantity needed."
           action={
             <Badge tone="amber">
               {lines.length} {lines.length === 1 ? 'item' : 'items'}
@@ -210,102 +260,153 @@ export function CreateRequest() {
           }
         />
 
-        <div className="divide-y divide-line">
+        <div className="divide-y divide-ink/[0.07]">
           {lines.map((line, index) => (
-            <div key={line.id} className="p-6">
-              <div className="mb-4 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-ink/5">
-                    <Package className="h-4 w-4 text-ink/50" />
+            <div
+              key={line.id}
+              className="relative p-5 sm:p-6"
+            >
+              {/* Material number accent */}
+              <div className="mb-5 flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#F5F7F5] text-ink/50">
+                    <Package className="h-[15px] w-[15px]" />
                   </div>
 
-                  <p className="text-xs font-semibold uppercase tracking-wide text-ink/40">
-                    Material {index + 1}
-                  </p>
+                  <div>
+                    <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-ink/35">
+                      Material line
+                    </p>
+
+                    <p className="mt-0.5 text-[12px] font-semibold text-ink">
+                      Requirement {String(index + 1).padStart(2, '0')}
+                    </p>
+                  </div>
                 </div>
 
                 {lines.length > 1 && (
                   <button
                     type="button"
                     onClick={() => removeLine(line.id)}
-                    className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium text-ink/40 transition-colors hover:bg-rose-500/5 hover:text-rose-600"
+                    className="
+                      group
+                      inline-flex
+                      items-center
+                      gap-1.5
+                      rounded-full
+                      border
+                      border-transparent
+                      px-3
+                      py-1.5
+                      text-[10px]
+                      font-semibold
+                      text-ink/35
+                      transition-all
+                      hover:border-rose-500/10
+                      hover:bg-rose-500/[0.04]
+                      hover:text-rose-600
+                    "
                   >
-                    <Trash2 className="h-3.5 w-3.5" />
+                    <Trash2 className="h-3 w-3 transition-transform group-hover:scale-95" />
                     Remove
                   </button>
                 )}
               </div>
 
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                <Field label="Material" required>
-                  <input
-                    required
-                    value={line.item}
-                    onChange={(event) =>
-                      updateLine(line.id, 'item', event.target.value)
-                    }
-                    placeholder="e.g. Portland cement"
-                    className={inputClass}
-                  />
-                </Field>
+              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-12">
+                <div className="lg:col-span-3">
+                  <Field label="Material" required>
+                    <input
+                      required
+                      value={line.item}
+                      onChange={(event) =>
+                        updateLine(line.id, 'item', event.target.value)
+                      }
+                      placeholder="e.g. Portland cement"
+                      className={inputClass}
+                    />
+                  </Field>
+                </div>
 
-                <Field label="Specification" required>
-                  <input
-                    required
-                    value={line.specification}
-                    onChange={(event) =>
-                      updateLine(
-                        line.id,
-                        'specification',
-                        event.target.value,
-                      )
-                    }
-                    placeholder="Grade / size / specification"
-                    className={inputClass}
-                  />
-                </Field>
+                <div className="lg:col-span-4">
+                  <Field label="Specification" required>
+                    <input
+                      required
+                      value={line.specification}
+                      onChange={(event) =>
+                        updateLine(
+                          line.id,
+                          'specification',
+                          event.target.value,
+                        )
+                      }
+                      placeholder="Grade / size / specification"
+                      className={inputClass}
+                    />
+                  </Field>
+                </div>
 
-                <Field label="Quantity" required>
-                  <input
-                    required
-                    type="number"
-                    min="0"
-                    step="any"
-                    value={line.quantity}
-                    onChange={(event) =>
-                      updateLine(line.id, 'quantity', event.target.value)
-                    }
-                    placeholder="0"
-                    className={inputClass}
-                  />
-                </Field>
+                <div className="lg:col-span-2">
+                  <Field label="Quantity" required>
+                    <input
+                      required
+                      type="number"
+                      min="0"
+                      step="any"
+                      value={line.quantity}
+                      onChange={(event) =>
+                        updateLine(line.id, 'quantity', event.target.value)
+                      }
+                      placeholder="0"
+                      className={inputClass}
+                    />
+                  </Field>
+                </div>
 
-                <Field label="Unit" required>
-                  <select
-                    required
-                    value={line.unit}
-                    onChange={(event) =>
-                      updateLine(line.id, 'unit', event.target.value)
-                    }
-                    className={inputClass}
-                  >
-                    {units.map((unit) => (
-                      <option key={unit} value={unit}>
-                        {unit}
-                      </option>
-                    ))}
-                  </select>
-                </Field>
+                <div className="lg:col-span-3">
+                  <Field label="Unit" required>
+                    <SelectField
+                      value={line.unit}
+                      onChange={(value) =>
+                        updateLine(line.id, 'unit', value)
+                      }
+                    >
+                      {units.map((unit) => (
+                        <option key={unit} value={unit}>
+                          {unit}
+                        </option>
+                      ))}
+                    </SelectField>
+                  </Field>
+                </div>
               </div>
             </div>
           ))}
         </div>
 
-        <div className="border-t border-line px-6 py-4">
+        <div className="border-t border-ink/[0.07] bg-[#FBFCFB] px-5 py-4 sm:px-6">
           <button
             type="button"
             onClick={addLine}
-            className="inline-flex items-center gap-2 rounded-xl border border-line bg-white px-4 py-2.5 text-xs font-semibold text-ink transition-colors hover:bg-ink/[0.03]"
+            className="
+              inline-flex
+              items-center
+              gap-2
+              rounded-full
+              border
+              border-ink/[0.09]
+              bg-white
+              px-4
+              py-2.5
+              text-[11px]
+              font-semibold
+              text-ink
+              shadow-[0_2px_8px_rgba(20,40,30,0.03)]
+              transition-all
+              hover:-translate-y-0.5
+              hover:border-ink/[0.15]
+              hover:shadow-[0_8px_20px_rgba(20,40,30,0.06)]
+            "
           >
             <Plus className="h-3.5 w-3.5" />
             Add material
@@ -313,34 +414,79 @@ export function CreateRequest() {
         </div>
       </Card>
 
-      <Card>
+      {/* ===================================================== */}
+      {/* Additional instructions */}
+      {/* ===================================================== */}
+
+      <Card className="overflow-hidden">
         <CardHeader
           title="Additional instructions"
-          subtitle="Provide delivery or procurement notes for the reviewing team."
+          subtitle="Include delivery, quality, access or site-specific requirements."
         />
 
-        <CardBody>
+        <CardBody className="p-5 sm:p-6">
           <textarea
             value={notes}
             onChange={(event) => setNotes(event.target.value)}
-            rows={4}
+            rows={5}
             placeholder="Add any relevant delivery instructions, quality requirements or site notes..."
             className={`${inputClass} resize-none`}
           />
+
+          <div className="mt-2 flex justify-end">
+            <span className="text-[9px] font-medium text-ink/25">
+              Optional
+            </span>
+          </div>
         </CardBody>
       </Card>
 
-      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+      {/* ===================================================== */}
+      {/* Submission actions */}
+      {/* ===================================================== */}
+
+      <div className="flex flex-col-reverse gap-3 border-t border-ink/[0.07] pt-6 sm:flex-row sm:items-center sm:justify-end">
         <button
           type="button"
-          className="rounded-xl border border-line bg-white px-5 py-2.5 text-xs font-semibold text-ink transition-colors hover:bg-ink/[0.03]"
+          className="
+            rounded-full
+            border
+            border-ink/[0.09]
+            bg-white
+            px-5
+            py-2.5
+            text-[11px]
+            font-semibold
+            text-ink
+            transition-all
+            hover:-translate-y-0.5
+            hover:border-ink/[0.15]
+            hover:shadow-[0_8px_20px_rgba(20,40,30,0.05)]
+          "
         >
           Save draft
         </button>
 
         <button
           type="submit"
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-ink px-5 py-2.5 text-xs font-semibold text-white transition-opacity hover:opacity-90"
+          className="
+            inline-flex
+            items-center
+            justify-center
+            gap-2
+            rounded-full
+            bg-ink
+            px-5
+            py-2.5
+            text-[11px]
+            font-bold
+            text-white
+            shadow-[0_8px_20px_rgba(15,25,20,0.12)]
+            transition-all
+            hover:-translate-y-0.5
+            hover:shadow-[0_12px_28px_rgba(15,25,20,0.16)]
+            active:translate-y-0
+          "
         >
           Submit request
           <Send className="h-3.5 w-3.5" />
@@ -349,6 +495,10 @@ export function CreateRequest() {
     </form>
   )
 }
+
+/* ============================================================= */
+/* Field                                                          */
+/* ============================================================= */
 
 function Field({
   label,
@@ -363,21 +513,78 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="text-xs font-semibold text-ink">
+      <span className="text-[11px] font-semibold tracking-[-0.005em] text-ink">
         {label}
-        {required && <span className="ml-1 text-rose-600">*</span>}
+        {required && (
+          <span className="ml-1 text-[#B85C12]">*</span>
+        )}
       </span>
 
       {description && (
-        <span className="mt-1 block text-[11px] leading-4 text-ink/35">
+        <span className="mt-1 block text-[10px] leading-4 text-ink/35">
           {description}
         </span>
       )}
 
-      <div className="mt-2">{children}</div>
+      <div className="mt-2.5">{children}</div>
     </label>
   )
 }
 
-const inputClass =
-  'w-full rounded-xl border border-line bg-white px-3 py-2.5 text-sm text-ink outline-none transition-colors placeholder:text-ink/25 focus:border-ink/30 focus:ring-2 focus:ring-ink/5'
+/* ============================================================= */
+/* Select                                                          */
+/* ============================================================= */
+
+function SelectField({
+  value,
+  onChange,
+  placeholder,
+  children,
+}: {
+  value: string
+  onChange: (value: string) => void
+  placeholder?: string
+  children: React.ReactNode
+}) {
+  return (
+    <div className="relative">
+      <select
+        required={Boolean(placeholder)}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className={`${inputClass} appearance-none pr-10`}
+      >
+        {placeholder && <option value="">{placeholder}</option>}
+        {children}
+      </select>
+
+      <ChevronDown className="pointer-events-none absolute right-3.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-ink/30" />
+    </div>
+  )
+}
+
+/* ============================================================= */
+/* Shared input treatment                                          */
+/* ============================================================= */
+
+const inputClass = `
+  w-full
+  rounded-[13px]
+  border
+  border-ink/[0.09]
+  bg-white
+  px-3.5
+  py-2.5
+  text-[12px]
+  font-medium
+  text-ink
+  outline-none
+  shadow-[0_1px_2px_rgba(20,40,30,0.02)]
+  transition-all
+  duration-200
+  placeholder:text-ink/25
+  hover:border-ink/[0.14]
+  focus:border-ink/30
+  focus:ring-4
+  focus:ring-ink/[0.035]
+`

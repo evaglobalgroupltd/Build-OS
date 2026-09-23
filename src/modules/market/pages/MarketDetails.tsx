@@ -1,3 +1,4 @@
+
 import {
   BadgeCheck,
   Building2,
@@ -17,7 +18,6 @@ import {
   Star,
   TrendingUp,
   Truck,
-  Users,
   Warehouse,
 } from 'lucide-react'
 
@@ -127,57 +127,130 @@ const categories = [
 
 export function MarketDetails() {
   return (
-    <div className="space-y-6">
-      {/* Supplier profile header */}
-      <Card className="overflow-hidden">
-        <div className="border-b border-line bg-paper-2 px-6 py-6 sm:px-8">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-            <div className="flex min-w-0 items-start gap-4">
-              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-ink text-xl font-bold text-white shadow-sm">
+    <div className="space-y-7 pb-8">
+
+      {/* ===================================================== */}
+      {/* Supplier Hero                                         */}
+      {/* ===================================================== */}
+
+      <section
+        aria-label="Supplier overview"
+        className="
+          relative
+          overflow-hidden
+          rounded-[28px]
+          bg-ink
+          text-white
+          shadow-[0_24px_70px_rgba(11,18,32,0.12)]
+        "
+      >
+        {/* Ambient decoration */}
+
+        <div className="pointer-events-none absolute -right-24 -top-28 h-80 w-80 rounded-full bg-white/[0.035]" />
+
+        <div className="pointer-events-none absolute -bottom-40 left-[35%] h-80 w-80 rounded-full bg-[#1657FF]/[0.10]" />
+
+        <div className="pointer-events-none absolute right-[25%] top-[22%] h-28 w-28 rounded-full border border-white/[0.05]" />
+
+        <div className="relative px-6 py-7 sm:px-8 sm:py-9 lg:px-10">
+
+          <div className="flex flex-col gap-8 xl:flex-row xl:items-end xl:justify-between">
+
+            {/* Identity */}
+
+            <div className="flex min-w-0 items-start gap-4 sm:gap-5">
+
+              <div
+                className="
+                  flex
+                  h-[68px]
+                  w-[68px]
+                  shrink-0
+                  items-center
+                  justify-center
+                  rounded-[21px]
+                  border
+                  border-white/[0.10]
+                  bg-white/[0.08]
+                  font-display
+                  text-xl
+                  font-semibold
+                  tracking-[-0.04em]
+                  text-white
+                  shadow-[0_12px_30px_rgba(0,0,0,0.15)]
+                "
+              >
                 PB
               </div>
 
               <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-2">
-                  <h1 className="font-display text-2xl font-semibold tracking-tight text-ink">
+
+                <div className="flex flex-wrap items-center gap-2.5">
+
+                  <h1 className="font-display text-[25px] font-semibold leading-tight tracking-[-0.035em] sm:text-[31px]">
                     {supplier.name}
                   </h1>
 
                   {supplier.verified && (
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-1 text-[10px] font-semibold text-emerald-700">
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/15 bg-emerald-400/[0.10] px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-[0.05em] text-emerald-200">
                       <BadgeCheck className="h-3.5 w-3.5" />
                       Verified supplier
                     </span>
                   )}
+
                 </div>
 
-                <p className="mt-1 text-sm text-ink/50">
+                <p className="mt-1.5 text-[12px] text-white/45">
                   {supplier.category}
                 </p>
 
-                <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-ink/45">
+                <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-[10px] text-white/40">
+
                   <span className="inline-flex items-center gap-1.5">
-                    <MapPin className="h-3.5 w-3.5" />
+                    <MapPin className="h-3 w-3" />
                     {supplier.location}
                   </span>
 
                   <span className="inline-flex items-center gap-1.5">
-                    <Building2 className="h-3.5 w-3.5" />
+                    <Building2 className="h-3 w-3" />
                     {supplier.registration}
                   </span>
 
                   <span className="inline-flex items-center gap-1.5">
-                    <CalendarDays className="h-3.5 w-3.5" />
+                    <CalendarDays className="h-3 w-3" />
                     {supplier.yearsExperience} years experience
                   </span>
+
                 </div>
+
               </div>
+
             </div>
 
-            <div className="flex flex-wrap gap-2">
+            {/* Actions */}
+
+            <div className="flex flex-wrap gap-2.5">
+
               <button
                 type="button"
-                className="inline-flex items-center gap-2 rounded-xl border border-line bg-white px-4 py-2.5 text-xs font-semibold text-ink transition-colors hover:bg-ink/[0.03]"
+                className="
+                  inline-flex
+                  items-center
+                  gap-2
+                  rounded-full
+                  border
+                  border-white/[0.12]
+                  bg-white/[0.06]
+                  px-4
+                  py-2.5
+                  text-[10.5px]
+                  font-semibold
+                  text-white/75
+                  backdrop-blur-sm
+                  transition
+                  hover:bg-white/[0.11]
+                  hover:text-white
+                "
               >
                 <Mail className="h-3.5 w-3.5" />
                 Contact supplier
@@ -185,60 +258,90 @@ export function MarketDetails() {
 
               <button
                 type="button"
-                className="inline-flex items-center gap-2 rounded-xl bg-ink px-4 py-2.5 text-xs font-semibold text-white transition-opacity hover:opacity-90"
+                className="
+                  inline-flex
+                  items-center
+                  gap-2
+                  rounded-full
+                  bg-white
+                  px-4
+                  py-2.5
+                  text-[10.5px]
+                  font-bold
+                  text-ink
+                  transition
+                  hover:-translate-y-0.5
+                  hover:bg-white/90
+                "
               >
+                <ShoppingCart className="h-3.5 w-3.5" />
                 View catalogue
                 <ChevronRight className="h-3.5 w-3.5" />
               </button>
+
             </div>
+
           </div>
+
+          {/* Executive metrics */}
+
+          <div className="mt-8 grid grid-cols-2 border-t border-white/[0.08] pt-6 sm:grid-cols-4">
+
+            <HeroMetric
+              label="Trust score"
+              value={`${supplier.trustScore}/100`}
+              description="Marketplace standing"
+              accent
+            />
+
+            <HeroMetric
+              label="Client rating"
+              value={supplier.rating.toString()}
+              description={`${supplier.reviews} verified reviews`}
+            />
+
+            <HeroMetric
+              label="Deliveries"
+              value={supplier.completedDeliveries.toString()}
+              description="Completed successfully"
+            />
+
+            <HeroMetric
+              label="On-time"
+              value={`${supplier.onTimeDelivery}%`}
+              description="Schedule adherence"
+            />
+
+          </div>
+
         </div>
+      </section>
 
-        {/* Supplier metrics */}
-        <div className="grid divide-y divide-line sm:grid-cols-2 sm:divide-x sm:divide-y-0 xl:grid-cols-4">
-          <ProfileMetric
-            icon={ShieldCheck}
-            label="Trust score"
-            value={`${supplier.trustScore}/100`}
-            description="Excellent marketplace standing"
-          />
+      {/* ===================================================== */}
+      {/* Main Layout                                           */}
+      {/* ===================================================== */}
 
-          <ProfileMetric
-            icon={Star}
-            label="Client rating"
-            value={supplier.rating.toString()}
-            description={`${supplier.reviews} verified reviews`}
-          />
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.55fr)_minmax(310px,0.65fr)]">
 
-          <ProfileMetric
-            icon={Truck}
-            label="Deliveries"
-            value={supplier.completedDeliveries.toString()}
-            description="Verified completed deliveries"
-          />
+        {/* =================================================== */}
+        {/* Primary Column                                      */}
+        {/* =================================================== */}
 
-          <ProfileMetric
-            icon={Clock3}
-            label="On-time delivery"
-            value={`${supplier.onTimeDelivery}%`}
-            description="Orders delivered on schedule"
-          />
-        </div>
-      </Card>
+        <div className="space-y-6">
 
-      {/* Main content */}
-      <div className="grid gap-6 xl:grid-cols-3">
-        {/* Main information */}
-        <div className="space-y-6 xl:col-span-2">
           {/* Company profile */}
+
           <Card>
+
             <CardHeader
               title="Supplier profile"
-              subtitle="Business information and marketplace capabilities"
+              subtitle="Business identity, operating capability and marketplace coverage"
             />
 
             <CardBody>
+
               <div className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
+
                 <InfoItem
                   icon={Building2}
                   label="Legal entity"
@@ -286,101 +389,204 @@ export function MarketDetails() {
                   label="Delivery coverage"
                   value={supplier.deliveryZones}
                 />
+
               </div>
 
-              <div className="mt-7 border-t border-line pt-6">
-                <p className="text-xs font-semibold uppercase tracking-wide text-ink/40">
-                  Material categories
-                </p>
+              {/* Categories */}
 
-                <div className="mt-3 flex flex-wrap gap-2">
+              <div className="mt-7 border-t border-line pt-6">
+
+                <div className="flex items-end justify-between gap-4">
+
+                  <div>
+                    <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-ink/30">
+                      Catalogue coverage
+                    </p>
+
+                    <p className="mt-1 text-[12px] font-semibold text-ink">
+                      Material categories
+                    </p>
+                  </div>
+
+                  <span className="text-[10px] font-medium text-ink/35">
+                    {categories.length} categories
+                  </span>
+
+                </div>
+
+                <div className="mt-4 flex flex-wrap gap-2">
+
                   {categories.map((category) => (
                     <span
                       key={category}
-                      className="rounded-full border border-line bg-paper-2 px-3 py-1.5 text-xs font-medium text-ink/60"
+                      className="
+                        rounded-full
+                        border
+                        border-line
+                        bg-paper-2
+                        px-3
+                        py-1.5
+                        text-[10px]
+                        font-medium
+                        text-ink/55
+                        transition
+                        hover:border-ink/[0.12]
+                        hover:bg-white
+                        hover:text-ink
+                      "
                     >
                       {category}
                     </span>
                   ))}
+
                 </div>
+
               </div>
+
             </CardBody>
+
           </Card>
 
-          {/* Catalogue preview */}
+          {/* ================================================= */}
+          {/* Catalogue                                        */}
+          {/* ================================================= */}
+
           <Card className="overflow-hidden">
+
             <CardHeader
               title="Marketplace catalogue"
-              subtitle="Approved materials currently listed by this supplier"
+              subtitle="Approved materials currently available through this supplier"
             />
 
             <div className="divide-y divide-line">
-              {products.map((product) => (
+
+              {products.map((product, index) => (
+
                 <div
                   key={product.name}
-                  className="flex flex-col gap-4 px-6 py-5 transition-colors hover:bg-ink/[0.02] sm:flex-row sm:items-center sm:justify-between"
+                  className="
+                    group
+                    px-5
+                    py-5
+                    transition
+                    duration-200
+                    hover:bg-paper-2
+                    sm:px-6
+                  "
                 >
-                  <div className="flex min-w-0 items-start gap-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-ink/5">
-                      <Package className="h-4 w-4 text-ink/50" />
+
+                  <div className="flex items-center gap-4">
+
+                    {/* Index / material identity */}
+
+                    <div className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-ink text-[9px] font-bold tracking-[0.08em] text-white sm:flex">
+                      {String(index + 1).padStart(2, '0')}
                     </div>
 
-                    <div className="min-w-0">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-ink/[0.045] text-ink/40 sm:hidden">
+                      <Package className="h-4 w-4" />
+                    </div>
+
+                    {/* Product */}
+
+                    <div className="min-w-0 flex-1">
+
                       <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="text-sm font-semibold text-ink">
+
+                        <h3 className="text-[12.5px] font-semibold text-ink">
                           {product.name}
                         </h3>
 
                         <StockBadge status={product.stock} />
+
                       </div>
 
-                      <p className="mt-1 text-xs text-ink/40">
+                      <p className="mt-1 text-[9.5px] font-bold uppercase tracking-[0.08em] text-ink/28">
                         {product.category}
                       </p>
 
-                      <p className="mt-1 text-xs text-ink/50">
+                      <p className="mt-1 text-[10.5px] text-ink/40">
                         {product.specification}
                       </p>
-                    </div>
-                  </div>
 
-                  <div className="flex shrink-0 items-center gap-5">
-                    <div>
-                      <p className="text-[10px] font-semibold uppercase tracking-wide text-ink/35">
+                    </div>
+
+                    {/* Price */}
+
+                    <div className="hidden shrink-0 text-right sm:block">
+
+                      <p className="text-[8.5px] font-bold uppercase tracking-[0.12em] text-ink/25">
                         Starting price
                       </p>
 
-                      <p className="mt-1 text-sm font-semibold text-ink">
+                      <p className="mt-1 font-display text-[16px] font-semibold tracking-[-0.02em] text-ink">
                         {product.price}
                       </p>
+
                     </div>
 
-                    <ChevronRight className="h-4 w-4 text-ink/30" />
+                    <ChevronRight className="h-4 w-4 shrink-0 text-ink/20 transition-transform group-hover:translate-x-0.5 group-hover:text-[#1657FF]" />
+
                   </div>
+
+                  {/* Mobile price */}
+
+                  <div className="mt-4 flex items-center justify-between border-t border-line pt-3 sm:hidden">
+
+                    <span className="text-[9px] font-bold uppercase tracking-[0.1em] text-ink/25">
+                      Starting price
+                    </span>
+
+                    <span className="font-display text-[16px] font-semibold text-ink">
+                      {product.price}
+                    </span>
+
+                  </div>
+
                 </div>
+
               ))}
+
             </div>
 
             <div className="border-t border-line px-6 py-4">
+
               <button
                 type="button"
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-ink/60 transition-colors hover:text-ink"
+                className="
+                  inline-flex
+                  items-center
+                  gap-1.5
+                  text-[10.5px]
+                  font-bold
+                  text-ink/45
+                  transition
+                  hover:text-[#1657FF]
+                "
               >
                 View full catalogue
                 <ChevronRight className="h-3.5 w-3.5" />
               </button>
+
             </div>
+
           </Card>
 
-          {/* Performance */}
+          {/* ================================================= */}
+          {/* Performance                                      */}
+          {/* ================================================= */}
+
           <Card>
+
             <CardHeader
               title="Delivery performance"
-              subtitle="Indicators contributing to supplier trust and procurement reliability"
+              subtitle="Operational indicators contributing to procurement reliability"
             />
 
             <CardBody>
+
               <div className="space-y-6">
+
                 <PerformanceRow
                   label="Delivery completion"
                   value={97}
@@ -410,254 +616,397 @@ export function MarketDetails() {
                   value={supplier.compliance}
                   description="Business, catalogue and platform compliance"
                 />
+
               </div>
+
             </CardBody>
+
           </Card>
 
-          {/* Delivery history */}
+          {/* ================================================= */}
+          {/* Procurement history                              */}
+          {/* ================================================= */}
+
           <Card className="overflow-hidden">
+
             <CardHeader
               title="Procurement activity"
-              subtitle="Recent Build OS project deliveries and procurement performance"
+              subtitle="Recent Build OS project deliveries and supplier performance"
             />
 
             <div className="divide-y divide-line">
+
               {deliveryHistory.map((delivery) => (
+
                 <div
                   key={delivery.project}
-                  className="px-6 py-5 transition-colors hover:bg-ink/[0.02]"
+                  className="
+                    group
+                    px-5
+                    py-5
+                    transition
+                    hover:bg-paper-2
+                    sm:px-6
+                  "
                 >
+
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+
                     <div className="min-w-0">
+
                       <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="text-sm font-semibold text-ink">
+
+                        <h3 className="text-[12.5px] font-semibold text-ink">
                           {delivery.project}
                         </h3>
 
                         <DeliveryStatus status={delivery.status} />
+
                       </div>
 
-                      <p className="mt-2 text-xs text-ink/45">
+                      <p className="mt-2 text-[10.5px] text-ink/40">
                         {delivery.materials}
                       </p>
+
                     </div>
 
-                    <div className="flex shrink-0 items-center gap-7 text-xs">
+                    <div className="flex shrink-0 items-center gap-7">
+
                       <div>
-                        <p className="text-ink/40">
+                        <p className="text-[8.5px] font-bold uppercase tracking-[0.1em] text-ink/25">
                           Order value
                         </p>
 
-                        <p className="mt-1 font-semibold text-ink">
+                        <p className="mt-1 text-[11.5px] font-semibold text-ink">
                           {delivery.value}
                         </p>
                       </div>
 
                       <div>
-                        <p className="text-ink/40">
+                        <p className="text-[8.5px] font-bold uppercase tracking-[0.1em] text-ink/25">
                           Rating
                         </p>
 
-                        <p className="mt-1 flex items-center gap-1 font-semibold text-ink">
-                          <Star className="h-3.5 w-3.5 fill-current" />
+                        <p className="mt-1 flex items-center gap-1 text-[11.5px] font-semibold text-ink">
+                          <Star className="h-3 w-3 fill-current" />
                           {delivery.rating}
                         </p>
                       </div>
+
+                      <ChevronRight className="hidden h-4 w-4 text-ink/20 transition-transform group-hover:translate-x-0.5 sm:block" />
+
                     </div>
+
                   </div>
+
                 </div>
+
               ))}
+
             </div>
+
           </Card>
+
         </div>
 
-        {/* Sidebar */}
-        <div className="space-y-6">
+        {/* =================================================== */}
+        {/* Intelligence Rail                                  */}
+        {/* =================================================== */}
+
+        <aside className="space-y-6">
+
           {/* Trust score */}
+
           <Card className="overflow-hidden">
-            <div className="border-b border-line bg-paper-2 p-6">
-              <div className="flex items-center justify-between">
+
+            <div className="border-b border-line bg-paper-2 px-5 py-5">
+
+              <div className="flex items-start justify-between gap-4">
+
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-ink/40">
-                    Build OS trust
+                  <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-ink/30">
+                    Build OS intelligence
                   </p>
 
-                  <h2 className="mt-1 font-display text-lg font-semibold text-ink">
+                  <h2 className="mt-1 font-display text-[17px] font-semibold tracking-[-0.025em] text-ink">
                     Supplier standing
                   </h2>
                 </div>
 
-                <TrendingUp className="h-5 w-5 text-emerald-600" />
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#1657FF]/[0.07] text-[#1657FF]">
+                  <TrendingUp className="h-4 w-4" />
+                </div>
+
               </div>
+
             </div>
 
-            <CardBody>
+            <CardBody className="p-5">
+
               <div className="flex items-center justify-center">
-                <div className="flex h-32 w-32 items-center justify-center rounded-full border-[9px] border-ink/10">
+
+                <div
+                  className="
+                    relative
+                    flex
+                    h-[148px]
+                    w-[148px]
+                    items-center
+                    justify-center
+                    rounded-full
+                    border-[10px]
+                    border-ink/[0.06]
+                  "
+                >
+
+                  <div className="absolute inset-[-10px] rounded-full border-[10px] border-transparent border-l-[#1657FF] border-t-[#1657FF] rotate-[35deg]" />
+
                   <div className="text-center">
-                    <p className="font-display text-3xl font-bold tracking-tight text-ink">
+
+                    <p className="font-display text-[34px] font-semibold leading-none tracking-[-0.05em] text-ink">
                       {supplier.trustScore}
                     </p>
 
-                    <p className="text-[10px] font-medium text-ink/40">
+                    <p className="mt-1 font-mono text-[8px] font-semibold tracking-[0.13em] text-ink/30">
                       OUT OF 100
                     </p>
+
                   </div>
+
                 </div>
+
               </div>
 
               <div className="mt-5 flex justify-center">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-700">
+
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/[0.08] px-3 py-1.5 text-[9.5px] font-bold uppercase tracking-[0.05em] text-emerald-700">
                   <ShieldCheck className="h-3.5 w-3.5" />
                   Excellent standing
                 </span>
+
               </div>
 
-              <p className="mt-4 text-center text-xs leading-5 text-ink/45">
+              <p className="mt-4 text-center text-[10.5px] leading-5 text-ink/40">
                 Based on verification, delivery performance, product quality,
                 client feedback, compliance and dispute history.
               </p>
+
             </CardBody>
+
           </Card>
 
           {/* Verification */}
+
           <Card>
+
             <CardHeader
               title="Verification"
-              subtitle="Business and supplier credentials reviewed by Build OS"
+              subtitle="Credentials reviewed by Build OS"
             />
 
-            <CardBody>
-              <div className="space-y-3">
+            <CardBody className="p-5">
+
+              <div className="space-y-2">
+
                 {verificationItems.map((item) => (
+
                   <div
                     key={item}
-                    className="flex items-center gap-3 rounded-xl bg-paper-2 px-3 py-3"
+                    className="
+                      group
+                      flex
+                      items-center
+                      gap-3
+                      rounded-xl
+                      border
+                      border-transparent
+                      bg-paper-2
+                      px-3
+                      py-2.5
+                      transition
+                      hover:border-emerald-500/10
+                      hover:bg-emerald-500/[0.025]
+                    "
                   >
-                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10">
+
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-emerald-500/[0.08]">
                       <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
                     </div>
 
-                    <span className="text-xs font-medium text-ink/65">
+                    <span className="min-w-0 flex-1 text-[10.5px] font-medium text-ink/60">
                       {item}
                     </span>
+
+                    <BadgeCheck className="h-3 w-3 shrink-0 text-emerald-500/60" />
+
                   </div>
+
                 ))}
+
               </div>
 
-              <div className="mt-5 border-t border-line pt-4">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-ink/40">
-                    Verification status
-                  </span>
+              <div className="mt-5 flex items-center justify-between border-t border-line pt-4">
 
-                  <span className="font-semibold text-emerald-700">
-                    Verified
-                  </span>
-                </div>
+                <span className="text-[9.5px] font-medium text-ink/35">
+                  Verification status
+                </span>
+
+                <span className="inline-flex items-center gap-1.5 text-[9.5px] font-bold text-emerald-700">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                  Fully verified
+                </span>
+
               </div>
+
             </CardBody>
+
           </Card>
 
-          {/* Marketplace summary */}
+          {/* Activity summary */}
+
           <Card>
+
             <CardHeader
               title="Marketplace activity"
-              subtitle="Current supplier activity on Build OS"
+              subtitle="Current supplier activity"
             />
 
-            <CardBody>
+            <CardBody className="p-5">
+
               <div className="space-y-4">
+
                 <ActivityMetric
+                  icon={Package}
                   label="Catalogue items"
                   value={supplier.catalogueItems.toString()}
                 />
 
                 <ActivityMetric
+                  icon={Truck}
                   label="Active orders"
                   value={supplier.activeOrders.toString()}
                 />
 
                 <ActivityMetric
+                  icon={CheckCircle2}
                   label="Completed deliveries"
                   value={supplier.completedDeliveries.toString()}
                 />
 
                 <ActivityMetric
+                  icon={Star}
                   label="Client rating"
                   value={`${supplier.rating} / 5`}
                 />
 
                 <ActivityMetric
+                  icon={ShieldCheck}
                   label="Compliance"
                   value={`${supplier.compliance}%`}
                 />
+
               </div>
+
             </CardBody>
+
           </Card>
 
-          {/* Procurement rule */}
-          <Card>
-            <CardHeader
-              title="Payment protection"
-              subtitle="Build OS procurement control"
-            />
+          {/* Payment protection */}
 
-            <CardBody>
-              <div className="flex gap-3">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-ink/5">
-                  <ClipboardCheck className="h-4 w-4 text-ink/55" />
-                </div>
+          <div
+            className="
+              overflow-hidden
+              rounded-[22px]
+              bg-ink
+              p-5
+              text-white
+              shadow-[0_16px_40px_rgba(11,18,32,0.10)]
+            "
+          >
 
-                <p className="text-xs leading-5 text-ink/50">
-                  Supplier payment is released only after delivery evidence is
-                  uploaded and the materials are verified and accepted through
-                  the Build OS procurement workflow.
-                </p>
+            <div className="flex items-center justify-between">
+
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/[0.08]">
+                <ClipboardCheck className="h-4 w-4 text-white/70" />
               </div>
-            </CardBody>
-          </Card>
-        </div>
+
+              <span className="font-mono text-[8px] font-semibold uppercase tracking-[0.15em] text-white/25">
+                Protected flow
+              </span>
+
+            </div>
+
+            <p className="mt-5 text-[11.5px] font-semibold text-white/90">
+              Payment protection
+            </p>
+
+            <p className="mt-2 text-[10px] leading-5 text-white/40">
+              Supplier payment is released only after delivery evidence is
+              uploaded and the materials are verified and accepted through
+              the Build OS procurement workflow.
+            </p>
+
+            <div className="mt-4 flex items-center gap-2 text-[9px] font-semibold text-white/45">
+              <ShieldCheck className="h-3.5 w-3.5 text-[#34A6FF]" />
+              Escrow-controlled procurement
+            </div>
+
+          </div>
+
+        </aside>
+
       </div>
+
     </div>
   )
 }
 
-function ProfileMetric({
-  icon: Icon,
+/* ========================================================= */
+/* Hero Metric                                               */
+/* ========================================================= */
+
+function HeroMetric({
   label,
   value,
   description,
+  accent = false,
 }: {
-  icon: React.ComponentType<{ className?: string }>
   label: string
   value: string
   description: string
+  accent?: boolean
 }) {
   return (
-    <div className="px-6 py-5 sm:px-7">
-      <div className="flex items-center gap-3">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-ink/5">
-          <Icon className="h-4 w-4 text-ink/55" />
-        </div>
+    <div className="border-r border-white/[0.08] px-4 first:pl-0 last:border-r-0 sm:px-5">
 
-        <div>
-          <p className="text-[10px] font-semibold uppercase tracking-wide text-ink/35">
-            {label}
-          </p>
+      <p className="font-mono text-[8px] font-semibold uppercase tracking-[0.15em] text-white/30">
+        {label}
+      </p>
 
-          <p className="mt-0.5 font-display text-xl font-semibold text-ink">
-            {value}
-          </p>
-        </div>
-      </div>
+      <p
+        className={`
+          mt-1
+          font-display
+          text-[21px]
+          font-semibold
+          tracking-[-0.035em]
+          ${accent ? 'text-[#7CB8FF]' : 'text-white'}
+        `}
+      >
+        {value}
+      </p>
 
-      <p className="mt-3 text-xs text-ink/40">
+      <p className="mt-0.5 text-[9px] text-white/30">
         {description}
       </p>
+
     </div>
   )
 }
+
+/* ========================================================= */
+/* Information Item                                          */
+/* ========================================================= */
 
 function InfoItem({
   icon: Icon,
@@ -670,22 +1019,30 @@ function InfoItem({
 }) {
   return (
     <div className="flex gap-3">
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-ink/5">
-        <Icon className="h-4 w-4 text-ink/50" />
+
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-paper-2 text-ink/40 ring-1 ring-ink/[0.03]">
+        <Icon className="h-3.5 w-3.5" />
       </div>
 
       <div className="min-w-0">
-        <p className="text-[10px] font-semibold uppercase tracking-wide text-ink/35">
+
+        <p className="font-mono text-[8.5px] font-semibold uppercase tracking-[0.11em] text-ink/28">
           {label}
         </p>
 
-        <p className="mt-1 truncate text-sm font-medium text-ink">
+        <p className="mt-1 truncate text-[11.5px] font-semibold text-ink">
           {value}
         </p>
+
       </div>
+
     </div>
   )
 }
+
+/* ========================================================= */
+/* Performance Row                                           */
+/* ========================================================= */
 
 function PerformanceRow({
   label,
@@ -700,31 +1057,43 @@ function PerformanceRow({
 
   return (
     <div>
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="text-sm font-medium text-ink">
+
+      <div className="flex items-start justify-between gap-5">
+
+        <div className="min-w-0">
+
+          <p className="text-[11.5px] font-semibold text-ink">
             {label}
           </p>
 
-          <p className="mt-0.5 text-xs text-ink/40">
+          <p className="mt-0.5 text-[9.5px] leading-4 text-ink/35">
             {description}
           </p>
+
         </div>
 
-        <span className="text-sm font-semibold text-ink">
+        <span className="shrink-0 font-display text-[15px] font-semibold tracking-[-0.02em] text-ink">
           {safeValue}%
         </span>
+
       </div>
 
-      <div className="mt-2 h-2 overflow-hidden rounded-full bg-ink/5">
+      <div className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-ink/[0.06]">
+
         <div
-          className="h-full rounded-full bg-ink transition-all duration-500"
+          className="h-full rounded-full bg-[#1657FF] transition-all duration-700"
           style={{ width: `${safeValue}%` }}
         />
+
       </div>
+
     </div>
   )
 }
+
+/* ========================================================= */
+/* Stock Badge                                               */
+/* ========================================================= */
 
 function StockBadge({
   status,
@@ -733,19 +1102,32 @@ function StockBadge({
 }) {
   const styles =
     status === 'In Stock'
-      ? 'bg-emerald-500/10 text-emerald-700'
+      ? 'bg-emerald-500/[0.08] text-emerald-700'
       : status === 'Low Stock'
-        ? 'bg-amber-500/10 text-amber-700'
-        : 'bg-rose-500/10 text-rose-700'
+        ? 'bg-amber-500/[0.08] text-amber-700'
+        : 'bg-rose-500/[0.08] text-rose-700'
 
   return (
     <span
-      className={`rounded-full px-2 py-1 text-[10px] font-semibold ${styles}`}
+      className={`
+        rounded-full
+        px-2
+        py-1
+        text-[8.5px]
+        font-bold
+        uppercase
+        tracking-[0.04em]
+        ${styles}
+      `}
     >
       {status}
     </span>
   )
 }
+
+/* ========================================================= */
+/* Delivery Status                                           */
+/* ========================================================= */
 
 function DeliveryStatus({
   status,
@@ -754,34 +1136,55 @@ function DeliveryStatus({
 }) {
   const styles =
     status === 'Delivered'
-      ? 'bg-emerald-500/10 text-emerald-700'
-      : 'bg-amber-500/10 text-amber-700'
+      ? 'bg-emerald-500/[0.08] text-emerald-700'
+      : 'bg-amber-500/[0.08] text-amber-700'
 
   return (
     <span
-      className={`rounded-full px-2 py-1 text-[10px] font-semibold ${styles}`}
+      className={`
+        rounded-full
+        px-2
+        py-1
+        text-[8.5px]
+        font-bold
+        uppercase
+        tracking-[0.04em]
+        ${styles}
+      `}
     >
       {status}
     </span>
   )
 }
 
+/* ========================================================= */
+/* Activity Metric                                           */
+/* ========================================================= */
+
 function ActivityMetric({
+  icon: Icon,
   label,
   value,
 }: {
+  icon: React.ComponentType<{ className?: string }>
   label: string
   value: string
 }) {
   return (
-    <div className="flex items-center justify-between border-b border-line pb-3 last:border-0 last:pb-0">
-      <span className="text-xs text-ink/45">
+    <div className="flex items-center gap-3 border-b border-line pb-3 last:border-0 last:pb-0">
+
+      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-paper-2 text-ink/35">
+        <Icon className="h-3.5 w-3.5" />
+      </div>
+
+      <span className="min-w-0 flex-1 text-[10.5px] text-ink/40">
         {label}
       </span>
 
-      <span className="text-sm font-semibold text-ink">
+      <span className="text-[11.5px] font-semibold text-ink">
         {value}
       </span>
+
     </div>
   )
 }

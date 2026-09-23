@@ -12,6 +12,7 @@ import {
   XCircle,
 } from 'lucide-react'
 import { useMemo, useState } from 'react'
+
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 
 type DeliverableStatus =
@@ -159,40 +160,72 @@ export function Deliverables() {
   ).length
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-7">
+      {/* ========================================================= */}
       {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-ink/40">
-            Professional workspace
-          </p>
+      {/* ========================================================= */}
 
-          <h1 className="mt-1 font-display text-2xl font-semibold tracking-tight text-ink">
+      <header className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+          <div className="mb-2 flex items-center gap-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#B85C12]" />
+
+            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-ink/40">
+              Professional workspace
+            </p>
+          </div>
+
+          <h1 className="font-display text-[30px] font-semibold leading-tight tracking-[-0.035em] text-ink sm:text-[34px]">
             Deliverables
           </h1>
 
-          <p className="mt-1 max-w-2xl text-sm leading-6 text-ink/50">
-            Manage submitted professional deliverables, review feedback and
-            track client approval before payment.
+          <p className="mt-1.5 max-w-xl text-[13px] leading-5 text-ink/50">
+            Manage submitted work, monitor review progress, respond to client
+            feedback and keep every deliverable moving toward approval.
           </p>
         </div>
 
         <button
           type="button"
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-ink px-4 py-2.5 text-xs font-semibold text-white transition-opacity hover:opacity-90"
+          className="
+            group
+            inline-flex
+            items-center
+            justify-center
+            gap-2
+            rounded-full
+            bg-ink
+            px-5
+            py-3
+            text-xs
+            font-semibold
+            text-white
+            shadow-[0_8px_24px_rgba(20,30,25,0.12)]
+            transition-all
+            duration-300
+            hover:-translate-y-0.5
+            hover:shadow-[0_12px_30px_rgba(20,30,25,0.16)]
+          "
         >
-          <Upload className="h-3.5 w-3.5" />
+          <Upload className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-y-0.5" />
           Upload deliverable
         </button>
-      </div>
+      </header>
 
+      {/* ========================================================= */}
       {/* Summary */}
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      {/* ========================================================= */}
+
+      <section
+        aria-label="Deliverable summary"
+        className="grid grid-cols-2 gap-3 lg:grid-cols-4"
+      >
         <SummaryCard
           icon={Clock3}
           label="Awaiting review"
           value={pendingCount}
           description="Submitted deliverables"
+          tone="amber"
         />
 
         <SummaryCard
@@ -200,6 +233,7 @@ export function Deliverables() {
           label="Needs revision"
           value={revisionCount}
           description="Client feedback received"
+          tone="orange"
         />
 
         <SummaryCard
@@ -207,6 +241,7 @@ export function Deliverables() {
           label="Approved"
           value={approvedCount}
           description="Accepted by clients"
+          tone="teal"
         />
 
         <SummaryCard
@@ -214,34 +249,60 @@ export function Deliverables() {
           label="Total deliverables"
           value={deliverables.length}
           description="Across active projects"
+          tone="ink"
         />
-      </div>
+      </section>
 
+      {/* ========================================================= */}
       {/* Main workspace */}
-      <Card className="overflow-hidden">
+      {/* ========================================================= */}
+
+      <Card className="overflow-hidden rounded-[24px]">
         <CardHeader
           title="Submitted deliverables"
-          subtitle="Track deliverables awaiting client review and approval"
+          subtitle="Track submitted work, client review and approval status"
         />
 
-        <div className="border-y border-line bg-paper-2 px-6 py-4">
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        {/* Search + Filters */}
+        <div className="border-y border-ink/[0.06] bg-[#FBFBFA] px-5 py-4 sm:px-6">
+          <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
             {/* Search */}
-            <div className="relative min-w-0 flex-1 lg:max-w-md">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/30" />
+            <div className="relative min-w-0 flex-1 xl:max-w-[430px]">
+              <Search className="pointer-events-none absolute left-3.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-ink/30" />
 
               <input
                 type="search"
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
                 placeholder="Search deliverables, projects or services..."
-                className="h-10 w-full rounded-xl border border-line bg-white pl-9 pr-3 text-xs text-ink outline-none placeholder:text-ink/30 focus:border-ink/30"
+                className="
+                  h-11
+                  w-full
+                  rounded-[14px]
+                  border
+                  border-ink/[0.07]
+                  bg-white
+                  pl-10
+                  pr-4
+                  text-[11px]
+                  font-medium
+                  text-ink
+                  outline-none
+                  shadow-[0_2px_10px_rgba(20,30,25,0.025)]
+                  placeholder:text-ink/30
+                  transition-all
+                  duration-200
+                  focus:border-ink/20
+                  focus:shadow-[0_4px_16px_rgba(20,30,25,0.05)]
+                "
               />
             </div>
 
             {/* Filters */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-1 lg:pb-0">
-              <Filter className="mr-1 h-3.5 w-3.5 shrink-0 text-ink/35" />
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 xl:pb-0">
+              <div className="mr-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-ink/[0.045]">
+                <Filter className="h-3.5 w-3.5 text-ink/40" />
+              </div>
 
               {filters.map((filter) => (
                 <button
@@ -249,10 +310,10 @@ export function Deliverables() {
                   type="button"
                   onClick={() => setActiveFilter(filter)}
                   className={[
-                    'whitespace-nowrap rounded-full px-3 py-1.5 text-[10px] font-semibold transition-colors',
+                    'whitespace-nowrap rounded-full px-3.5 py-2 text-[10px] font-semibold transition-all duration-200',
                     activeFilter === filter
-                      ? 'bg-ink text-white'
-                      : 'bg-white text-ink/50 hover:bg-ink/5 hover:text-ink',
+                      ? 'bg-ink text-white shadow-[0_4px_12px_rgba(20,30,25,0.10)]'
+                      : 'bg-white text-ink/45 hover:bg-ink/[0.045] hover:text-ink',
                   ].join(' ')}
                 >
                   {filter}
@@ -264,7 +325,7 @@ export function Deliverables() {
 
         {/* Results */}
         {filteredDeliverables.length > 0 ? (
-          <div className="divide-y divide-line">
+          <div className="divide-y divide-ink/[0.06]">
             {filteredDeliverables.map((deliverable) => (
               <DeliverableRow
                 key={deliverable.id}
@@ -274,17 +335,18 @@ export function Deliverables() {
           </div>
         ) : (
           <CardBody>
-            <div className="flex min-h-52 flex-col items-center justify-center text-center">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-ink/5">
-                <FileText className="h-5 w-5 text-ink/35" />
+            <div className="flex min-h-[260px] flex-col items-center justify-center text-center">
+              <div className="flex h-12 w-12 items-center justify-center rounded-[16px] bg-ink/[0.045]">
+                <FileText className="h-5 w-5 text-ink/30" />
               </div>
 
-              <h3 className="mt-4 text-sm font-semibold text-ink">
+              <h3 className="mt-4 font-display text-base font-semibold text-ink">
                 No deliverables found
               </h3>
 
-              <p className="mt-1 max-w-sm text-xs leading-5 text-ink/40">
-                Try another search term or change the status filter.
+              <p className="mt-1 max-w-sm text-[11px] leading-5 text-ink/40">
+                Try another search term or change the status filter to find
+                another deliverable.
               </p>
             </div>
           </CardBody>
@@ -294,43 +356,83 @@ export function Deliverables() {
   )
 }
 
+/* =============================================================== */
+/* Deliverable Row */
+/* =============================================================== */
+
 function DeliverableRow({
   deliverable,
 }: {
   deliverable: Deliverable
 }) {
   return (
-    <div className="px-6 py-5 transition-colors hover:bg-ink/[0.015]">
+    <article
+      className="
+        group
+        px-5
+        py-5
+        transition-all
+        duration-300
+        hover:bg-[#FCFCFB]
+        sm:px-6
+      "
+    >
       <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
         {/* Identity */}
         <div className="flex min-w-0 items-start gap-4">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-ink/5">
-            <FileText className="h-4 w-4 text-ink/45" />
+          <div
+            className="
+              relative
+              flex
+              h-12
+              w-12
+              shrink-0
+              items-center
+              justify-center
+              overflow-hidden
+              rounded-[15px]
+              border
+              border-ink/[0.06]
+              bg-[#F7F7F5]
+              transition-all
+              duration-300
+              group-hover:border-ink/[0.10]
+              group-hover:bg-white
+              group-hover:shadow-[0_6px_18px_rgba(20,30,25,0.06)]
+            "
+          >
+            <FileText className="h-[17px] w-[17px] text-ink/40 transition-colors group-hover:text-ink/65" />
           </div>
 
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <h3 className="text-sm font-semibold text-ink">
+              <h3 className="font-display text-[14px] font-semibold tracking-[-0.01em] text-ink">
                 {deliverable.title}
               </h3>
 
               <StatusBadge status={deliverable.status} />
             </div>
 
-            <p className="mt-1 text-xs text-ink/45">
+            <p className="mt-1 text-[11px] font-medium text-ink/55">
               {deliverable.project}
             </p>
 
             <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[10px] text-ink/35">
-              <span>{deliverable.id}</span>
+              <span className="font-semibold text-ink/45">
+                {deliverable.id}
+              </span>
+
               <span>{deliverable.service}</span>
-              <span>{deliverable.files} files</span>
+
+              <span>
+                {deliverable.files} {deliverable.files === 1 ? 'file' : 'files'}
+              </span>
             </div>
           </div>
         </div>
 
         {/* Metadata */}
-        <div className="grid grid-cols-2 gap-x-8 gap-y-3 sm:grid-cols-4 xl:min-w-[510px]">
+        <div className="grid grid-cols-2 gap-x-7 gap-y-4 sm:grid-cols-4 xl:min-w-[510px]">
           <MetaItem
             label="Submitted"
             value={deliverable.submittedAt}
@@ -344,6 +446,7 @@ function DeliverableRow({
           <MetaItem
             label="Professional fee"
             value={deliverable.amount}
+            emphasize
           />
 
           <MetaItem
@@ -355,76 +458,192 @@ function DeliverableRow({
         {/* Action */}
         <button
           type="button"
-          className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl border border-line bg-white px-3.5 py-2.5 text-xs font-semibold text-ink transition-colors hover:bg-ink/[0.03]"
+          className="
+            group/action
+            inline-flex
+            shrink-0
+            items-center
+            justify-center
+            gap-1.5
+            rounded-full
+            border
+            border-ink/[0.08]
+            bg-white
+            px-4
+            py-2.5
+            text-[10px]
+            font-bold
+            text-ink/70
+            shadow-[0_2px_8px_rgba(20,30,25,0.025)]
+            transition-all
+            duration-200
+            hover:border-ink/[0.15]
+            hover:bg-ink
+            hover:text-white
+            hover:shadow-[0_6px_16px_rgba(20,30,25,0.10)]
+          "
         >
           <Eye className="h-3.5 w-3.5" />
+
           View
-          <ChevronRight className="h-3.5 w-3.5 text-ink/35" />
+
+          <ChevronRight
+            className="
+              h-3.5
+              w-3.5
+              text-ink/25
+              transition-all
+              duration-200
+              group-hover/action:translate-x-0.5
+              group-hover/action:text-white/60
+            "
+          />
         </button>
       </div>
 
       {/* Revision feedback */}
       {deliverable.feedback && (
-        <div className="mt-4 rounded-xl border border-amber-500/15 bg-amber-500/[0.04] px-4 py-3">
-          <div className="flex gap-3">
-            <MessageSquare className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-700" />
+        <div
+          className="
+            mt-5
+            overflow-hidden
+            rounded-[16px]
+            border
+            border-[#B85C12]/[0.12]
+            bg-[#B85C12]/[0.035]
+          "
+        >
+          <div className="flex gap-3 px-4 py-3.5">
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#B85C12]/[0.08]">
+              <MessageSquare className="h-3.5 w-3.5 text-[#B85C12]" />
+            </div>
 
-            <div>
-              <p className="text-[10px] font-semibold uppercase tracking-wide text-amber-700/70">
+            <div className="min-w-0 flex-1">
+              <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-[#B85C12]/75">
                 Review feedback
               </p>
 
-              <p className="mt-1 text-xs leading-5 text-ink/55">
+              <p className="mt-1 text-[11px] leading-5 text-ink/55">
                 {deliverable.feedback}
               </p>
+
+              {(deliverable.status === 'Revision Requested' ||
+                deliverable.status === 'Rejected') && (
+                <button
+                  type="button"
+                  className="
+                    mt-3
+                    inline-flex
+                    items-center
+                    gap-1.5
+                    rounded-full
+                    bg-ink
+                    px-3.5
+                    py-2
+                    text-[9px]
+                    font-bold
+                    text-white
+                    transition-all
+                    duration-200
+                    hover:-translate-y-0.5
+                    hover:shadow-[0_5px_14px_rgba(20,30,25,0.12)]
+                  "
+                >
+                  <Upload className="h-3 w-3" />
+                  Submit revision
+                </button>
+              )}
             </div>
           </div>
-
-          {(deliverable.status === 'Revision Requested' ||
-            deliverable.status === 'Rejected') && (
-            <button
-              type="button"
-              className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-ink px-3 py-2 text-[10px] font-semibold text-white transition-opacity hover:opacity-90"
-            >
-              <Upload className="h-3 w-3" />
-              Submit revision
-            </button>
-          )}
         </div>
       )}
-    </div>
+    </article>
   )
 }
+
+/* =============================================================== */
+/* Summary Card */
+/* =============================================================== */
 
 function SummaryCard({
   icon: Icon,
   label,
   value,
   description,
+  tone,
 }: {
   icon: React.ComponentType<{ className?: string }>
   label: string
   value: number
   description: string
+  tone: 'amber' | 'orange' | 'teal' | 'ink'
 }) {
+  const toneStyles = {
+    amber: {
+      icon: 'bg-[#F7EFE8] text-[#B85C12]',
+      accent: 'text-[#B85C12]',
+    },
+    orange: {
+      icon: 'bg-orange-500/[0.07] text-orange-700',
+      accent: 'text-orange-700',
+    },
+    teal: {
+      icon: 'bg-[#EAF4EE] text-[#12613E]',
+      accent: 'text-[#12613E]',
+    },
+    ink: {
+      icon: 'bg-ink/[0.045] text-ink/55',
+      accent: 'text-ink',
+    },
+  }
+
   return (
-    <Card>
-      <CardBody>
+    <Card
+      className="
+        group
+        relative
+        overflow-hidden
+        rounded-[20px]
+        transition-all
+        duration-300
+        hover:-translate-y-0.5
+        hover:shadow-[0_14px_34px_rgba(20,30,25,0.055)]
+      "
+    >
+      <CardBody className="relative">
         <div className="flex items-start justify-between">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-ink/5">
-            <Icon className="h-4 w-4 text-ink/45" />
+          <div
+            className={`
+              flex h-10 w-10 items-center justify-center
+              rounded-[13px]
+              transition-transform
+              duration-300
+              group-hover:scale-105
+              ${toneStyles[tone].icon}
+            `}
+          >
+            <Icon className="h-[17px] w-[17px]" />
           </div>
 
-          <span className="font-display text-2xl font-semibold tracking-tight text-ink">
-            {value}
+          <span className="font-display text-[27px] font-semibold leading-none tracking-[-0.04em] text-ink">
+            {value.toString().padStart(2, '0')}
           </span>
         </div>
 
-        <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-ink/40">
+        <p
+          className={`
+            mt-5
+            text-[10px]
+            font-bold
+            uppercase
+            tracking-[0.13em]
+            ${toneStyles[tone].accent}
+          `}
+        >
           {label}
         </p>
 
-        <p className="mt-1 text-xs text-ink/40">
+        <p className="mt-1.5 text-[10px] leading-4 text-ink/40">
           {description}
         </p>
       </CardBody>
@@ -432,25 +651,42 @@ function SummaryCard({
   )
 }
 
+/* =============================================================== */
+/* Metadata */
+/* =============================================================== */
+
 function MetaItem({
   label,
   value,
+  emphasize = false,
 }: {
   label: string
   value: string
+  emphasize?: boolean
 }) {
   return (
     <div className="min-w-0">
-      <p className="text-[9px] font-semibold uppercase tracking-wide text-ink/30">
+      <p className="text-[9px] font-bold uppercase tracking-[0.1em] text-ink/30">
         {label}
       </p>
 
-      <p className="mt-1 truncate text-[11px] font-medium text-ink/65">
+      <p
+        className={[
+          'mt-1.5 truncate text-[11px]',
+          emphasize
+            ? 'font-semibold text-ink'
+            : 'font-medium text-ink/60',
+        ].join(' ')}
+      >
         {value}
       </p>
     </div>
   )
 }
+
+/* =============================================================== */
+/* Status Badge */
+/* =============================================================== */
 
 function StatusBadge({
   status,
@@ -465,23 +701,27 @@ function StatusBadge({
     }
   > = {
     Submitted: {
-      className: 'bg-sky-500/10 text-sky-700',
+      className: 'bg-sky-500/[0.08] text-sky-700',
       icon: Upload,
     },
+
     'Under Review': {
-      className: 'bg-amber-500/10 text-amber-700',
+      className: 'bg-[#B85C12]/[0.08] text-[#B85C12]',
       icon: Clock3,
     },
+
     'Revision Requested': {
-      className: 'bg-orange-500/10 text-orange-700',
+      className: 'bg-orange-500/[0.08] text-orange-700',
       icon: MessageSquare,
     },
+
     Approved: {
-      className: 'bg-emerald-500/10 text-emerald-700',
+      className: 'bg-[#12613E]/[0.08] text-[#12613E]',
       icon: CheckCircle2,
     },
+
     Rejected: {
-      className: 'bg-rose-500/10 text-rose-700',
+      className: 'bg-rose-500/[0.07] text-rose-700',
       icon: XCircle,
     },
   }
@@ -490,10 +730,21 @@ function StatusBadge({
 
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-[9px] font-semibold ${className}`}
+      className={`
+        inline-flex
+        items-center
+        gap-1.5
+        rounded-full
+        px-2.5
+        py-1.5
+        text-[9px]
+        font-bold
+        leading-none
+        ${className}
+      `}
     >
       <Icon className="h-3 w-3" />
       {status}
     </span>
   )
-}  
+}

@@ -1,6 +1,9 @@
+
 import {
   AlertTriangle,
   ArrowLeft,
+  ArrowUpRight,
+  Check,
   CheckCircle2,
   Clock3,
   FileText,
@@ -146,24 +149,38 @@ export function DisputeDetails() {
     },
   ]
 
-  return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
-        <div>
-          <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-red-500/10">
-              <Scale className="h-5 w-5 text-red-600" />
-            </div>
+  const completedSteps = timeline.filter(
+    (item) => item.status === 'completed',
+  ).length
 
-            <span className="text-xs font-semibold uppercase tracking-[0.16em] text-ink/40">
+  const currentStepIndex = timeline.findIndex(
+    (item) => item.status === 'current',
+  )
+
+  const progress =
+    currentStepIndex >= 0
+      ? Math.round((currentStepIndex / (timeline.length - 1)) * 100)
+      : 100
+
+  return (
+    <div className="space-y-7">
+      {/* ===================================================== */}
+      {/* Header */}
+      {/* ===================================================== */}
+
+      <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+          <div className="mb-2 flex items-center gap-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#B85C12]" />
+
+            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-ink/40">
               Dispute management
-            </span>
+            </p>
           </div>
 
-          <div className="mt-3 flex flex-wrap items-center gap-3">
-            <h1 className="font-display text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
-              Dispute Details
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="font-display text-[30px] font-semibold leading-tight tracking-[-0.035em] text-ink sm:text-[36px]">
+              Dispute details
             </h1>
 
             <Badge tone={statusTone[dispute.status]}>
@@ -171,172 +188,340 @@ export function DisputeDetails() {
             </Badge>
           </div>
 
-          <p className="mt-1 text-sm text-ink/50">
-            {dispute.id} · Project {dispute.projectId}
-          </p>
+          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
+            <span className="font-mono text-[10px] font-semibold text-ink/40">
+              {dispute.id}
+            </span>
+
+            <span className="h-1 w-1 rounded-full bg-ink/15" />
+
+            <span className="text-[11px] text-ink/40">
+              Project {dispute.projectId}
+            </span>
+          </div>
         </div>
 
         <button
           type="button"
-          className="inline-flex w-fit items-center gap-2 rounded-xl border border-line bg-white px-4 py-2.5 text-xs font-semibold text-ink/60 transition hover:bg-ink/[0.02] hover:text-ink"
+          className="
+            group
+            inline-flex
+            w-fit
+            items-center
+            gap-2
+            rounded-full
+            border
+            border-ink/[0.08]
+            bg-white
+            px-4
+            py-2.5
+            text-xs
+            font-semibold
+            text-ink/60
+            transition
+            hover:-translate-y-0.5
+            hover:border-ink/15
+            hover:text-ink
+            hover:shadow-[0_8px_22px_rgba(20,40,30,0.05)]
+          "
         >
-          <ArrowLeft className="h-4 w-4" />
+          <ArrowLeft
+            size={14}
+            className="transition group-hover:-translate-x-0.5"
+          />
           Back to disputes
         </button>
       </div>
 
-      {/* Status alert */}
-      <div className="flex gap-3 rounded-2xl border border-red-500/20 bg-red-500/[0.05] p-4">
-        <LockKeyhole className="mt-0.5 h-5 w-5 shrink-0 text-red-600" />
+      {/* ===================================================== */}
+      {/* Premium case hero */}
+      {/* ===================================================== */}
 
-        <div>
-          <p className="text-sm font-semibold text-ink">
-            Payment currently frozen
-          </p>
+      <section className="relative overflow-hidden rounded-[26px] bg-[#173629] p-6 text-white sm:p-7">
+        <div className="absolute -right-20 -top-24 h-64 w-64 rounded-full bg-white/[0.035]" />
+        <div className="absolute -bottom-28 right-20 h-48 w-48 rounded-full bg-[#B85C12]/10" />
+        <div className="absolute left-[42%] top-0 h-full w-px bg-white/[0.035]" />
 
-          <p className="mt-1 text-xs leading-5 text-ink/50">
-            {dispute.amount} associated with {dispute.affectedMilestone} is
-            currently protected from release while this dispute is reviewed.
-          </p>
+        <div className="relative">
+          <div className="flex flex-col gap-7 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-3xl">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="rounded-full bg-white/10 px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.1em] text-white/55 ring-1 ring-white/[0.06]">
+                  {dispute.category}
+                </span>
+
+                <span className="flex items-center gap-1.5 rounded-full bg-[#B85C12]/20 px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.1em] text-[#F1B47B]">
+                  <AlertTriangle size={10} />
+                  {dispute.priority} priority
+                </span>
+              </div>
+
+              <h2 className="mt-4 max-w-2xl font-display text-[24px] font-semibold leading-[1.12] tracking-[-0.025em] sm:text-[30px]">
+                {dispute.title}
+              </h2>
+
+              <p className="mt-3 max-w-2xl text-[11px] leading-5 text-white/50">
+                {dispute.description}
+              </p>
+            </div>
+
+            <div className="shrink-0 lg:min-w-[190px] lg:text-right">
+              <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-white/35">
+                Amount protected
+              </p>
+
+              <p className="mt-1 font-display text-[30px] font-semibold tracking-[-0.035em] text-white">
+                {dispute.amount}
+              </p>
+
+              <p className="mt-1 text-[10px] text-white/40">
+                {dispute.affectedMilestone}
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-7 border-t border-white/[0.08] pt-5">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-white/35">
+                  Case progress
+                </p>
+
+                <p className="mt-1 text-[11px] font-semibold text-white/70">
+                  {completedSteps} of {timeline.length} stages completed
+                </p>
+              </div>
+
+              <span className="font-mono text-[10px] text-white/35">
+                {progress}% progressed
+              </span>
+            </div>
+
+            <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/[0.08]">
+              <div
+                className="h-full rounded-full bg-[#D58A4D] transition-all duration-500"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ===================================================== */}
+      {/* Payment protection */}
+      {/* ===================================================== */}
+
+      <div className="relative overflow-hidden rounded-[22px] border border-[#B85C12]/15 bg-[#F8EEE6] px-5 py-4.5 sm:px-6 sm:py-5">
+        <div className="absolute -right-10 -top-14 h-32 w-32 rounded-full bg-[#B85C12]/[0.04]" />
+
+        <div className="relative flex items-start gap-3.5">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#B85C12]/10 text-[#B85C12]">
+            <LockKeyhole size={17} />
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="text-[12px] font-semibold text-[#713C14]">
+                Payment currently protected
+              </p>
+
+              <span className="rounded-full bg-[#B85C12]/10 px-2 py-0.5 text-[8px] font-bold uppercase tracking-[0.08em] text-[#8A4A13]">
+                On hold
+              </span>
+            </div>
+
+            <p className="mt-1 text-[11px] leading-5 text-[#713C14]/65">
+              {dispute.amount} associated with{' '}
+              <span className="font-semibold">
+                {dispute.affectedMilestone}
+              </span>{' '}
+              is currently protected from release while this dispute is
+              reviewed.
+            </p>
+          </div>
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        {/* Main content */}
-        <div className="space-y-6 lg:col-span-2">
+      {/* ===================================================== */}
+      {/* Main layout */}
+      {/* ===================================================== */}
+
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.55fr)_minmax(310px,0.7fr)]">
+        {/* ================================================= */}
+        {/* Main column */}
+        {/* ================================================= */}
+
+        <div className="space-y-6">
+          {/* --------------------------------------------- */}
+          {/* Case information */}
+          {/* --------------------------------------------- */}
+
           <Card className="overflow-hidden">
             <CardHeader
-              title={dispute.title}
+              title="Case information"
               subtitle="Formal complaint and affected project information"
             />
 
-            <CardBody>
-              <div className="grid gap-5 sm:grid-cols-2">
-                <div>
-                  <p className="text-xs text-ink/40">Dispute category</p>
-                  <p className="mt-1 text-sm font-semibold text-ink">
-                    {dispute.category}
-                  </p>
-                </div>
+            <CardBody className="p-5 sm:p-6">
+              <div className="grid gap-px overflow-hidden rounded-[18px] border border-ink/[0.07] bg-ink/[0.07] sm:grid-cols-2">
+                <DetailCell
+                  label="Dispute category"
+                  value={dispute.category}
+                />
 
-                <div>
-                  <p className="text-xs text-ink/40">Priority</p>
-                  <p className="mt-1 flex items-center gap-1.5 text-sm font-semibold text-red-600">
-                    <AlertTriangle className="h-4 w-4" />
-                    {dispute.priority}
-                  </p>
-                </div>
+                <DetailCell
+                  label="Priority"
+                  value={dispute.priority}
+                  accent
+                  icon={<AlertTriangle size={13} />}
+                />
 
-                <div>
-                  <p className="text-xs text-ink/40">Affected milestone</p>
-                  <p className="mt-1 text-sm font-semibold text-ink">
-                    {dispute.affectedMilestone}
-                  </p>
-                </div>
+                <DetailCell
+                  label="Affected milestone"
+                  value={dispute.affectedMilestone}
+                />
 
-                <div>
-                  <p className="text-xs text-ink/40">Affected amount</p>
-                  <p className="mt-1 font-mono text-sm font-semibold text-ink">
-                    {dispute.amount}
-                  </p>
-                </div>
+                <DetailCell
+                  label="Affected amount"
+                  value={dispute.amount}
+                  mono
+                />
               </div>
 
-              <div className="mt-6 border-t border-line pt-5">
-                <p className="text-xs font-semibold uppercase tracking-wide text-ink/40">
-                  Complaint
-                </p>
+              <div className="mt-6 rounded-[18px] bg-[#F7F9F7] p-5">
+                <div className="flex items-center gap-2">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white text-ink/40">
+                    <Flag size={13} />
+                  </div>
 
-                <p className="mt-2 text-sm leading-7 text-ink/65">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-ink/40">
+                    Complaint
+                  </p>
+                </div>
+
+                <p className="mt-3 text-[12px] leading-6 text-ink/60">
                   {dispute.description}
                 </p>
               </div>
             </CardBody>
           </Card>
 
+          {/* --------------------------------------------- */}
           {/* Parties */}
+          {/* --------------------------------------------- */}
+
           <Card>
             <CardHeader
               title="Dispute parties"
               subtitle="Users and organisations involved in this matter"
             />
 
-            <CardBody>
+            <CardBody className="p-5 sm:p-6">
               <div className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-2xl border border-line bg-paper-2 p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white">
-                      <User className="h-5 w-5 text-ink/50" />
-                    </div>
+                <PartyCard
+                  label="Complainant"
+                  name={dispute.openedBy}
+                  icon={<User size={17} />}
+                  tone="neutral"
+                />
 
-                    <div>
-                      <p className="text-[10px] font-semibold uppercase tracking-wide text-ink/35">
-                        Complainant
-                      </p>
-
-                      <p className="mt-1 text-sm font-semibold text-ink">
-                        {dispute.openedBy}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="rounded-2xl border border-line bg-paper-2 p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white">
-                      <ConstructionIcon />
-                    </div>
-
-                    <div>
-                      <p className="text-[10px] font-semibold uppercase tracking-wide text-ink/35">
-                        Respondent
-                      </p>
-
-                      <p className="mt-1 text-sm font-semibold text-ink">
-                        {dispute.respondent}
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                <PartyCard
+                  label="Respondent"
+                  name={dispute.respondent}
+                  icon={<ConstructionIcon />}
+                  tone="green"
+                />
               </div>
             </CardBody>
           </Card>
 
+          {/* --------------------------------------------- */}
           {/* Evidence */}
+          {/* --------------------------------------------- */}
+
           <Card className="overflow-hidden">
             <CardHeader
               title="Evidence"
               subtitle="Documents and records attached to the dispute"
             />
 
-            <CardBody>
-              <div className="space-y-2">
+            <CardBody className="p-5 sm:p-6">
+              <div className="mb-4 flex items-center justify-between gap-3">
+                <p className="text-[10px] text-ink/35">
+                  {evidence.length} supporting files
+                </p>
+
+                <span className="flex items-center gap-1.5 text-[10px] font-semibold text-ink/45">
+                  <LockKeyhole size={11} />
+                  Secure record
+                </span>
+              </div>
+
+              <div className="space-y-2.5">
                 {evidence.map((file) => (
                   <div
                     key={file.name}
-                    className="flex items-center justify-between gap-4 rounded-xl border border-line bg-paper-2 p-3"
+                    className="
+                      group
+                      flex
+                      items-center
+                      justify-between
+                      gap-4
+                      rounded-[16px]
+                      border
+                      border-ink/[0.07]
+                      bg-white
+                      p-3.5
+                      transition
+                      hover:-translate-y-0.5
+                      hover:border-ink/15
+                      hover:shadow-[0_8px_22px_rgba(20,40,30,0.045)]
+                    "
                   >
                     <div className="flex min-w-0 items-center gap-3">
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white">
-                        <FileText className="h-4 w-4 text-ink/50" />
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#F4F6F3] text-ink/45">
+                        <FileText size={16} />
                       </div>
 
                       <div className="min-w-0">
-                        <p className="truncate text-xs font-semibold text-ink">
+                        <p className="truncate text-[11px] font-semibold text-ink">
                           {file.name}
                         </p>
 
-                        <p className="mt-0.5 text-[11px] text-ink/40">
-                          {file.type} · {file.size}
+                        <p className="mt-1 text-[10px] text-ink/35">
+                          {file.type}
+                          <span className="mx-1.5 text-ink/15">•</span>
+                          {file.size}
                         </p>
                       </div>
                     </div>
 
                     <button
                       type="button"
-                      className="shrink-0 rounded-lg border border-line bg-white px-3 py-1.5 text-[11px] font-semibold text-ink/55 transition hover:text-ink"
+                      className="
+                        inline-flex
+                        shrink-0
+                        items-center
+                        gap-1.5
+                        rounded-full
+                        border
+                        border-ink/[0.08]
+                        bg-white
+                        px-3
+                        py-1.5
+                        text-[10px]
+                        font-semibold
+                        text-ink/50
+                        transition
+                        hover:border-ink/15
+                        hover:text-ink
+                      "
                     >
                       View
+                      <ArrowUpRight
+                        size={11}
+                        className="transition group-hover:translate-x-0.5"
+                      />
                     </button>
                   </div>
                 ))}
@@ -345,116 +530,307 @@ export function DisputeDetails() {
           </Card>
         </div>
 
+        {/* ================================================= */}
         {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Metadata */}
-          <Card className="p-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-ink/40">
-              Case information
-            </p>
+        {/* ================================================= */}
 
-            <div className="mt-5 space-y-4">
-              <InfoRow label="Dispute ID" value={dispute.id} mono />
-              <InfoRow label="Project ID" value={dispute.projectId} mono />
-              <InfoRow label="Opened" value={dispute.openedAt} />
-              <InfoRow label="Status" value={formatStatus(dispute.status)} />
-              <InfoRow label="Priority" value={dispute.priority} />
+        <div className="space-y-6">
+          {/* --------------------------------------------- */}
+          {/* Case metadata */}
+          {/* --------------------------------------------- */}
+
+          <Card className="overflow-hidden">
+            <div className="border-b border-ink/[0.07] px-5 py-5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-ink/35">
+                    Case information
+                  </p>
+
+                  <h2 className="mt-1 font-display text-lg font-semibold text-ink">
+                    Case record
+                  </h2>
+                </div>
+
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#F4F6F3] text-ink/45">
+                  <FileText size={15} />
+                </div>
+              </div>
             </div>
+
+            <CardBody className="p-5">
+              <div className="space-y-0">
+                <InfoRow label="Dispute ID" value={dispute.id} mono />
+                <InfoRow label="Project ID" value={dispute.projectId} mono />
+                <InfoRow label="Opened" value={dispute.openedAt} />
+                <InfoRow
+                  label="Current status"
+                  value={formatStatus(dispute.status)}
+                />
+                <InfoRow label="Priority" value={dispute.priority} />
+              </div>
+            </CardBody>
           </Card>
 
+          {/* --------------------------------------------- */}
           {/* Timeline */}
-          <Card className="p-5">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-ink/40">
-                  Case timeline
-                </p>
+          {/* --------------------------------------------- */}
 
-                <h2 className="mt-1 font-display text-base font-semibold text-ink">
-                  Review progress
-                </h2>
+          <Card className="overflow-hidden">
+            <div className="border-b border-ink/[0.07] px-5 py-5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-ink/35">
+                    Case timeline
+                  </p>
+
+                  <h2 className="mt-1 font-display text-lg font-semibold text-ink">
+                    Review progress
+                  </h2>
+                </div>
+
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#F4F6F3] text-ink/45">
+                  <Clock3 size={15} />
+                </div>
               </div>
-
-              <Clock3 className="h-4 w-4 text-ink/40" />
             </div>
 
-            <div className="mt-6">
-              {timeline.map((item, index) => {
-                const Icon = item.icon
-                const isLast = index === timeline.length - 1
+            <CardBody className="p-5">
+              <div>
+                {timeline.map((item, index) => {
+                  const Icon = item.icon
+                  const isLast = index === timeline.length - 1
 
-                return (
-                  <div key={item.title} className="relative flex gap-3">
-                    <div className="flex flex-col items-center">
-                      <div
-                        className={`z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border ${
-                          item.status === 'completed'
-                            ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-600'
-                            : item.status === 'current'
-                              ? 'border-amber-500/20 bg-amber-500/10 text-amber-600'
-                              : 'border-line bg-paper-2 text-ink/30'
-                        }`}
-                      >
-                        <Icon className="h-3.5 w-3.5" />
+                  return (
+                    <div key={item.title} className="relative flex gap-3">
+                      <div className="flex w-8 shrink-0 flex-col items-center">
+                        <div
+                          className={`
+                            z-10 flex h-8 w-8 items-center justify-center rounded-full border
+                            transition
+                            ${
+                              item.status === 'completed'
+                                ? 'border-[#12613E]/15 bg-[#EAF4EE] text-[#12613E]'
+                                : item.status === 'current'
+                                  ? 'border-[#B85C12]/20 bg-[#F8EEE6] text-[#B85C12] shadow-[0_0_0_4px_rgba(184,92,18,0.05)]'
+                                  : 'border-ink/[0.08] bg-[#F7F9F7] text-ink/25'
+                            }
+                          `}
+                        >
+                          <Icon size={13} />
+                        </div>
+
+                        {!isLast && (
+                          <div
+                            className={`
+                              h-10 w-px
+                              ${
+                                item.status === 'completed'
+                                  ? 'bg-[#12613E]/15'
+                                  : 'bg-ink/[0.07]'
+                              }
+                            `}
+                          />
+                        )}
                       </div>
 
-                      {!isLast && (
-                        <div className="h-10 w-px bg-line" />
-                      )}
+                      <div className="min-w-0 pb-5">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p
+                            className={`
+                              text-[11px] font-semibold
+                              ${
+                                item.status === 'current'
+                                  ? 'text-[#B85C12]'
+                                  : item.status === 'completed'
+                                    ? 'text-ink'
+                                    : 'text-ink/40'
+                              }
+                            `}
+                          >
+                            {item.title}
+                          </p>
+
+                          {item.status === 'current' && (
+                            <span className="rounded-full bg-[#F8EEE6] px-2 py-0.5 text-[8px] font-bold uppercase tracking-[0.06em] text-[#B85C12]">
+                              Current
+                            </span>
+                          )}
+                        </div>
+
+                        <p className="mt-1 text-[10px] leading-4.5 text-ink/40">
+                          {item.description}
+                        </p>
+
+                        <p
+                          className={`
+                            mt-1 font-mono text-[9px]
+                            ${
+                              item.status === 'current'
+                                ? 'text-[#B85C12]/65'
+                                : 'text-ink/25'
+                            }
+                          `}
+                        >
+                          {item.date}
+                        </p>
+                      </div>
                     </div>
-
-                    <div className="min-w-0 pb-5">
-                      <p
-                        className={`text-xs font-semibold ${
-                          item.status === 'current'
-                            ? 'text-amber-700'
-                            : 'text-ink'
-                        }`}
-                      >
-                        {item.title}
-                      </p>
-
-                      <p className="mt-1 text-[11px] leading-5 text-ink/40">
-                        {item.description}
-                      </p>
-
-                      <p className="mt-1 font-mono text-[10px] text-ink/30">
-                        {item.date}
-                      </p>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
+                  )
+                })}
+              </div>
+            </CardBody>
           </Card>
 
-          {/* Admin action */}
-          <Card className="p-5">
-            <div className="flex items-start gap-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-ink/5">
-                <ShieldCheck className="h-4 w-4 text-ink/55" />
+          {/* --------------------------------------------- */}
+          {/* Current action */}
+          {/* --------------------------------------------- */}
+
+          <div className="relative overflow-hidden rounded-[22px] bg-[#173629] p-5 text-white">
+            <div className="absolute -bottom-12 -right-10 h-32 w-32 rounded-full bg-[#B85C12]/10" />
+
+            <div className="relative">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/10">
+                <MessageSquare size={16} />
               </div>
 
-              <div>
-                <p className="text-sm font-semibold text-ink">
-                  Awaiting respondent
-                </p>
+              <p className="mt-5 text-[9px] font-bold uppercase tracking-[0.14em] text-white/40">
+                Current action
+              </p>
 
-                <p className="mt-1 text-xs leading-5 text-ink/40">
-                  The respondent can provide a response and additional
-                  evidence before administrative review begins.
-                </p>
-              </div>
+              <h3 className="mt-1.5 font-display text-[17px] font-semibold leading-tight">
+                Awaiting respondent
+              </h3>
+
+              <p className="mt-2 text-[10px] leading-4.5 text-white/50">
+                The respondent can provide a response and additional evidence
+                before administrative review begins.
+              </p>
+
+              <button
+                type="button"
+                className="
+                  mt-5
+                  inline-flex
+                  h-10
+                  w-full
+                  items-center
+                  justify-center
+                  gap-2
+                  rounded-full
+                  bg-white
+                  text-xs
+                  font-bold
+                  text-ink
+                  transition
+                  hover:-translate-y-0.5
+                  hover:bg-white/90
+                "
+              >
+                <MessageSquare size={13} />
+                Add case note
+              </button>
             </div>
+          </div>
 
-            <button
-              type="button"
-              className="mt-4 flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-ink text-xs font-semibold text-white transition hover:bg-ink/90"
-            >
-              <MessageSquare className="h-4 w-4" />
-              Add case note
-            </button>
+          {/* --------------------------------------------- */}
+          {/* Protection */}
+          {/* --------------------------------------------- */}
+
+          <Card>
+            <CardBody className="p-5">
+              <div className="flex items-start gap-3">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#EAF4EE] text-[#12613E]">
+                  <ShieldCheck size={15} />
+                </div>
+
+                <div>
+                  <p className="text-[11px] font-semibold text-ink">
+                    Audit trail protected
+                  </p>
+
+                  <p className="mt-1 text-[10px] leading-4.5 text-ink/40">
+                    Case activity, evidence and resolution actions are retained
+                    as part of the project's formal record.
+                  </p>
+                </div>
+              </div>
+            </CardBody>
           </Card>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function DetailCell({
+  label,
+  value,
+  mono = false,
+  accent = false,
+  icon,
+}: {
+  label: string
+  value: string
+  mono?: boolean
+  accent?: boolean
+  icon?: React.ReactNode
+}) {
+  return (
+    <div className="bg-white p-4 sm:p-4.5">
+      <p className="text-[9px] font-bold uppercase tracking-[0.1em] text-ink/30">
+        {label}
+      </p>
+
+      <p
+        className={`
+          mt-1.5 flex items-center gap-1.5 text-[12px] font-semibold
+          ${accent ? 'text-[#B85C12]' : 'text-ink'}
+          ${mono ? 'font-mono' : ''}
+        `}
+      >
+        {icon}
+        {value}
+      </p>
+    </div>
+  )
+}
+
+function PartyCard({
+  label,
+  name,
+  icon,
+  tone,
+}: {
+  label: string
+  name: string
+  icon: React.ReactNode
+  tone: 'neutral' | 'green'
+}) {
+  return (
+    <div className="group rounded-[18px] border border-ink/[0.07] bg-[#F7F9F7] p-4 transition hover:-translate-y-0.5 hover:border-ink/12 hover:shadow-[0_8px_22px_rgba(20,40,30,0.045)]">
+      <div className="flex items-center gap-3">
+        <div
+          className={`
+            flex h-10 w-10 items-center justify-center rounded-xl
+            ${
+              tone === 'green'
+                ? 'bg-[#EAF4EE] text-[#12613E]'
+                : 'bg-white text-ink/45'
+            }
+          `}
+        >
+          {icon}
+        </div>
+
+        <div className="min-w-0">
+          <p className="text-[9px] font-bold uppercase tracking-[0.1em] text-ink/30">
+            {label}
+          </p>
+
+          <p className="mt-1 truncate text-[12px] font-semibold text-ink">
+            {name}
+          </p>
         </div>
       </div>
     </div>
@@ -471,13 +847,14 @@ function InfoRow({
   mono?: boolean
 }) {
   return (
-    <div className="flex items-start justify-between gap-4">
-      <span className="text-xs text-ink/40">{label}</span>
+    <div className="flex items-center justify-between gap-4 border-b border-ink/[0.06] py-3 last:border-0 last:pb-0 first:pt-0">
+      <span className="text-[10px] text-ink/35">{label}</span>
 
       <span
-        className={`text-right text-xs font-semibold text-ink ${
-          mono ? 'font-mono' : ''
-        }`}
+        className={`
+          text-right text-[10px] font-semibold text-ink/70
+          ${mono ? 'font-mono' : ''}
+        `}
       >
         {value}
       </span>
@@ -492,7 +869,7 @@ function ConstructionIcon() {
       fill="none"
       stroke="currentColor"
       strokeWidth="1.8"
-      className="h-5 w-5 text-ink/50"
+      className="h-[17px] w-[17px]"
       aria-hidden="true"
     >
       <path d="M3 21h18" />

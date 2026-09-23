@@ -1,3 +1,5 @@
+import type { ComponentType, ReactNode } from 'react'
+
 import {
   AlertTriangle,
   CheckCircle2,
@@ -108,130 +110,221 @@ const securityEvents = [
 
 export function Security() {
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-        <div>
-          <div className="mb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.16em] text-ink/40">
-            <Shield className="h-3.5 w-3.5" />
-            Account
-          </div>
+    <div className="space-y-8">
+      {/* ------------------------------------------------------------------ */}
+      {/* Hero                                                               */}
+      {/* ------------------------------------------------------------------ */}
 
-          <h1 className="text-2xl font-semibold tracking-tight">
-            Security
-          </h1>
+      <section className="relative overflow-hidden rounded-[24px] border border-ink/[0.07] bg-white shadow-[0_18px_50px_rgba(20,40,30,0.08)]">
+        <div className="absolute -right-24 -top-24 h-64 w-64 rounded-full bg-[#12613E]/[0.07] blur-3xl" />
+        <div className="absolute -bottom-28 left-1/3 h-64 w-64 rounded-full bg-[#B85C12]/[0.05] blur-3xl" />
 
-          <p className="mt-1 max-w-2xl text-sm text-ink/50">
-            Protect your account, manage authentication methods and control
-            where your account is signed in.
-          </p>
-        </div>
+        <div className="relative p-6 sm:p-8 lg:p-10">
+          <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-3xl">
+              <div className="mb-4 flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center gap-2 rounded-full border border-[#12613E]/10 bg-[#12613E]/[0.06] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#12613E]">
+                  <ShieldCheck className="h-3.5 w-3.5" />
+                  Account protection
+                </span>
 
-        <div className="inline-flex w-fit items-center gap-2 rounded-full bg-success/10 px-3 py-1.5 text-xs font-medium text-success">
-          <CheckCircle2 className="h-3.5 w-3.5" />
-          Account protected
-        </div>
-      </div>
-
-      {/* Security Score */}
-      <Card>
-        <CardBody>
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-            <div className="flex items-center gap-4">
-              <div className="relative flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-success/10">
-                <ShieldCheck className="h-8 w-8 text-success" />
+                <span className="rounded-full border border-ink/[0.07] bg-paper-2 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-ink/45">
+                  Security centre
+                </span>
               </div>
 
-              <div>
-                <p className="text-sm font-medium text-ink/50">
-                  Security Score
-                </p>
+              <h1 className="font-display text-3xl font-semibold tracking-[-0.035em] text-ink sm:text-4xl lg:text-[42px]">
+                Security & access.
+              </h1>
 
-                <div className="mt-1 flex items-baseline gap-2">
-                  <span className="text-3xl font-semibold tracking-tight">
-                    {securityOverview.score}%
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-ink/50 sm:text-[15px]">
+                Manage authentication, trusted devices and account protection
+                from one controlled security workspace.
+              </p>
+
+              <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3">
+                <HeroMeta
+                  icon={ShieldCheck}
+                  label="Protection"
+                  value="Active"
+                />
+
+                <HeroMeta
+                  icon={SmartphoneNfc}
+                  label="MFA"
+                  value="Enabled"
+                />
+
+                <HeroMeta
+                  icon={Laptop}
+                  label="Sessions"
+                  value={`${securityOverview.activeSessions} active`}
+                />
+              </div>
+            </div>
+
+            <div className="w-full shrink-0 lg:w-[250px]">
+              <div className="rounded-[20px] border border-ink/[0.07] bg-paper-2/70 p-5">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-ink/40">
+                      Security posture
+                    </p>
+
+                    <div className="mt-2 flex items-baseline gap-2">
+                      <span className="font-display text-3xl font-semibold tracking-[-0.04em]">
+                        {securityOverview.score}
+                      </span>
+
+                      <span className="text-xs font-medium text-ink/40">
+                        / 100
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#12613E]/[0.08]">
+                    <ShieldCheck className="h-5 w-5 text-[#12613E]" />
+                  </div>
+                </div>
+
+                <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-ink/[0.08]">
+                  <div
+                    className="h-full rounded-full bg-[#12613E]"
+                    style={{ width: `${securityOverview.score}%` }}
+                  />
+                </div>
+
+                <div className="mt-3 flex items-center justify-between">
+                  <span className="text-[11px] text-ink/40">
+                    Protection level
                   </span>
 
-                  <span className="text-xs font-medium text-success">
+                  <span className="text-[11px] font-semibold text-[#12613E]">
                     Excellent
                   </span>
                 </div>
-
-                <p className="mt-1 text-xs text-ink/40">
-                  Your account has strong security protection enabled.
-                </p>
-              </div>
-            </div>
-
-            <div className="w-full max-w-sm">
-              <div className="mb-2 flex items-center justify-between">
-                <span className="text-xs text-ink/45">
-                  Protection level
-                </span>
-
-                <span className="text-xs font-semibold">
-                  {securityOverview.score}%
-                </span>
-              </div>
-
-              <div className="h-2 overflow-hidden rounded-full bg-ink/10">
-                <div
-                  className="h-full rounded-full bg-success"
-                  style={{
-                    width: `${securityOverview.score}%`,
-                  }}
-                />
-              </div>
-
-              <div className="mt-2 flex items-center justify-between text-[11px] text-ink/35">
-                <span>Needs attention</span>
-                <span>Excellent</span>
               </div>
             </div>
           </div>
-        </CardBody>
-      </Card>
+        </div>
+      </section>
 
-      {/* Security Controls */}
-      <div className="grid gap-6 lg:grid-cols-2">
-        <SecurityControl
+      {/* ------------------------------------------------------------------ */}
+      {/* Security indicators                                                */}
+      {/* ------------------------------------------------------------------ */}
+
+      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <SecurityMetric
+          icon={ShieldCheck}
+          label="Security score"
+          value={`${securityOverview.score}%`}
+          detail="Strong protection"
+          tone="green"
+        />
+
+        <SecurityMetric
           icon={KeyRound}
-          title="Password"
-          description="Keep your password strong and up to date."
-          status={securityOverview.password}
-          statusType="success"
-          action="Change password"
-        >
-          <div className="mt-4 flex items-center gap-2 rounded-xl bg-paper-2 px-3 py-2.5 text-xs text-ink/45">
-            <Clock3 className="h-3.5 w-3.5" />
-            Last changed {securityOverview.lastPasswordChange}
-          </div>
-        </SecurityControl>
+          label="Password"
+          value={securityOverview.password}
+          detail={`Changed ${securityOverview.lastPasswordChange}`}
+          tone="neutral"
+        />
 
-        <SecurityControl
+        <SecurityMetric
           icon={SmartphoneNfc}
-          title="Two-Factor Authentication"
-          description="Add an additional layer of protection when signing in."
-          status={securityOverview.twoFactor}
-          statusType="success"
-          action="Manage MFA"
-        >
-          <div className="mt-4 flex items-center gap-2 rounded-xl bg-success/10 px-3 py-2.5 text-xs text-success">
-            <ShieldCheck className="h-3.5 w-3.5" />
-            Authentication protection is active
-          </div>
-        </SecurityControl>
-      </div>
+          label="Two-factor"
+          value={securityOverview.twoFactor}
+          detail="Authenticator protection"
+          tone="green"
+        />
 
-      {/* Password Security */}
+        <SecurityMetric
+          icon={Laptop}
+          label="Active sessions"
+          value={String(securityOverview.activeSessions)}
+          detail="Recognized devices"
+          tone="bronze"
+        />
+      </section>
+
+      {/* ------------------------------------------------------------------ */}
+      {/* Security notice                                                    */}
+      {/* ------------------------------------------------------------------ */}
+
+      <section className="rounded-[20px] border border-[#12613E]/10 bg-[#12613E]/[0.045] p-5 sm:p-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#12613E]/[0.09]">
+            <ShieldCheck className="h-5 w-5 text-[#12613E]" />
+          </div>
+
+          <div>
+            <p className="text-sm font-semibold text-ink">
+              Your account is currently well protected.
+            </p>
+
+            <p className="mt-1 max-w-3xl text-xs leading-5 text-ink/50">
+              Two-factor authentication is enabled and all currently active
+              sessions are recognized. Continue reviewing security activity
+              periodically and revoke any session you do not recognize.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ------------------------------------------------------------------ */}
+      {/* Primary controls                                                   */}
+      {/* ------------------------------------------------------------------ */}
+
+      <section>
+        <SectionHeading
+          eyebrow="Authentication"
+          title="Core protection"
+          description="The primary authentication controls protecting your account."
+        />
+
+        <div className="mt-4 grid gap-5 lg:grid-cols-2">
+          <SecurityControl
+            icon={KeyRound}
+            title="Password"
+            description="Keep your password strong and up to date."
+            status={securityOverview.password}
+            statusType="success"
+            action="Change password"
+          >
+            <div className="mt-5 flex items-center gap-2 rounded-xl border border-ink/[0.06] bg-paper-2 px-3.5 py-3 text-xs text-ink/45">
+              <Clock3 className="h-3.5 w-3.5 shrink-0" />
+              Last changed {securityOverview.lastPasswordChange}
+            </div>
+          </SecurityControl>
+
+          <SecurityControl
+            icon={SmartphoneNfc}
+            title="Two-factor authentication"
+            description="Add an additional layer of protection whenever your account is accessed."
+            status={securityOverview.twoFactor}
+            statusType="success"
+            action="Manage MFA"
+          >
+            <div className="mt-5 flex items-center gap-2 rounded-xl border border-[#12613E]/10 bg-[#12613E]/[0.055] px-3.5 py-3 text-xs text-[#12613E]">
+              <ShieldCheck className="h-3.5 w-3.5 shrink-0" />
+              Authentication protection is active
+            </div>
+          </SecurityControl>
+        </div>
+      </section>
+
+      {/* ------------------------------------------------------------------ */}
+      {/* Password & authentication                                          */}
+      {/* ------------------------------------------------------------------ */}
+
       <Card>
         <CardHeader
-          title="Password & Authentication"
+          title="Password & authentication"
           subtitle="Manage the credentials and authentication methods used to protect your account."
         />
 
         <CardBody>
-          <div className="divide-y divide-line overflow-hidden rounded-2xl border border-line">
+          <div className="divide-y divide-ink/[0.06] overflow-hidden rounded-[20px] border border-ink/[0.07]">
             <SecurityAction
               icon={KeyRound}
               title="Change password"
@@ -258,28 +351,40 @@ export function Security() {
         </CardBody>
       </Card>
 
-      {/* Active Sessions */}
+      {/* ------------------------------------------------------------------ */}
+      {/* Active sessions                                                    */}
+      {/* ------------------------------------------------------------------ */}
+
       <Card>
         <CardHeader
-          title="Active Sessions"
+          title="Active sessions"
           subtitle="Review the devices currently signed in to your Build OS account."
+          action={
+            <span className="inline-flex items-center gap-2 rounded-full border border-ink/[0.07] bg-paper-2 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-ink/45">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#12613E]" />
+              {securityOverview.activeSessions} active
+            </span>
+          }
         />
 
         <CardBody>
-          <div className="mb-4 flex items-start gap-3 rounded-2xl border border-line bg-paper-2 p-4">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-background">
-              <Laptop className="h-4 w-4 text-ink/50" />
-            </div>
+          <div className="mb-5 rounded-[20px] border border-ink/[0.06] bg-paper-2/70 p-5">
+            <div className="flex items-start gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white">
+                <Laptop className="h-4 w-4 text-ink/50" />
+              </div>
 
-            <div>
-              <p className="text-sm font-medium">
-                {securityOverview.activeSessions} active devices
-              </p>
+              <div>
+                <p className="text-sm font-semibold text-ink">
+                  Recognized devices
+                </p>
 
-              <p className="mt-1 text-xs leading-5 text-ink/45">
-                If you don't recognize a session, revoke it immediately and
-                change your password.
-              </p>
+                <p className="mt-1 max-w-2xl text-xs leading-5 text-ink/45">
+                  These sessions represent devices currently authenticated to
+                  your account. If you do not recognize one, revoke it
+                  immediately and review your password.
+                </p>
+              </div>
             </div>
           </div>
 
@@ -292,63 +397,77 @@ export function Security() {
             ))}
           </div>
 
-          <div className="mt-5 flex justify-end">
+          <div className="mt-5 flex flex-col gap-3 border-t border-ink/[0.06] pt-5 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-xs text-ink/40">
+              Signing out other devices will end their current sessions.
+            </p>
+
             <button
               type="button"
-              className="inline-flex items-center gap-2 rounded-xl border border-line px-4 py-2.5 text-sm font-medium transition hover:bg-paper-2"
+              className="inline-flex w-fit items-center gap-2 rounded-xl border border-ink/[0.09] bg-white px-4 py-2.5 text-xs font-semibold text-ink transition hover:bg-paper-2"
             >
-              <LogOut className="h-4 w-4" />
+              <LogOut className="h-3.5 w-3.5" />
               Sign out all other devices
             </button>
           </div>
         </CardBody>
       </Card>
 
-      {/* Login Protection */}
-      <Card>
-        <CardHeader
-          title="Login Protection"
-          subtitle="Additional controls that help protect your account from unauthorized access."
+      {/* ------------------------------------------------------------------ */}
+      {/* Login protection                                                   */}
+      {/* ------------------------------------------------------------------ */}
+
+      <section>
+        <SectionHeading
+          eyebrow="Access controls"
+          title="Login protection"
+          description="Additional controls that help protect your account from unauthorized access."
         />
 
-        <CardBody>
-          <div className="grid gap-3 md:grid-cols-2">
-            <ProtectionRow
-              icon={ShieldCheck}
-              title="Login verification"
-              description="Require additional verification when a login requires extra protection."
-              enabled
-            />
+        <div className="mt-4 grid gap-3 md:grid-cols-2">
+          <ProtectionRow
+            icon={ShieldCheck}
+            title="Login verification"
+            description="Require additional verification when a login requires extra protection."
+            enabled
+          />
 
-            <ProtectionRow
-              icon={Monitor}
-              title="Device recognition"
-              description="Recognize trusted devices and monitor unfamiliar sign-ins."
-              enabled
-            />
+          <ProtectionRow
+            icon={Monitor}
+            title="Device recognition"
+            description="Recognize trusted devices and monitor unfamiliar sign-ins."
+            enabled
+          />
 
-            <ProtectionRow
-              icon={Clock3}
-              title="Session timeout"
-              description="Automatically expire inactive sessions to reduce account exposure."
-              enabled
-            />
+          <ProtectionRow
+            icon={Clock3}
+            title="Session timeout"
+            description="Automatically expire inactive sessions to reduce account exposure."
+            enabled
+          />
 
-            <ProtectionRow
-              icon={Unlock}
-              title="Suspicious login protection"
-              description="Additional security controls may be triggered for unusual activity."
-              enabled
-            />
-          </div>
-        </CardBody>
-      </Card>
+          <ProtectionRow
+            icon={Unlock}
+            title="Suspicious login protection"
+            description="Additional security controls may be triggered for unusual activity."
+            enabled
+          />
+        </div>
+      </section>
 
-      {/* Security Activity */}
+      {/* ------------------------------------------------------------------ */}
+      {/* Security activity                                                  */}
+      {/* ------------------------------------------------------------------ */}
+
       <Card>
         <CardHeader
-          title="Recent Security Activity"
+          title="Recent security activity"
           subtitle="A record of recent authentication and account security events."
+          action={
+            <span className="hidden text-[10px] font-semibold uppercase tracking-[0.12em] text-ink/35 sm:block">
+              Audit trail
+            </span>
+          }
         />
 
         <CardBody>
@@ -361,41 +480,168 @@ export function Security() {
             ))}
           </div>
 
-          <button
-            type="button"
-            className="mt-5 inline-flex items-center gap-1.5 text-xs font-medium text-ink transition hover:opacity-60"
-          >
-            View full security history
-            <ChevronRight className="h-3.5 w-3.5" />
-          </button>
-        </CardBody>
-      </Card>
-
-      {/* Security Warning */}
-      <Card>
-        <CardBody>
-          <div className="flex flex-col gap-4 rounded-2xl border border-warning/20 bg-warning/5 p-4 sm:flex-row sm:items-start">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-warning/10">
-              <AlertTriangle className="h-4 w-4 text-warning" />
-            </div>
-
-            <div>
-              <h3 className="text-sm font-semibold">
-                Keep your account secure
-              </h3>
-
-              <p className="mt-1 max-w-3xl text-xs leading-5 text-ink/50">
-                Never share your password, authentication codes or recovery
-                credentials. Build OS will never ask you to provide these
-                details through an unsolicited message.
-              </p>
-            </div>
+          <div className="mt-5 border-t border-ink/[0.06] pt-5">
+            <button
+              type="button"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-ink transition hover:text-[#12613E]"
+            >
+              View full security history
+              <ChevronRight className="h-3.5 w-3.5" />
+            </button>
           </div>
         </CardBody>
       </Card>
+
+      {/* ------------------------------------------------------------------ */}
+      {/* Security warning                                                   */}
+      {/* ------------------------------------------------------------------ */}
+
+      <section className="rounded-[20px] border border-[#B85C12]/15 bg-[#B85C12]/[0.045] p-5 sm:p-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#B85C12]/[0.10]">
+            <AlertTriangle className="h-5 w-5 text-[#B85C12]" />
+          </div>
+
+          <div>
+            <h3 className="text-sm font-semibold text-ink">
+              Protect your authentication credentials
+            </h3>
+
+            <p className="mt-1 max-w-3xl text-xs leading-5 text-ink/50">
+              Never share your password, authentication codes or recovery
+              credentials. Build OS will never ask you to provide these
+              details through an unsolicited message.
+            </p>
+          </div>
+        </div>
+      </section>
     </div>
   )
 }
+
+/* ========================================================================== */
+/* Hero                                                                       */
+/* ========================================================================== */
+
+function HeroMeta({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: ComponentType<{ className?: string }>
+  label: string
+  value: string
+}) {
+  return (
+    <div className="flex items-center gap-2">
+      <Icon className="h-3.5 w-3.5 text-ink/30" />
+
+      <div className="flex items-center gap-1.5 text-xs">
+        <span className="text-ink/40">{label}</span>
+        <span className="font-semibold text-ink">{value}</span>
+      </div>
+    </div>
+  )
+}
+
+/* ========================================================================== */
+/* Section heading                                                            */
+/* ========================================================================== */
+
+function SectionHeading({
+  eyebrow,
+  title,
+  description,
+}: {
+  eyebrow: string
+  title: string
+  description: string
+}) {
+  return (
+    <div>
+      <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#12613E]">
+        {eyebrow}
+      </p>
+
+      <h2 className="mt-1.5 font-display text-xl font-semibold tracking-[-0.025em] text-ink">
+        {title}
+      </h2>
+
+      <p className="mt-1 text-xs leading-5 text-ink/45">
+        {description}
+      </p>
+    </div>
+  )
+}
+
+/* ========================================================================== */
+/* Security metric                                                            */
+/* ========================================================================== */
+
+function SecurityMetric({
+  icon: Icon,
+  label,
+  value,
+  detail,
+  tone,
+}: {
+  icon: ComponentType<{ className?: string }>
+  label: string
+  value: string
+  detail: string
+  tone: 'green' | 'bronze' | 'neutral'
+}) {
+  const toneClasses = {
+    green: {
+      icon: 'bg-[#12613E]/[0.08] text-[#12613E]',
+      value: 'text-[#12613E]',
+    },
+    bronze: {
+      icon: 'bg-[#B85C12]/[0.08] text-[#B85C12]',
+      value: 'text-[#B85C12]',
+    },
+    neutral: {
+      icon: 'bg-ink/[0.05] text-ink/50',
+      value: 'text-ink',
+    },
+  }
+
+  const styles = toneClasses[tone]
+
+  return (
+    <div className="rounded-[20px] border border-ink/[0.07] bg-white p-5 shadow-[0_10px_30px_rgba(20,40,30,0.04)]">
+      <div className="flex items-start justify-between gap-4">
+        <div
+          className={`flex h-10 w-10 items-center justify-center rounded-xl ${styles.icon}`}
+        >
+          <Icon className="h-4.5 w-4.5" />
+        </div>
+
+        <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-ink/30">
+          Protected
+        </span>
+      </div>
+
+      <p className="mt-5 text-xs font-medium text-ink/45">
+        {label}
+      </p>
+
+      <p
+        className={`mt-1 font-display text-2xl font-semibold tracking-[-0.035em] ${styles.value}`}
+      >
+        {value}
+      </p>
+
+      <p className="mt-1 text-[11px] text-ink/35">
+        {detail}
+      </p>
+    </div>
+  )
+}
+
+/* ========================================================================== */
+/* Security control                                                           */
+/* ========================================================================== */
 
 function SecurityControl({
   icon: Icon,
@@ -406,38 +652,38 @@ function SecurityControl({
   action,
   children,
 }: {
-  icon: React.ComponentType<{ className?: string }>
+  icon: ComponentType<{ className?: string }>
   title: string
   description: string
   status: string
   statusType: 'success' | 'neutral'
   action: string
-  children?: React.ReactNode
+  children?: ReactNode
 }) {
   return (
     <Card>
       <CardBody>
         <div className="flex items-start justify-between gap-4">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-paper-2">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-paper-2">
             <Icon className="h-5 w-5 text-ink/50" />
           </div>
 
           <span
             className={`rounded-full px-2.5 py-1 text-[10px] font-semibold ${
               statusType === 'success'
-                ? 'bg-success/10 text-success'
-                : 'bg-ink/5 text-ink/50'
+                ? 'bg-[#12613E]/[0.08] text-[#12613E]'
+                : 'bg-ink/[0.05] text-ink/50'
             }`}
           >
             {status}
           </span>
         </div>
 
-        <h3 className="mt-4 text-sm font-semibold">
+        <h3 className="mt-5 text-sm font-semibold text-ink">
           {title}
         </h3>
 
-        <p className="mt-1 text-xs leading-5 text-ink/45">
+        <p className="mt-1 max-w-xl text-xs leading-5 text-ink/45">
           {description}
         </p>
 
@@ -445,7 +691,7 @@ function SecurityControl({
 
         <button
           type="button"
-          className="mt-4 inline-flex items-center gap-1.5 text-xs font-medium text-ink transition hover:opacity-60"
+          className="mt-5 inline-flex items-center gap-1.5 text-xs font-semibold text-ink transition hover:text-[#12613E]"
         >
           {action}
           <ChevronRight className="h-3.5 w-3.5" />
@@ -455,6 +701,10 @@ function SecurityControl({
   )
 }
 
+/* ========================================================================== */
+/* Security action                                                            */
+/* ========================================================================== */
+
 function SecurityAction({
   icon: Icon,
   title,
@@ -462,27 +712,27 @@ function SecurityAction({
   action,
   badge,
 }: {
-  icon: React.ComponentType<{ className?: string }>
+  icon: ComponentType<{ className?: string }>
   title: string
   description: string
   action: string
   badge?: string
 }) {
   return (
-    <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between">
-      <div className="flex items-start gap-3">
+    <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex items-start gap-3.5">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-paper-2">
           <Icon className="h-4 w-4 text-ink/50" />
         </div>
 
         <div>
           <div className="flex flex-wrap items-center gap-2">
-            <h3 className="text-sm font-medium">
+            <h3 className="text-sm font-semibold text-ink">
               {title}
             </h3>
 
             {badge && (
-              <span className="rounded-full bg-success/10 px-2 py-0.5 text-[9px] font-semibold text-success">
+              <span className="rounded-full bg-[#12613E]/[0.08] px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.08em] text-[#12613E]">
                 {badge}
               </span>
             )}
@@ -496,7 +746,7 @@ function SecurityAction({
 
       <button
         type="button"
-        className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl border border-line px-3.5 py-2 text-xs font-medium transition hover:bg-paper-2"
+        className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl border border-ink/[0.08] bg-white px-3.5 py-2 text-xs font-semibold text-ink transition hover:bg-paper-2"
       >
         {action}
         <ChevronRight className="h-3.5 w-3.5" />
@@ -504,6 +754,10 @@ function SecurityAction({
     </div>
   )
 }
+
+/* ========================================================================== */
+/* Session row                                                                */
+/* ========================================================================== */
 
 function SessionRow({
   device,
@@ -518,24 +772,40 @@ function SessionRow({
   location: string
   lastActive: string
   current: boolean
-  icon: React.ComponentType<{ className?: string }>
+  icon: ComponentType<{ className?: string }>
 }) {
   return (
-    <div className="flex flex-col gap-4 rounded-2xl border border-line p-4 sm:flex-row sm:items-center sm:justify-between">
-      <div className="flex items-center gap-3">
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-paper-2">
-          <Icon className="h-5 w-5 text-ink/50" />
+    <div
+      className={`group flex flex-col gap-4 rounded-[18px] border p-4 transition sm:flex-row sm:items-center sm:justify-between ${
+        current
+          ? 'border-[#12613E]/15 bg-[#12613E]/[0.025]'
+          : 'border-ink/[0.07] bg-white hover:border-ink/[0.12] hover:shadow-[0_8px_25px_rgba(20,40,30,0.04)]'
+      }`}
+    >
+      <div className="flex items-center gap-3.5">
+        <div
+          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${
+            current
+              ? 'bg-[#12613E]/[0.08]'
+              : 'bg-paper-2'
+          }`}
+        >
+          <Icon
+            className={`h-5 w-5 ${
+              current ? 'text-[#12613E]' : 'text-ink/45'
+            }`}
+          />
         </div>
 
         <div>
           <div className="flex flex-wrap items-center gap-2">
-            <h3 className="text-sm font-medium">
+            <h3 className="text-sm font-semibold text-ink">
               {device}
             </h3>
 
             {current && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-success/10 px-2 py-0.5 text-[9px] font-semibold text-success">
-                <span className="h-1.5 w-1.5 rounded-full bg-success" />
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#12613E]/[0.08] px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.08em] text-[#12613E]">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#12613E]" />
                 This device
               </span>
             )}
@@ -554,7 +824,7 @@ function SessionRow({
       {!current && (
         <button
           type="button"
-          className="inline-flex w-fit items-center gap-1.5 rounded-xl border border-line px-3 py-2 text-xs font-medium transition hover:bg-paper-2"
+          className="inline-flex w-fit items-center gap-1.5 rounded-xl border border-ink/[0.08] bg-white px-3 py-2 text-xs font-semibold text-ink transition hover:border-ink/[0.14] hover:bg-paper-2"
         >
           <LogOut className="h-3.5 w-3.5" />
           Revoke session
@@ -564,49 +834,65 @@ function SessionRow({
   )
 }
 
+/* ========================================================================== */
+/* Protection row                                                             */
+/* ========================================================================== */
+
 function ProtectionRow({
   icon: Icon,
   title,
   description,
   enabled,
 }: {
-  icon: React.ComponentType<{ className?: string }>
+  icon: ComponentType<{ className?: string }>
   title: string
   description: string
   enabled: boolean
 }) {
   return (
-    <div className="flex items-start gap-3 rounded-2xl bg-paper-2 p-4">
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-background">
-        <Icon className="h-4 w-4 text-ink/50" />
-      </div>
-
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center justify-between gap-3">
-          <h3 className="text-sm font-medium">
-            {title}
-          </h3>
-
-          <div
-            className={`h-5 w-9 shrink-0 rounded-full p-0.5 ${
-              enabled ? 'bg-ink' : 'bg-ink/15'
-            }`}
-          >
-            <div
-              className={`h-4 w-4 rounded-full bg-white transition-transform ${
-                enabled ? 'translate-x-4' : 'translate-x-0'
-              }`}
-            />
-          </div>
+    <div className="rounded-[18px] border border-ink/[0.07] bg-white p-5 transition hover:border-ink/[0.11] hover:shadow-[0_10px_30px_rgba(20,40,30,0.04)]">
+      <div className="flex items-start gap-3.5">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-paper-2">
+          <Icon className="h-4 w-4 text-ink/50" />
         </div>
 
-        <p className="mt-1 text-xs leading-5 text-ink/45">
-          {description}
-        </p>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center justify-between gap-4">
+            <h3 className="text-sm font-semibold text-ink">
+              {title}
+            </h3>
+
+            <div
+              className={`h-5 w-9 shrink-0 rounded-full p-0.5 ${
+                enabled ? 'bg-[#12613E]' : 'bg-ink/15'
+              }`}
+              aria-hidden="true"
+            >
+              <div
+                className={`h-4 w-4 rounded-full bg-white shadow-sm transition-transform ${
+                  enabled ? 'translate-x-4' : 'translate-x-0'
+                }`}
+              />
+            </div>
+          </div>
+
+          <p className="mt-1.5 text-xs leading-5 text-ink/45">
+            {description}
+          </p>
+
+          <div className="mt-3 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-[#12613E]">
+            <CheckCircle2 className="h-3 w-3" />
+            Enabled
+          </div>
+        </div>
       </div>
     </div>
   )
 }
+
+/* ========================================================================== */
+/* Security event                                                             */
+/* ========================================================================== */
 
 function SecurityEvent({
   action,
@@ -619,21 +905,21 @@ function SecurityEvent({
   description: string
   location: string
   time: string
-  icon: React.ComponentType<{ className?: string }>
+  icon: ComponentType<{ className?: string }>
 }) {
   return (
-    <div className="flex items-start gap-3 rounded-2xl border border-line p-4">
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-paper-2">
+    <div className="flex items-start gap-3.5 rounded-[18px] border border-ink/[0.07] bg-white p-4 transition hover:border-ink/[0.11] hover:shadow-[0_8px_25px_rgba(20,40,30,0.035)]">
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-paper-2">
         <Icon className="h-4 w-4 text-ink/50" />
       </div>
 
       <div className="min-w-0 flex-1">
         <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-          <h3 className="text-sm font-medium">
+          <h3 className="text-sm font-semibold text-ink">
             {action}
           </h3>
 
-          <span className="text-[11px] text-ink/35">
+          <span className="text-[11px] font-medium text-ink/30">
             {time}
           </span>
         </div>

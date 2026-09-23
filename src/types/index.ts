@@ -12,6 +12,16 @@ export type UserRole =
   | 'professional'
   | 'admin'
 
+// Sub-type for the generic 'professional' role only. 'contractor' and
+// 'project_manager' are their own top-level UserRole (they have dedicated
+// dashboards at /app/contractor and /app/pm), so they are NOT included here.
+export type ProfessionalType =
+  | 'architect'
+  | 'engineer'
+  | 'surveyor'
+  | 'artisan'
+  | 'other_professional'
+
 export type VerificationStatus =
   | 'unverified'
   | 'pending'
@@ -24,6 +34,8 @@ export interface User {
   fullName: string
   email: string
   role: UserRole
+  // Only set (and only meaningful) when role === 'professional'.
+  professionalType?: ProfessionalType
   avatarInitials: string
   verificationStatus: VerificationStatus
   trustScore: number // 0-100, see Section 15.4

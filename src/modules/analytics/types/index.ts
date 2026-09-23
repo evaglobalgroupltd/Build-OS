@@ -4,8 +4,14 @@
 // Cross-cutting application types such as User, UserRole, Project,
 // Contractor, Supplier/MarketplaceUser, etc. should remain in src/types.
 //
-// These interfaces are intentionally frontend-friendly and can later be
-// mapped directly from API/DTO responses.
+// These interfaces are frontend-friendly and intentionally mirror the
+// analytics domain rather than raw API/DTO contracts. API responses can
+// be mapped into these types at the service boundary.
+
+
+// -----------------------------------------------------------------------------
+// Time & trend primitives
+// -----------------------------------------------------------------------------
 
 export type AnalyticsPeriod =
   | 'today'
@@ -25,34 +31,16 @@ export type AnalyticsChangeType =
   | 'negative'
   | 'neutral'
 
-export type RiskSeverity =
-  | 'critical'
-  | 'high'
-  | 'medium'
-  | 'low'
-
-export type ProjectHealth =
-  | 'healthy'
-  | 'at-risk'
-  | 'delayed'
-  | 'completed'
-
-export type ProjectStage =
-  | 'draft'
-  | 'under-review'
-  | 'bidding'
-  | 'contracted'
-  | 'in-progress'
-  | 'inspection'
-  | 'handover'
-  | 'completed'
-  | 'disputed'
-
 export interface AnalyticsDateRange {
   from: string
   to: string
   period: AnalyticsPeriod
 }
+
+
+// -----------------------------------------------------------------------------
+// Shared analytics primitives
+// -----------------------------------------------------------------------------
 
 export interface AnalyticsMetric {
   label: string
@@ -75,6 +63,28 @@ export interface AnalyticsSeries {
   name: string
   data: AnalyticsSeriesPoint[]
 }
+
+
+// -----------------------------------------------------------------------------
+// Project analytics
+// -----------------------------------------------------------------------------
+
+export type ProjectHealth =
+  | 'healthy'
+  | 'at-risk'
+  | 'delayed'
+  | 'completed'
+
+export type ProjectStage =
+  | 'draft'
+  | 'under-review'
+  | 'bidding'
+  | 'contracted'
+  | 'in-progress'
+  | 'inspection'
+  | 'handover'
+  | 'completed'
+  | 'disputed'
 
 export interface ProjectAnalyticsSummary {
   activeProjects: number
@@ -123,6 +133,11 @@ export interface MilestoneAnalytics {
   completionRate: number
 }
 
+
+// -----------------------------------------------------------------------------
+// Financial analytics
+// -----------------------------------------------------------------------------
+
 export interface FinancialAnalyticsSummary {
   totalRevenue: number
   totalProjectValue: number
@@ -143,6 +158,11 @@ export interface FinancialTrend {
   projectSpend: number
   procurementSpend: number
 }
+
+
+// -----------------------------------------------------------------------------
+// Contractor analytics
+// -----------------------------------------------------------------------------
 
 export interface ContractorAnalyticsSummary {
   totalContractors: number
@@ -168,6 +188,11 @@ export interface ContractorPerformance {
   averageRating?: number
   totalContractValue?: number
 }
+
+
+// -----------------------------------------------------------------------------
+// Marketplace analytics
+// -----------------------------------------------------------------------------
 
 export interface MarketplaceAnalyticsSummary {
   activeMarketplaceUsers: number
@@ -195,6 +220,17 @@ export interface MarketplacePerformance {
   rating?: number
   totalTransactionValue: number
 }
+
+
+// -----------------------------------------------------------------------------
+// Risk analytics
+// -----------------------------------------------------------------------------
+
+export type RiskSeverity =
+  | 'critical'
+  | 'high'
+  | 'medium'
+  | 'low'
 
 export interface RiskAnalyticsSummary {
   activeRisks: number
@@ -238,6 +274,11 @@ export interface RiskTrend {
   trend: AnalyticsTrend
 }
 
+
+// -----------------------------------------------------------------------------
+// Dispute analytics
+// -----------------------------------------------------------------------------
+
 export interface DisputeAnalytics {
   totalDisputes: number
   openDisputes: number
@@ -247,6 +288,11 @@ export interface DisputeAnalytics {
   averageResolutionDays: number
   resolutionRate: number
 }
+
+
+// -----------------------------------------------------------------------------
+// Verification & compliance analytics
+// -----------------------------------------------------------------------------
 
 export interface VerificationAnalytics {
   totalSubmitted: number
@@ -266,6 +312,11 @@ export interface ComplianceAnalytics {
   complianceRate: number
 }
 
+
+// -----------------------------------------------------------------------------
+// Platform analytics
+// -----------------------------------------------------------------------------
+
 export interface PlatformAnalyticsSummary {
   users: number
   verifiedUsers: number
@@ -278,6 +329,11 @@ export interface PlatformAnalyticsSummary {
   platformRevenue: number
   overallRiskScore: number
 }
+
+
+// -----------------------------------------------------------------------------
+// Analytics dashboard aggregate
+// -----------------------------------------------------------------------------
 
 export interface AnalyticsDashboardData {
   period: AnalyticsDateRange

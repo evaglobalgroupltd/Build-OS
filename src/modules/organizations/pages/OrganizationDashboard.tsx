@@ -1,3 +1,5 @@
+import type { ComponentType } from 'react'
+
 import {
   AlertTriangle,
   ArrowUpRight,
@@ -16,6 +18,10 @@ import {
 } from 'lucide-react'
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
+
+/* -------------------------------------------------------------------------- */
+/* Data                                                                       */
+/* -------------------------------------------------------------------------- */
 
 const organization = {
   name: 'BuildRight Construction Ltd.',
@@ -101,55 +107,99 @@ const attentionItems = [
   },
 ]
 
+/* -------------------------------------------------------------------------- */
+/* Dashboard                                                                  */
+/* -------------------------------------------------------------------------- */
+
 export function OrganizationDashboard() {
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-        <div>
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-ink">
-              <Building2 className="h-5 w-5 text-white" />
-            </div>
+    <div className="space-y-7 pb-8">
+      {/* ------------------------------------------------------------------ */}
+      {/* Executive hero                                                      */}
+      {/* ------------------------------------------------------------------ */}
 
-            <div>
+      <section className="relative overflow-hidden rounded-[24px] border border-ink/[0.07] bg-white shadow-[0_18px_50px_rgba(20,40,30,0.08)]">
+        <div className="absolute -right-24 -top-28 h-72 w-72 rounded-full bg-[#12613E]/[0.07] blur-3xl" />
+        <div className="absolute -bottom-28 left-1/3 h-64 w-64 rounded-full bg-[#B85C12]/[0.045] blur-3xl" />
+
+        <div className="relative px-5 py-6 sm:px-7 sm:py-7 lg:px-8">
+          <div className="flex flex-col gap-7 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-3xl">
               <div className="flex flex-wrap items-center gap-2">
-                <h1 className="font-display text-2xl font-semibold tracking-tight text-ink">
-                  {organization.name}
-                </h1>
+                <span className="inline-flex items-center gap-2 rounded-full border border-[#12613E]/10 bg-[#12613E]/[0.06] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#12613E]">
+                  <Building2 className="h-3 w-3" />
+                  Organization overview
+                </span>
 
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-1 text-[10px] font-semibold text-emerald-700">
-                  <ShieldCheck className="h-3 w-3" />
-                  {organization.status}
+                <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-ink/25">
+                  Build OS workspace
                 </span>
               </div>
 
-              <p className="mt-1 text-sm text-ink/45">
-                Organization overview and operational activity
-              </p>
+              <div className="mt-5 flex items-start gap-4">
+                <div className="hidden h-12 w-12 shrink-0 items-center justify-center rounded-[15px] bg-[#18271F] shadow-[0_10px_25px_rgba(24,39,31,0.14)] sm:flex">
+                  <Building2 className="h-5 w-5 text-white" />
+                </div>
+
+                <div>
+                  <div className="flex flex-wrap items-center gap-2.5">
+                    <h1 className="font-display text-3xl font-semibold tracking-[-0.035em] text-[#18271F] sm:text-4xl">
+                      {organization.name}
+                    </h1>
+
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-[#12613E]/[0.08] px-2.5 py-1 text-[10px] font-semibold text-[#12613E]">
+                      <ShieldCheck className="h-3 w-3" />
+                      {organization.status}
+                    </span>
+                  </div>
+
+                  <p className="mt-2 max-w-2xl text-sm leading-6 text-ink/45">
+                    Organization portfolio, financial position and operational
+                    activity across your Build OS workspace.
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-ink/40">
+                <HeroMeta
+                  label="Registration"
+                  value={organization.registration}
+                />
+
+                <HeroMeta label="Location" value={organization.location} />
+
+                <HeroMeta
+                  label="Trust score"
+                  value={`${organization.trustScore}/100`}
+                  accent
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                className="inline-flex h-11 items-center justify-center rounded-xl border border-ink/[0.08] bg-white px-4 text-xs font-semibold text-ink/60 shadow-sm transition-all hover:border-ink/[0.14] hover:text-ink"
+              >
+                Organization settings
+              </button>
+
+              <button
+                type="button"
+                className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-[#18271F] px-5 text-xs font-semibold text-white shadow-[0_10px_24px_rgba(24,39,31,0.16)] transition-all hover:-translate-y-0.5 hover:bg-[#12613E]"
+              >
+                <FolderKanban className="h-3.5 w-3.5" />
+                View projects
+              </button>
             </div>
           </div>
         </div>
+      </section>
 
-        <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            className="inline-flex items-center gap-2 rounded-xl border border-line bg-white px-4 py-2.5 text-xs font-semibold text-ink/65 transition-colors hover:bg-ink/[0.03]"
-          >
-            Organization settings
-          </button>
+      {/* ------------------------------------------------------------------ */}
+      {/* Organization profile                                                */}
+      {/* ------------------------------------------------------------------ */}
 
-          <button
-            type="button"
-            className="inline-flex items-center gap-2 rounded-xl bg-ink px-4 py-2.5 text-xs font-semibold text-white transition-opacity hover:opacity-90"
-          >
-            <FolderKanban className="h-3.5 w-3.5" />
-            View projects
-          </button>
-        </div>
-      </div>
-
-      {/* Organization information */}
       <Card>
         <CardBody>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -175,19 +225,24 @@ export function OrganizationDashboard() {
               label="Trust score"
               value={`${organization.trustScore}/100`}
               icon={ShieldCheck}
+              accent
             />
           </div>
         </CardBody>
       </Card>
 
-      {/* KPI cards */}
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      {/* ------------------------------------------------------------------ */}
+      {/* Executive metrics                                                   */}
+      {/* ------------------------------------------------------------------ */}
+
+      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard
           icon={FolderKanban}
           label="Active projects"
           value="12"
           description="9 on track · 3 need attention"
           trend="+2 this month"
+          tone="green"
         />
 
         <MetricCard
@@ -196,6 +251,7 @@ export function OrganizationDashboard() {
           value="24"
           description="21 active · 3 pending"
           trend="+4 this month"
+          tone="neutral"
         />
 
         <MetricCard
@@ -204,6 +260,7 @@ export function OrganizationDashboard() {
           value="₦186.4M"
           description="Across active projects"
           trend="+12.8%"
+          tone="bronze"
         />
 
         <MetricCard
@@ -212,86 +269,41 @@ export function OrganizationDashboard() {
           value="₦42.8M"
           description="Current project procurement"
           trend="+8.4%"
+          tone="neutral"
         />
-      </div>
+      </section>
 
-      {/* Main grid */}
+      {/* ------------------------------------------------------------------ */}
+      {/* Portfolio + attention                                               */}
+      {/* ------------------------------------------------------------------ */}
+
       <div className="grid gap-6 xl:grid-cols-3">
-        {/* Projects */}
+        {/* Active projects */}
         <Card className="overflow-hidden xl:col-span-2">
           <CardHeader
             title="Active projects"
             subtitle="Current organization project portfolio"
+            action={
+              <span className="hidden rounded-full bg-ink/[0.04] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-ink/35 sm:inline-flex">
+                12 active
+              </span>
+            }
           />
 
-          <div className="divide-y divide-line">
-            {projects.map((project) => (
-              <div
+          <div className="divide-y divide-ink/[0.055]">
+            {projects.map((project, index) => (
+              <ProjectRow
                 key={project.name}
-                className="px-6 py-5 transition-colors hover:bg-ink/[0.02]"
-              >
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="min-w-0">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="text-sm font-semibold text-ink">
-                        {project.name}
-                      </h3>
-
-                      <ProjectStatus status={project.status} />
-                    </div>
-
-                    <p className="mt-1 text-xs text-ink/40">
-                      {project.location}
-                    </p>
-                  </div>
-
-                  <div className="flex shrink-0 items-center gap-5">
-                    <div>
-                      <p className="text-[10px] font-semibold uppercase tracking-wide text-ink/35">
-                        Budget
-                      </p>
-
-                      <p className="mt-1 text-sm font-semibold text-ink">
-                        {project.budget}
-                      </p>
-                    </div>
-
-                    <ChevronRight className="h-4 w-4 text-ink/25" />
-                  </div>
-                </div>
-
-                <div className="mt-5">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-[10px] font-semibold uppercase tracking-wide text-ink/35">
-                        Current milestone
-                      </p>
-
-                      <p className="mt-1 text-xs font-medium text-ink/60">
-                        {project.milestone}
-                      </p>
-                    </div>
-
-                    <span className="text-sm font-semibold text-ink">
-                      {project.progress}%
-                    </span>
-                  </div>
-
-                  <div className="mt-2 h-2 overflow-hidden rounded-full bg-ink/5">
-                    <div
-                      className="h-full rounded-full bg-ink transition-all duration-500"
-                      style={{ width: `${project.progress}%` }}
-                    />
-                  </div>
-                </div>
-              </div>
+                project={project}
+                index={index}
+              />
             ))}
           </div>
 
-          <div className="border-t border-line px-6 py-4">
+          <div className="border-t border-ink/[0.06] px-6 py-4">
             <button
               type="button"
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-ink/60 transition-colors hover:text-ink"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#12613E] transition-colors hover:text-[#0E4C31]"
             >
               View all projects
               <ChevronRight className="h-3.5 w-3.5" />
@@ -304,55 +316,50 @@ export function OrganizationDashboard() {
           <CardHeader
             title="Requires attention"
             subtitle="Actions that may need organization review"
+            action={
+              <span className="inline-flex h-7 min-w-7 items-center justify-center rounded-full bg-rose-500/10 px-2 text-[10px] font-bold text-rose-700">
+                {attentionItems.length}
+              </span>
+            }
           />
 
-          <div className="divide-y divide-line">
+          <div className="divide-y divide-ink/[0.055]">
             {attentionItems.map((item) => (
-              <div key={item.title} className="px-5 py-4">
-                <div className="flex gap-3">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-500/10">
-                    <AlertTriangle className="h-3.5 w-3.5 text-amber-600" />
-                  </div>
-
-                  <div className="min-w-0">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <p className="text-xs font-semibold text-ink">
-                        {item.title}
-                      </p>
-
-                      <PriorityBadge priority={item.priority} />
-                    </div>
-
-                    <p className="mt-1 text-xs leading-5 text-ink/40">
-                      {item.description}
-                    </p>
-
-                    <button
-                      type="button"
-                      className="mt-3 inline-flex items-center gap-1 text-[11px] font-semibold text-ink/60 hover:text-ink"
-                    >
-                      {item.action}
-                      <ArrowUpRight className="h-3 w-3" />
-                    </button>
-                  </div>
-                </div>
-              </div>
+              <AttentionItem key={item.title} item={item} />
             ))}
+          </div>
+
+          <div className="border-t border-ink/[0.06] bg-[#FBFCFA] px-5 py-4">
+            <button
+              type="button"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-ink/55 transition-colors hover:text-[#12613E]"
+            >
+              View all exceptions
+              <ArrowUpRight className="h-3.5 w-3.5" />
+            </button>
           </div>
         </Card>
       </div>
 
-      {/* Operational overview */}
+      {/* ------------------------------------------------------------------ */}
+      {/* Procurement + financial position                                   */}
+      {/* ------------------------------------------------------------------ */}
+
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Procurement */}
         <Card>
           <CardHeader
             title="Procurement overview"
             subtitle="Current procurement activity across projects"
+            action={
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#12613E]/[0.07] text-[#12613E]">
+                <ShoppingCart className="h-3.5 w-3.5" />
+              </div>
+            }
           />
 
           <CardBody>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-3 sm:grid-cols-2">
               <OperationalMetric
                 icon={ShoppingCart}
                 label="Open requests"
@@ -382,24 +389,26 @@ export function OrganizationDashboard() {
               />
             </div>
 
-            <div className="mt-6 border-t border-line pt-5">
-              <div className="flex items-center justify-between">
+            <div className="mt-6 rounded-2xl border border-ink/[0.055] bg-[#FAFBF9] p-4">
+              <div className="flex items-end justify-between gap-4">
                 <div>
-                  <p className="text-xs font-semibold text-ink">
+                  <p className="text-xs font-semibold text-[#18271F]">
                     Procurement efficiency
                   </p>
 
-                  <p className="mt-1 text-xs text-ink/40">
+                  <p className="mt-1 text-[11px] text-ink/38">
                     Verified orders completed successfully
                   </p>
                 </div>
 
-                <span className="text-lg font-semibold text-ink">96%</span>
+                <span className="font-display text-xl font-semibold text-[#18271F]">
+                  96%
+                </span>
               </div>
 
-              <div className="mt-3 h-2 overflow-hidden rounded-full bg-ink/5">
+              <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-ink/[0.06]">
                 <div
-                  className="h-full rounded-full bg-ink"
+                  className="h-full rounded-full bg-[#12613E]"
                   style={{ width: '96%' }}
                 />
               </div>
@@ -412,22 +421,27 @@ export function OrganizationDashboard() {
           <CardHeader
             title="Financial position"
             subtitle="Organization-level project funding overview"
+            action={
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#B85C12]/[0.08] text-[#B85C12]">
+                <WalletCards className="h-3.5 w-3.5" />
+              </div>
+            }
           />
 
           <CardBody>
-            <div className="flex items-end justify-between">
+            <div className="flex items-end justify-between gap-4">
               <div>
-                <p className="text-[10px] font-semibold uppercase tracking-wide text-ink/35">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-ink/30">
                   Total project value
                 </p>
 
-                <p className="mt-1 font-display text-3xl font-semibold tracking-tight text-ink">
+                <p className="mt-1 font-display text-3xl font-semibold tracking-[-0.03em] text-[#18271F]">
                   ₦412.8M
                 </p>
               </div>
 
-              <div className="flex items-center gap-1 text-xs font-semibold text-emerald-700">
-                <TrendingUp className="h-3.5 w-3.5" />
+              <div className="flex items-center gap-1 rounded-full bg-[#12613E]/[0.07] px-2.5 py-1.5 text-[10px] font-semibold text-[#12613E]">
+                <TrendingUp className="h-3 w-3" />
                 14.6%
               </div>
             </div>
@@ -437,66 +451,65 @@ export function OrganizationDashboard() {
                 label="Funded in escrow"
                 value="₦286.4M"
                 percentage={69}
+                tone="green"
               />
 
               <FinancialRow
                 label="Released"
                 value="₦100.2M"
                 percentage={24}
+                tone="bronze"
               />
 
               <FinancialRow
                 label="Reserved"
                 value="₦26.2M"
                 percentage={7}
+                tone="neutral"
               />
+            </div>
+
+            <div className="mt-6 flex items-center justify-between border-t border-ink/[0.06] pt-4">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-ink/30">
+                Available position
+              </span>
+
+              <span className="text-sm font-semibold text-[#18271F]">
+                ₦26.2M
+              </span>
             </div>
           </CardBody>
         </Card>
       </div>
 
-      {/* Recent activity */}
+      {/* ------------------------------------------------------------------ */}
+      {/* Recent activity                                                     */}
+      {/* ------------------------------------------------------------------ */}
+
       <Card className="overflow-hidden">
         <CardHeader
           title="Recent activity"
           subtitle="Latest actions across the organization"
+          action={
+            <span className="hidden text-[10px] font-semibold uppercase tracking-[0.12em] text-ink/30 sm:inline">
+              Live activity
+            </span>
+          }
         />
 
-        <div className="divide-y divide-line">
-          {activities.map((activity) => {
-            const Icon = activity.icon
-
-            return (
-              <div
-                key={`${activity.title}-${activity.time}`}
-                className="flex items-start gap-4 px-6 py-4 transition-colors hover:bg-ink/[0.02]"
-              >
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-ink/5">
-                  <Icon className="h-4 w-4 text-ink/50" />
-                </div>
-
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium text-ink">
-                    {activity.title}
-                  </p>
-
-                  <p className="mt-1 text-xs text-ink/40">
-                    {activity.description}
-                  </p>
-                </div>
-
-                <span className="shrink-0 text-[10px] text-ink/35">
-                  {activity.time}
-                </span>
-              </div>
-            )
-          })}
+        <div className="divide-y divide-ink/[0.055]">
+          {activities.map((activity) => (
+            <ActivityRow
+              key={`${activity.title}-${activity.time}`}
+              activity={activity}
+            />
+          ))}
         </div>
 
-        <div className="border-t border-line px-6 py-4">
+        <div className="border-t border-ink/[0.06] px-6 py-4">
           <button
             type="button"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-ink/60 transition-colors hover:text-ink"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#12613E] transition-colors hover:text-[#0E4C31]"
           >
             View activity history
             <ChevronRight className="h-3.5 w-3.5" />
@@ -507,33 +520,77 @@ export function OrganizationDashboard() {
   )
 }
 
+/* -------------------------------------------------------------------------- */
+/* Hero metadata                                                              */
+/* -------------------------------------------------------------------------- */
+
+function HeroMeta({
+  label,
+  value,
+  accent = false,
+}: {
+  label: string
+  value: string
+  accent?: boolean
+}) {
+  return (
+    <div className="flex items-center gap-2">
+      <span className={accent ? 'font-semibold text-[#12613E]' : 'font-semibold text-ink/65'}>
+        {value}
+      </span>
+
+      <span>{label}</span>
+    </div>
+  )
+}
+
+/* -------------------------------------------------------------------------- */
+/* Organization information                                                   */
+/* -------------------------------------------------------------------------- */
+
 function OrganizationInfo({
   icon: Icon,
   label,
   value,
+  accent = false,
 }: {
-  icon: React.ComponentType<{ className?: string }>
+  icon: ComponentType<{ className?: string }>
   label: string
   value: string
+  accent?: boolean
 }) {
   return (
     <div className="flex items-center gap-3">
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-ink/5">
-        <Icon className="h-4 w-4 text-ink/50" />
+      <div
+        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${
+          accent
+            ? 'bg-[#12613E]/[0.07] text-[#12613E]'
+            : 'bg-ink/[0.045] text-ink/50'
+        }`}
+      >
+        <Icon className="h-4 w-4" />
       </div>
 
       <div className="min-w-0">
-        <p className="text-[10px] font-semibold uppercase tracking-wide text-ink/35">
+        <p className="text-[9px] font-semibold uppercase tracking-[0.13em] text-ink/30">
           {label}
         </p>
 
-        <p className="mt-1 truncate text-sm font-medium text-ink">
+        <p
+          className={`mt-1 truncate text-sm font-medium ${
+            accent ? 'text-[#12613E]' : 'text-[#18271F]'
+          }`}
+        >
           {value}
         </p>
       </div>
     </div>
   )
 }
+
+/* -------------------------------------------------------------------------- */
+/* KPI card                                                                   */
+/* -------------------------------------------------------------------------- */
 
 function MetricCard({
   icon: Icon,
@@ -541,39 +598,217 @@ function MetricCard({
   value,
   description,
   trend,
+  tone,
 }: {
-  icon: React.ComponentType<{ className?: string }>
+  icon: ComponentType<{ className?: string }>
   label: string
   value: string
   description: string
   trend: string
+  tone: 'green' | 'bronze' | 'neutral'
 }) {
+  const toneClasses = {
+    green: {
+      icon: 'bg-[#12613E]/[0.07] text-[#12613E]',
+      trend: 'bg-[#12613E]/[0.07] text-[#12613E]',
+    },
+    bronze: {
+      icon: 'bg-[#B85C12]/[0.08] text-[#B85C12]',
+      trend: 'bg-[#B85C12]/[0.08] text-[#A4510F]',
+    },
+    neutral: {
+      icon: 'bg-ink/[0.05] text-ink/50',
+      trend: 'bg-ink/[0.04] text-ink/45',
+    },
+  } as const
+
   return (
-    <Card>
+    <Card className="relative overflow-hidden">
+      <div
+        className={`absolute left-0 top-0 h-full w-0.5 ${
+          tone === 'green'
+            ? 'bg-[#12613E]'
+            : tone === 'bronze'
+              ? 'bg-[#B85C12]'
+              : 'bg-ink/15'
+        }`}
+      />
+
       <CardBody>
-        <div className="flex items-center justify-between">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-ink/5">
-            <Icon className="h-4 w-4 text-ink/50" />
+        <div className="flex items-center justify-between gap-3">
+          <div
+            className={`flex h-9 w-9 items-center justify-center rounded-xl ${toneClasses[tone].icon}`}
+          >
+            <Icon className="h-4 w-4" />
           </div>
 
-          <span className="text-[10px] font-semibold text-emerald-700">
+          <span
+            className={`rounded-full px-2.5 py-1 text-[9px] font-semibold ${toneClasses[tone].trend}`}
+          >
             {trend}
           </span>
         </div>
 
-        <p className="mt-5 text-[10px] font-semibold uppercase tracking-wide text-ink/35">
+        <p className="mt-5 text-[9px] font-semibold uppercase tracking-[0.14em] text-ink/30">
           {label}
         </p>
 
-        <p className="mt-1 font-display text-2xl font-semibold tracking-tight text-ink">
+        <p className="mt-1 font-display text-2xl font-semibold tracking-[-0.025em] text-[#18271F]">
           {value}
         </p>
 
-        <p className="mt-1 text-xs text-ink/40">{description}</p>
+        <p className="mt-1 text-[11px] text-ink/38">{description}</p>
       </CardBody>
     </Card>
   )
 }
+
+/* -------------------------------------------------------------------------- */
+/* Project row                                                                */
+/* -------------------------------------------------------------------------- */
+
+function ProjectRow({
+  project,
+  index,
+}: {
+  project: (typeof projects)[number]
+  index: number
+}) {
+  const isRisk = project.status === 'At Risk'
+
+  return (
+    <div className="group px-5 py-5 transition-colors hover:bg-[#FBFCFA] sm:px-6">
+      <div className="flex flex-col gap-5">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex min-w-0 gap-3.5">
+            <div className="hidden h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-ink/[0.06] bg-[#FAFBF9] text-[9px] font-bold text-ink/30 sm:flex">
+              0{index + 1}
+            </div>
+
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <h3 className="text-sm font-semibold text-[#18271F]">
+                  {project.name}
+                </h3>
+
+                <ProjectStatus status={project.status} />
+              </div>
+
+              <p className="mt-1 text-xs text-ink/38">
+                {project.location}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex shrink-0 items-center gap-3">
+            <div className="hidden text-right sm:block">
+              <p className="text-[9px] font-semibold uppercase tracking-[0.12em] text-ink/28">
+                Budget
+              </p>
+
+              <p className="mt-1 text-sm font-semibold text-[#18271F]">
+                {project.budget}
+              </p>
+            </div>
+
+            <ChevronRight className="h-4 w-4 text-ink/20 transition-transform group-hover:translate-x-0.5 group-hover:text-[#12613E]" />
+          </div>
+        </div>
+
+        <div>
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <p className="text-[9px] font-semibold uppercase tracking-[0.13em] text-ink/28">
+                Current milestone
+              </p>
+
+              <p className="mt-1 text-xs font-medium text-ink/58">
+                {project.milestone}
+              </p>
+            </div>
+
+            <span className="font-display text-lg font-semibold text-[#18271F]">
+              {project.progress}%
+            </span>
+          </div>
+
+          <div className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-ink/[0.055]">
+            <div
+              className={`h-full rounded-full transition-all duration-500 ${
+                isRisk ? 'bg-[#B85C12]' : 'bg-[#12613E]'
+              }`}
+              style={{ width: `${project.progress}%` }}
+            />
+          </div>
+
+          <div className="mt-2 flex items-center justify-between">
+            <span className="text-[10px] text-ink/30">
+              Project delivery progress
+            </span>
+
+            <span className="text-[10px] font-medium text-ink/35 sm:hidden">
+              {project.budget}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* -------------------------------------------------------------------------- */
+/* Attention item                                                             */
+/* -------------------------------------------------------------------------- */
+
+function AttentionItem({
+  item,
+}: {
+  item: (typeof attentionItems)[number]
+}) {
+  const high = item.priority === 'High'
+
+  return (
+    <div className="group px-5 py-4.5 transition-colors hover:bg-[#FBFCFA]">
+      <div className="flex gap-3">
+        <div
+          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${
+            high
+              ? 'bg-rose-500/[0.08] text-rose-700'
+              : 'bg-[#B85C12]/[0.08] text-[#A4510F]'
+          }`}
+        >
+          <AlertTriangle className="h-3.5 w-3.5" />
+        </div>
+
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="text-xs font-semibold text-[#18271F]">
+              {item.title}
+            </p>
+
+            <PriorityBadge priority={item.priority} />
+          </div>
+
+          <p className="mt-1 text-[11px] leading-5 text-ink/40">
+            {item.description}
+          </p>
+
+          <button
+            type="button"
+            className="mt-3 inline-flex items-center gap-1 text-[10px] font-semibold text-ink/50 transition-colors hover:text-[#12613E]"
+          >
+            {item.action}
+            <ArrowUpRight className="h-3 w-3" />
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* -------------------------------------------------------------------------- */
+/* Operational metric                                                         */
+/* -------------------------------------------------------------------------- */
 
 function OperationalMetric({
   icon: Icon,
@@ -581,56 +816,110 @@ function OperationalMetric({
   value,
   description,
 }: {
-  icon: React.ComponentType<{ className?: string }>
+  icon: ComponentType<{ className?: string }>
   label: string
   value: string
   description: string
 }) {
   return (
-    <div className="rounded-2xl border border-line bg-paper-2 p-4">
-      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white">
-        <Icon className="h-3.5 w-3.5 text-ink/50" />
+    <div className="rounded-[17px] border border-ink/[0.055] bg-[#FAFBF9] p-4 transition-colors hover:bg-white">
+      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-ink/50 shadow-sm">
+        <Icon className="h-3.5 w-3.5" />
       </div>
 
-      <p className="mt-4 text-xs font-medium text-ink/50">{label}</p>
+      <p className="mt-4 text-[10px] font-semibold uppercase tracking-[0.1em] text-ink/32">
+        {label}
+      </p>
 
-      <p className="mt-1 font-display text-xl font-semibold text-ink">
+      <p className="mt-1 font-display text-xl font-semibold text-[#18271F]">
         {value}
       </p>
 
-      <p className="mt-1 text-[11px] leading-4 text-ink/35">
+      <p className="mt-1 text-[10px] leading-4 text-ink/35">
         {description}
       </p>
     </div>
   )
 }
 
+/* -------------------------------------------------------------------------- */
+/* Financial row                                                              */
+/* -------------------------------------------------------------------------- */
+
 function FinancialRow({
   label,
   value,
   percentage,
+  tone,
 }: {
   label: string
   value: string
   percentage: number
+  tone: 'green' | 'bronze' | 'neutral'
 }) {
+  const barClass = {
+    green: 'bg-[#12613E]',
+    bronze: 'bg-[#B85C12]',
+    neutral: 'bg-ink/20',
+  } as const
+
   return (
     <div>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-4">
         <span className="text-xs text-ink/45">{label}</span>
 
-        <span className="text-xs font-semibold text-ink">{value}</span>
+        <span className="text-xs font-semibold text-[#18271F]">
+          {value}
+        </span>
       </div>
 
-      <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-ink/5">
+      <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-ink/[0.055]">
         <div
-          className="h-full rounded-full bg-ink"
+          className={`h-full rounded-full ${barClass[tone]}`}
           style={{ width: `${percentage}%` }}
         />
       </div>
     </div>
   )
 }
+
+/* -------------------------------------------------------------------------- */
+/* Activity row                                                               */
+/* -------------------------------------------------------------------------- */
+
+function ActivityRow({
+  activity,
+}: {
+  activity: (typeof activities)[number]
+}) {
+  const Icon = activity.icon
+
+  return (
+    <div className="flex items-start gap-4 px-5 py-4 transition-colors hover:bg-[#FBFCFA] sm:px-6">
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#12613E]/[0.06] text-[#12613E]">
+        <Icon className="h-4 w-4" />
+      </div>
+
+      <div className="min-w-0 flex-1">
+        <p className="text-sm font-medium text-[#18271F]">
+          {activity.title}
+        </p>
+
+        <p className="mt-1 text-xs text-ink/38">
+          {activity.description}
+        </p>
+      </div>
+
+      <span className="shrink-0 text-[10px] text-ink/30">
+        {activity.time}
+      </span>
+    </div>
+  )
+}
+
+/* -------------------------------------------------------------------------- */
+/* Status badges                                                              */
+/* -------------------------------------------------------------------------- */
 
 function ProjectStatus({
   status,
@@ -641,12 +930,18 @@ function ProjectStatus({
 
   return (
     <span
-      className={`rounded-full px-2.5 py-1 text-[10px] font-semibold ${
+      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[9px] font-semibold ${
         isRisk
-          ? 'bg-amber-500/10 text-amber-700'
-          : 'bg-emerald-500/10 text-emerald-700'
+          ? 'bg-[#B85C12]/[0.09] text-[#A4510F]'
+          : 'bg-[#12613E]/[0.08] text-[#12613E]'
       }`}
     >
+      <span
+        className={`h-1.5 w-1.5 rounded-full ${
+          isRisk ? 'bg-[#B85C12]' : 'bg-[#12613E]'
+        }`}
+      />
+
       {status}
     </span>
   )
@@ -657,14 +952,15 @@ function PriorityBadge({
 }: {
   priority: string
 }) {
-  const styles =
-    priority === 'High'
-      ? 'bg-rose-500/10 text-rose-700'
-      : 'bg-amber-500/10 text-amber-700'
+  const high = priority === 'High'
 
   return (
     <span
-      className={`rounded-full px-2 py-0.5 text-[9px] font-semibold ${styles}`}
+      className={`rounded-full px-2 py-0.5 text-[9px] font-semibold ${
+        high
+          ? 'bg-rose-500/[0.08] text-rose-700'
+          : 'bg-[#B85C12]/[0.08] text-[#A4510F]'
+      }`}
     >
       {priority}
     </span>

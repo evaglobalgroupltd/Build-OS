@@ -1,617 +1,355 @@
-import { useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import {
-  Bell,
-  ChevronDown,
-  LogOut,
-  Menu,
-  UserCircle,
-} from 'lucide-react'
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react'
+import { Link } from 'react-router-dom'
+import { ChevronDown, LogOut, Menu, Search, UserCircle } from 'lucide-react'
 
-import { useAuth } from '@/context/AuthContext'
 import { roleLabels } from '@/config/navigation'
-import { roleMeta, accentClasses, roleOrder } from '@/config/roleUi'
-import type { UserRole } from '@/types'
-import { Badge } from '@/components/ui/Badge'
+import type { AppRole } from '@/config/roles'
+import { useAuth } from '@/context/AuthContext'
 
-interface AppHeaderProps {
-  title: string
-  onMenuClick?: () => void
+/* -------------------------------------------------------------------------- */
+/*  Helpers                                                                    */
+/* -------------------------------------------------------------------------- */
+
+type DismissReason = 'pointer' | 'escape'
+
+/** Closes a popover on an outside pointer-down or Escape. */
+function useDismiss<T extends HTMLElement>(
+  open: boolean,
+  onDismiss: (reason: DismissReason) => void,
+) {
+  const ref = useRef<T>(null)
+  const latest = useRef(onDismiss)
+
+  useEffect(() => {
+    latest.current = onDismiss
+  })
+
+  useEffect(() => {
+    if (!open) return
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (ref.current && !ref.current.contains(event.target as Node)) {
+        latest.current('pointer')
+      }
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') latest.current('escape')
+    }
+
+    document.addEventListener('pointerdown', handlePointerDown)
+    document.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown)
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [open])
+
+  return ref
 }
 
-function VerificationBadge({
-  status,
-}: {
-  status: string
-}) {
-  if (status === 'verified') {
-    return <Badge tone="teal">Verified</Badge>
+function getInitials(name?: string | null, email?: string | null) {
+  if (name?.trim()) {
+    return name
+      .trim()
+      .split(/\s+/)
+      .slice(0, 2)
+      .map((part) => part[0])
+      .join('')
+      .toUpperCase()
   }
 
+  if (email?.trim()) return email.trim().slice(0, 2).toUpperCase()
+
+  return 'U'
+}
+
+const focusRing =
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber/60 focus-visible:ring-offset-2'
+
+/* -------------------------------------------------------------------------- */
+/*  Search trigger                                                             */
+/*                                                                             */
+/*  Rendered only when the page supplies `onSearchClick`, so there is never    */
+/*  a search box that does nothing. Cmd/Ctrl + K calls the same handler.       */
+/* -------------------------------------------------------------------------- */
+
+function SearchTrigger({ onClick }: { onClick: () => void }) {
+  const shortcut = useMemo(
+    () =>
+      typeof navigator !== 'undefined' &&
+      /Mac|iPhone|iPad/.test(navigator.userAgent)
+        ? '⌘K'
+        : 'Ctrl K',
+    [],
+  )
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault()
+        onClick()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [onClick])
+
   return (
-    <Badge tone="amber">
-      {status.replace('_', ' ')}
-    </Badge>
+    <>
+      <button
+        type="button"
+        onClick={onClick}
+        aria-keyshortcuts="Control+K Meta+K"
+        className={`hidden h-10 w-[240px] items-center gap-2.5 rounded-xl border border-line bg-ink/[0.025] px-3.5 text-[13px] text-ink/45 transition-colors hover:border-ink/15 hover:bg-white hover:text-ink/70 motion-reduce:transition-none md:flex xl:w-[320px] ${focusRing}`}
+      >
+        <Search size={16} strokeWidth={1.75} aria-hidden="true" />
+
+        <span className="flex-1 text-left">Search</span>
+
+        <kbd className="rounded-md border border-line bg-white px-1.5 py-0.5 font-sans text-[11px] font-medium text-ink/45">
+          {shortcut}
+        </kbd>
+      </button>
+
+      <button
+        type="button"
+        onClick={onClick}
+        aria-label="Search"
+        className={`flex h-10 w-10 items-center justify-center rounded-xl border border-line bg-white text-ink/60 transition-colors hover:border-ink/15 hover:text-ink motion-reduce:transition-none md:hidden ${focusRing}`}
+      >
+        <Search size={17} strokeWidth={1.75} aria-hidden="true" />
+      </button>
+    </>
   )
 }
 
-function RolePreview({
-  role,
-  onRoleChange,
+/* -------------------------------------------------------------------------- */
+/*  Account menu                                                               */
+/* -------------------------------------------------------------------------- */
+
+function Monogram({
+  initials,
+  className,
 }: {
-  role: UserRole
-  onRoleChange: (role: UserRole) => void
+  initials: string
+  className: string
 }) {
-  const activeMeta = roleMeta[role]
-  const activeAccent = accentClasses[activeMeta.accent]
+  return (
+    <span
+      className={`flex shrink-0 items-center justify-center rounded-full bg-ink font-display font-medium tracking-wide text-white ring-1 ring-amber/60 ${className}`}
+    >
+      {initials}
+    </span>
+  )
+}
+
+const menuItem = `flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[13px] font-medium text-ink/70 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber/60`
+
+function AccountMenu() {
+  const { user, role, logout } = useAuth()
+  const [open, setOpen] = useState(false)
+
+  const panelId = useId()
+  const triggerRef = useRef<HTMLButtonElement>(null)
+
+  const dismiss = useCallback((reason: DismissReason) => {
+    setOpen(false)
+    if (reason === 'escape') triggerRef.current?.focus()
+  }, [])
+
+  const containerRef = useDismiss<HTMLDivElement>(open, dismiss)
+
+  const initials = getInitials(user?.name, user?.email)
+  const displayName = user?.name || user?.email || 'Account'
+  const roleLabel = roleLabels[role as AppRole] ?? 'Workspace'
 
   return (
-    <div
-      className={`
-        hidden
-        items-center
-        gap-2
-        rounded-lg
-        border
-        px-2.5
-        py-1.5
-        md:flex
-        ${activeAccent.active}
-        border-current/15
-      `}
-    >
-      <span
-        className="
-          flex
-          h-6
-          w-6
-          shrink-0
-          items-center
-          justify-center
-          rounded-md
-          bg-white/60
-        "
+    <div ref={containerRef} className="relative">
+      <button
+        ref={triggerRef}
+        type="button"
+        aria-expanded={open}
+        aria-controls={panelId}
+        onClick={() => setOpen((value) => !value)}
+        className={`group flex items-center gap-3 rounded-full p-1 transition-colors hover:bg-ink/[0.04] motion-reduce:transition-none lg:pr-3.5 ${focusRing}`}
       >
-        <activeMeta.icon
-          size={13}
-          className={activeAccent.icon}
-          strokeWidth={2.25}
-          aria-hidden="true"
-        />
-      </span>
+        <span className="sr-only">Open account menu</span>
 
-      <div className="flex items-center gap-1.5">
-        <span className="text-[9px] font-semibold uppercase tracking-[0.08em] text-ink/40">
-          Role
+        <Monogram initials={initials} className="h-10 w-10 text-[13px]" />
+
+        <span className="hidden min-w-0 max-w-[160px] text-left lg:block">
+          <span className="block truncate text-[13px] font-semibold text-ink">
+            {displayName}
+          </span>
+          <span className="block truncate text-xs text-ink/50">
+            {roleLabel}
+          </span>
         </span>
 
-        <select
-          aria-label="Select preview role"
-          value={role}
-          onChange={(event) =>
-            onRoleChange(event.target.value as UserRole)
-          }
-          className="
-            cursor-pointer
-            bg-transparent
-            text-xs
-            font-semibold
-            text-ink
-            outline-none
-          "
-        >
-          {roleOrder.map((itemRole) => (
-            <option key={itemRole} value={itemRole}>
-              {roleLabels[itemRole]}
-            </option>
-          ))}
-        </select>
+        <ChevronDown
+          size={15}
+          strokeWidth={1.75}
+          aria-hidden="true"
+          className={`hidden text-ink/35 transition-transform duration-200 motion-reduce:transition-none lg:block ${
+            open ? 'rotate-180' : ''
+          }`}
+        />
+      </button>
+
+      <div
+        id={panelId}
+        className={`absolute right-0 top-[calc(100%+10px)] z-40 w-[280px] origin-top-right overflow-hidden rounded-2xl border border-line bg-white shadow-[0_18px_50px_-16px_rgba(11,18,32,0.3)] transition-[opacity,transform,visibility] duration-150 motion-reduce:transition-none ${
+          open
+            ? 'visible translate-y-0 scale-100 opacity-100'
+            : 'invisible -translate-y-1 scale-[0.98] opacity-0'
+        }`}
+      >
+        <div className="flex items-center gap-3.5 border-b border-line p-4">
+          <Monogram initials={initials} className="h-11 w-11 text-sm" />
+
+          <div className="min-w-0">
+            <p className="truncate text-sm font-semibold text-ink">
+              {user?.name || 'Build OS user'}
+            </p>
+
+            {user?.email && (
+              <p className="mt-0.5 truncate text-xs text-ink/50">
+                {user.email}
+              </p>
+            )}
+
+            <p className="mt-1 text-xs text-ink/40">{roleLabel}</p>
+          </div>
+        </div>
+
+        <div className="p-1.5">
+          <Link
+            to="/profile"
+            onClick={() => setOpen(false)}
+            className={`${menuItem} hover:bg-ink/[0.04] hover:text-ink`}
+          >
+            <UserCircle
+              size={17}
+              strokeWidth={1.75}
+              className="text-ink/35"
+              aria-hidden="true"
+            />
+            View profile
+          </Link>
+
+          <button
+            type="button"
+            onClick={() => {
+              setOpen(false)
+              logout()
+            }}
+            className={`${menuItem} hover:bg-red-50 hover:text-red-700`}
+          >
+            <LogOut
+              size={17}
+              strokeWidth={1.75}
+              className="text-ink/35"
+              aria-hidden="true"
+            />
+            Log out
+          </button>
+        </div>
       </div>
     </div>
   )
 }
 
-function NotificationButton() {
-  return (
-    <button
-      type="button"
-      aria-label="Notifications"
-      className="
-        relative
-        flex
-        h-9
-        w-9
-        shrink-0
-        items-center
-        justify-center
-        rounded-lg
-        text-ink/55
-        transition-all
-        duration-150
-        hover:bg-ink/5
-        hover:text-ink
-        focus-visible:outline-none
-        focus-visible:ring-2
-        focus-visible:ring-amber/60
-        focus-visible:ring-offset-1
-      "
-    >
-      <Bell
-        size={18}
-        strokeWidth={1.9}
-        aria-hidden="true"
-      />
+/* -------------------------------------------------------------------------- */
+/*  Topbar                                                                     */
+/* -------------------------------------------------------------------------- */
 
-      {/* Unread indicator */}
-      <span
-        className="
-          absolute
-          right-[7px]
-          top-[6px]
-          h-1.5
-          w-1.5
-          rounded-full
-          bg-brick
-          ring-2
-          ring-white
-        "
-        aria-hidden="true"
-      />
-    </button>
-  )
+interface TopbarProps {
+  title?: string
+  onMenuClick?: () => void
+  /** True once the page content has scrolled: adds depth and the brass thread. */
+  elevated?: boolean
+  /** Page-level controls (notifications, a primary action) shown before the account menu. */
+  actions?: ReactNode
+  /** Shows the search trigger and binds Cmd/Ctrl + K. Omit to hide search. */
+  onSearchClick?: () => void
 }
 
-export function AppHeader({
+export function Topbar({
   title,
   onMenuClick,
-}: AppHeaderProps) {
-  const navigate = useNavigate()
-  const { user, role, setRole } = useAuth()
-
-  const [menuOpen, setMenuOpen] = useState(false)
-
-  const menuRef = useRef<HTMLDivElement | null>(null)
-
-  const activeMeta = roleMeta[role]
-  const activeAccent = accentClasses[activeMeta.accent]
-
-  useEffect(() => {
-    if (!menuOpen) return
-
-    function handleClickOutside(event: MouseEvent) {
-      if (
-        menuRef.current &&
-        !menuRef.current.contains(event.target as Node)
-      ) {
-        setMenuOpen(false)
-      }
-    }
-
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === 'Escape') {
-        setMenuOpen(false)
-      }
-    }
-
-    document.addEventListener(
-      'mousedown',
-      handleClickOutside,
-    )
-
-    window.addEventListener(
-      'keydown',
-      handleKeyDown,
-    )
-
-    return () => {
-      document.removeEventListener(
-        'mousedown',
-        handleClickOutside,
-      )
-
-      window.removeEventListener(
-        'keydown',
-        handleKeyDown,
-      )
-    }
-  }, [menuOpen])
-
-  function handleLogOut() {
-    setMenuOpen(false)
-
-    // Demo-only:
-    // Replace with authService.logOut() once the
-    // real authentication/session layer is connected.
-    navigate('/login')
-  }
+  elevated = false,
+  actions,
+  onSearchClick,
+}: TopbarProps) {
+  const hasControls = Boolean(onSearchClick || actions)
 
   return (
+    // 76px tall to match the sidebar brand row, so the two dividers form one line.
     <header
-      className="
-        sticky
-        top-0
-        z-30
-        flex
-        h-16
-        shrink-0
-        items-center
-        justify-between
-        border-b
-        border-line
-        bg-white/95
-        px-4
-        backdrop-blur-sm
-        sm:px-6
-      "
+      className={`relative z-30 h-[76px] shrink-0 border-b border-line bg-white/85 backdrop-blur-xl transition-shadow duration-300 motion-reduce:transition-none ${
+        elevated
+          ? 'shadow-[0_12px_32px_-20px_rgba(11,18,32,0.28)]'
+          : 'shadow-none'
+      }`}
     >
-      {/* =====================================================
-          LEFT — MOBILE MENU + PAGE CONTEXT
-          ===================================================== */}
-      <div className="flex min-w-0 items-center gap-3">
+      <div className="mx-auto flex h-full w-full max-w-[1680px] items-center gap-4 px-4 sm:px-6 lg:px-10">
         <button
           type="button"
           onClick={onMenuClick}
-          aria-label="Open navigation menu"
-          className="
-            flex
-            h-9
-            w-9
-            shrink-0
-            items-center
-            justify-center
-            rounded-lg
-            text-ink/55
-            transition-all
-            duration-150
-            hover:bg-ink/5
-            hover:text-ink
-            focus-visible:outline-none
-            focus-visible:ring-2
-            focus-visible:ring-amber/60
-            focus-visible:ring-offset-1
-            lg:hidden
-          "
+          aria-label="Open navigation"
+          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-line bg-white text-ink/60 transition-colors hover:border-ink/15 hover:text-ink motion-reduce:transition-none lg:hidden ${focusRing}`}
         >
-          <Menu
-            size={19}
-            strokeWidth={2}
-            aria-hidden="true"
-          />
+          <Menu size={18} strokeWidth={1.75} aria-hidden="true" />
         </button>
 
-        <div className="min-w-0">
-          <h1
-            className="
-              truncate
-              font-display
-              text-base
-              font-semibold
-              tracking-[-0.01em]
-              text-ink
-              sm:text-lg
-            "
-          >
-            {title}
-          </h1>
-        </div>
-      </div>
-
-      {/* =====================================================
-          RIGHT — ROLE / NOTIFICATIONS / ACCOUNT
-          ===================================================== */}
-      <div className="flex shrink-0 items-center gap-1.5 sm:gap-3">
-        {/* Demo role switcher */}
-        <RolePreview
-          role={role}
-          onRoleChange={setRole}
-        />
-
-        {/* Divider */}
-        <div
-          className="hidden h-6 w-px bg-line md:block"
-          aria-hidden="true"
-        />
-
-        {/* Notifications */}
-        <NotificationButton />
-
-        {/* Account */}
-        <div
-          ref={menuRef}
-          className="
-            relative
-            border-l
-            border-line
-            pl-1.5
-            sm:pl-3
-          "
-        >
-          <button
-            type="button"
-            onClick={() =>
-              setMenuOpen((open) => !open)
-            }
-            aria-expanded={menuOpen}
-            aria-haspopup="menu"
-            className="
-              group
-              flex
-              items-center
-              gap-2
-              rounded-lg
-              py-1
-              pl-1
-              pr-1
-              transition-colors
-              hover:bg-ink/5
-              focus-visible:outline-none
-              focus-visible:ring-2
-              focus-visible:ring-amber/60
-              focus-visible:ring-offset-1
-              sm:gap-2.5
-              sm:pr-1.5
-            "
-          >
-            {/* Avatar */}
-            <div
-              className="
-                flex
-                h-8
-                w-8
-                shrink-0
-                items-center
-                justify-center
-                rounded-full
-                bg-amber/15
-                font-mono
-                text-[11px]
-                font-bold
-                text-amber-dark
-                ring-1
-                ring-amber/10
-              "
-            >
-              {user.avatarInitials}
-            </div>
-
-            {/* User information */}
-            <div className="hidden min-w-0 text-left sm:block">
-              <p
-                className="
-                  max-w-[150px]
-                  truncate
-                  text-xs
-                  font-semibold
-                  leading-none
-                  text-ink
-                "
-              >
-                {user.fullName}
-              </p>
-
-              <div className="mt-1.5">
-                <VerificationBadge
-                  status={user.verificationStatus}
-                />
-              </div>
-            </div>
-
-            {/* Dropdown indicator */}
-            <ChevronDown
-              size={14}
-              strokeWidth={2}
-              className={`
-                hidden
-                text-ink/35
-                transition-transform
-                duration-150
-                sm:block
-                ${
-                  menuOpen
-                    ? 'rotate-180'
-                    : ''
-                }
-              `}
-              aria-hidden="true"
-            />
-          </button>
-
-          {/* =================================================
-              ACCOUNT MENU
-              ================================================= */}
-          {menuOpen && (
-            <div
-              role="menu"
-              aria-label="Account menu"
-              className="
-                absolute
-                right-0
-                top-full
-                z-50
-                mt-2
-                w-60
-                overflow-hidden
-                rounded-xl
-                border
-                border-line
-                bg-white
-                shadow-xl
-                shadow-ink/10
-              "
-            >
-              {/* Mobile user summary */}
-              <div
-                className="
-                  border-b
-                  border-line
-                  px-4
-                  py-3.5
-                  sm:hidden
-                "
-              >
-                <div className="flex items-center gap-2.5">
-                  <div
-                    className="
-                      flex
-                      h-9
-                      w-9
-                      shrink-0
-                      items-center
-                      justify-center
-                      rounded-full
-                      bg-amber/15
-                      font-mono
-                      text-xs
-                      font-bold
-                      text-amber-dark
-                    "
-                  >
-                    {user.avatarInitials}
-                  </div>
-
-                  <div className="min-w-0">
-                    <p className="truncate text-xs font-semibold text-ink">
-                      {user.fullName}
-                    </p>
-
-                    <div className="mt-1">
-                      <VerificationBadge
-                        status={user.verificationStatus}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Current role */}
-              <div
-                className="
-                  flex
-                  items-center
-                  gap-2
-                  border-b
-                  border-line
-                  px-4
-                  py-3
-                "
-              >
-                <span
-                  className={`
-                    flex
-                    h-6
-                    w-6
-                    items-center
-                    justify-center
-                    rounded-md
-                    ${activeAccent.active}
-                  `}
-                >
-                  <activeMeta.icon
-                    size={13}
-                    className={activeAccent.icon}
-                    strokeWidth={2.25}
-                    aria-hidden="true"
-                  />
-                </span>
-
-                <div className="min-w-0">
-                  <p className="text-[9px] font-semibold uppercase tracking-[0.1em] text-ink/35">
-                    Current role
-                  </p>
-
-                  <p className="mt-0.5 truncate text-xs font-semibold text-ink">
-                    {roleLabels[role]}
-                  </p>
-                </div>
-              </div>
-
-              {/* Profile */}
-              <div className="p-1.5">
-                <button
-                  type="button"
-                  role="menuitem"
-                  onClick={() => {
-                    setMenuOpen(false)
-                    // Connect to profile route when available.
-                  }}
-                  className="
-                    flex
-                    w-full
-                    items-center
-                    gap-2.5
-                    rounded-lg
-                    px-3
-                    py-2.5
-                    text-left
-                    text-sm
-                    font-medium
-                    text-ink/75
-                    transition-colors
-                    hover:bg-ink/5
-                    hover:text-ink
-                    focus-visible:outline-none
-                    focus-visible:ring-2
-                    focus-visible:ring-amber/60
-                  "
-                >
-                  <UserCircle
-                    size={17}
-                    className="text-ink/40"
-                    strokeWidth={1.9}
-                    aria-hidden="true"
-                  />
-
-                  <span>View profile</span>
-                </button>
-
-                {/* Logout */}
-                <button
-                  type="button"
-                  role="menuitem"
-                  onClick={handleLogOut}
-                  className="
-                    mt-0.5
-                    flex
-                    w-full
-                    items-center
-                    gap-2.5
-                    rounded-lg
-                    border-t
-                    border-line
-                    px-3
-                    py-2.5
-                    text-left
-                    text-sm
-                    font-medium
-                    text-brick
-                    transition-colors
-                    hover:bg-brick-light
-                    focus-visible:outline-none
-                    focus-visible:ring-2
-                    focus-visible:ring-brick/40
-                  "
-                >
-                  <LogOut
-                    size={17}
-                    strokeWidth={1.9}
-                    aria-hidden="true"
-                  />
-
-                  <span>Log out</span>
-                </button>
-              </div>
-            </div>
+        <div className="min-w-0 flex-1">
+          {title && (
+            <h1 className="truncate font-display text-[22px] font-medium leading-tight tracking-[-0.015em] text-ink sm:text-[26px]">
+              {title}
+            </h1>
           )}
         </div>
+
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+          {onSearchClick && <SearchTrigger onClick={onSearchClick} />}
+          {actions}
+
+          {hasControls && (
+            <span
+              aria-hidden="true"
+              className="mx-1 hidden h-6 w-px bg-line sm:block"
+            />
+          )}
+
+          <AccountMenu />
+        </div>
       </div>
+
+      {/* Brass thread: fades in once the page has scrolled. */}
+      <span
+        aria-hidden="true"
+        className={`pointer-events-none absolute inset-x-0 -bottom-px h-px bg-gradient-to-r from-transparent via-amber/60 to-transparent transition-opacity duration-300 motion-reduce:transition-none ${
+          elevated ? 'opacity-100' : 'opacity-0'
+        }`}
+      />
     </header>
   )
 }
 
 /**
- * Backwards-compatible export.
+ * Backwards-compatible alias.
  *
- * If existing layouts still import `Topbar`, they will continue
- * to work while the application gradually moves to `AppHeader`.
+ *   import { AppHeader } from '@/components/layout/Topbar'
  */
-export const Topbar = AppHeader
+export const AppHeader = Topbar

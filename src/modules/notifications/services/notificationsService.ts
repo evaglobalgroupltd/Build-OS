@@ -1,40 +1,70 @@
 import { api } from '@/lib/api'
 import type {
   Notification,
-  NotificationPreferences,
   NotificationListParams,
   NotificationListResponse,
+  NotificationPreferences,
 } from './types'
 
 /**
  * Notifications module — API service layer
  *
- * BRD reference: Sec. 20.2 / 28.1
+ * BRD references:
+ * - Sec. 20.2 — Notifications
+ * - Sec. 28.1 — System/API integration
  *
- * All notification-related network communication belongs here.
- * Pages and components should consume this service instead of calling
- * fetch/axios directly.
+ * Architecture:
+ * UI / Pages
+ *      ↓
+ * Notification hooks / state
+ *      ↓
+ * notificationsService
+ *      ↓
+ * shared API client
+ *      ↓
+ * Notifications API
+ *
+ * This module is the single network boundary for notifications.
+ * Components and pages should never call fetch/axios directly.
  *
  * Backend endpoint assumptions:
- *   GET    /notifications
- *   GET    /notifications/:id
- *   GET    /notifications/unread-count
- *   PATCH  /notifications/:id/read
- *   PATCH  /notifications/read-all
- *   DELETE /notifications/:id
- *   GET    /notifications/preferences
- *   PATCH  /notifications/preferences
  *
- * Adjust endpoint paths once the final backend contract is available.
+ * GET    /notifications
+ * GET    /notifications/:id
+ * GET    /notifications/unread-count
+ * PATCH  /notifications/:id/read
+ * PATCH  /notifications/:id/unread
+ * PATCH  /notifications/read-all
+ * DELETE /notifications/:id
+ *
+ * GET    /notifications/preferences
+ * PATCH  /notifications/preferences
+ *
+ * Update endpoint paths here when the final backend contract is confirmed.
  */
+
+/* -------------------------------------------------------------------------- */
+/* API response contracts                                                     */
+/* -------------------------------------------------------------------------- */
+
+interface UnreadCountResponse {
+  count: number
+}
+
+/* -------------------------------------------------------------------------- */
+/* Service                                                                     */
+/* -------------------------------------------------------------------------- */
 
 export const notificationsService = {
   /**
-   * List notifications for the current authenticated user.
+   * List notifications belonging to the authenticated user.
+   *
+   * Supports pagination, filtering and sorting through the shared
+   * NotificationListParams contract.
    */
-  list: async (
+  async list(
     params?: NotificationListParams,
-  ): Promise<NotificationListResponse> => {
+  ): Promise<NotificationListResponse> {
     const response = await api.get<NotificationListResponse>(
       '/notifications',
       {
@@ -46,9 +76,9 @@ export const notificationsService = {
   },
 
   /**
-   * Get a single notification by ID.
+   * Retrieve a single notification.
    */
-  get: async (id: string): Promise<Notification> => {
+  async get(id: string): Promise<Notification> {
     const response = await api.get<Notification>(
       `/notifications/${id}`,
     )
@@ -57,10 +87,13 @@ export const notificationsService = {
   },
 
   /**
-   * Get the number of unread notifications.
+   * Retrieve the unread notification count.
+   *
+   * This is intentionally kept separate from list() so the global
+   * notification badge can remain lightweight.
    */
-  getUnreadCount: async (): Promise<number> => {
-    const response = await api.get<{ count: number }>(
+  async getUnreadCount(): Promise<number> {
+    const response = await api.get<UnreadCountResponse>(
       '/notifications/unread-count',
     )
 
@@ -68,9 +101,9 @@ export const notificationsService = {
   },
 
   /**
-   * Mark one notification as read.
+   * Mark a notification as read.
    */
-  markAsRead: async (id: string): Promise<Notification> => {
+  async markAsRead(id: string): Promise<Notification> {
     const response = await api.patch<Notification>(
       `/notifications/${id}/read`,
     )
@@ -79,9 +112,9 @@ export const notificationsService = {
   },
 
   /**
-   * Mark one notification as unread.
+   * Mark a notification as unread.
    */
-  markAsUnread: async (id: string): Promise<Notification> => {
+  async markAsUnread(id: string): Promise<Notification> {
     const response = await api.patch<Notification>(
       `/notifications/${id}/unread`,
     )
@@ -90,23 +123,23 @@ export const notificationsService = {
   },
 
   /**
-   * Mark all notifications as read.
+   * Mark every notification for the authenticated user as read.
    */
-  markAllAsRead: async (): Promise<void> => {
+  async markAllAsRead(): Promise<void> {
     await api.patch('/notifications/read-all')
   },
 
   /**
-   * Delete/dismiss a notification.
+   * Permanently remove/dismiss a notification.
    */
-  remove: async (id: string): Promise<void> => {
+  async remove(id: string): Promise<void> {
     await api.delete(`/notifications/${id}`)
   },
 
   /**
-   * Get the current user's notification preferences.
+   * Retrieve the authenticated user's notification preferences.
    */
-  getPreferences: async (): Promise<NotificationPreferences> => {
+  async getPreferences(): Promise<NotificationPreferences> {
     const response = await api.get<NotificationPreferences>(
       '/notifications/preferences',
     )
@@ -115,11 +148,14 @@ export const notificationsService = {
   },
 
   /**
-   * Update the current user's notification preferences.
+   * Update one or more notification preferences.
+   *
+   * Partial updates allow the settings screen to change individual
+   * preferences without replacing the entire preference object.
    */
-  updatePreferences: async (
+  async updatePreferences(
     preferences: Partial<NotificationPreferences>,
-  ): Promise<NotificationPreferences> => {
+  ): Promise<NotificationPreferences> {
     const response = await api.patch<NotificationPreferences>(
       '/notifications/preferences',
       preferences,
@@ -127,4 +163,6 @@ export const notificationsService = {
 
     return response.data
   },
-}
+} as const
+
+export type NotificationsService = typeof notificationsService

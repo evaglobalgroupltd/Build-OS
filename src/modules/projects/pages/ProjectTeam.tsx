@@ -9,6 +9,7 @@ import {
   UserRound,
   Users,
 } from 'lucide-react'
+
 import { Badge } from '@/components/ui/Badge'
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 
@@ -162,35 +163,73 @@ export function ProjectTeam() {
   )
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-        <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-ink/35">
-            Project team
-          </p>
+    <div className="space-y-7">
+      {/* ------------------------------------------------------------------ */}
+      {/* Header / hero                                                      */}
+      {/* ------------------------------------------------------------------ */}
 
-          <h1 className="mt-1 font-display text-2xl font-semibold tracking-tight text-ink">
-            Team & professionals
-          </h1>
+      <section
+        aria-label="Project team header"
+        className="
+          relative overflow-hidden rounded-[24px]
+          bg-[#18271F]
+          shadow-[0_18px_50px_rgba(20,40,30,0.10)]
+        "
+      >
+        <div className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-white/[0.04] blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-24 left-1/3 h-48 w-48 rounded-full bg-[#B8D9C4]/[0.04] blur-3xl" />
 
-          <p className="mt-1 max-w-2xl text-sm leading-6 text-ink/45">
-            Manage the contractor, project manager and professionals assigned
-            to this project.
-          </p>
+        <div className="relative flex flex-col gap-7 p-6 sm:p-7 lg:flex-row lg:items-end lg:justify-between lg:p-8">
+          <div className="min-w-0">
+            <div className="mb-4 flex flex-wrap items-center gap-2">
+              <span className="rounded-full bg-white/[0.09] px-3 py-1.5 text-[9px] font-bold uppercase tracking-[0.14em] text-white/65">
+                Project team
+              </span>
+
+              <span className="h-1 w-1 rounded-full bg-white/20" />
+
+              <span className="text-[9px] font-medium text-white/35">
+                People & professionals
+              </span>
+            </div>
+
+            <h1 className="font-display text-[29px] font-semibold leading-tight tracking-[-0.035em] text-white sm:text-[34px]">
+              Team & professionals
+            </h1>
+
+            <p className="mt-3 max-w-2xl text-[11px] leading-5 text-white/45 sm:text-xs">
+              Manage the people responsible for project delivery, technical
+              oversight, approvals and professional services.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            className="
+              group inline-flex w-fit shrink-0 items-center justify-center gap-2
+              rounded-full bg-white px-5 py-2.5
+              text-[10px] font-bold text-ink
+              transition duration-300
+              hover:-translate-y-0.5 hover:bg-white/90
+            "
+          >
+            <Plus
+              size={13}
+              className="transition-transform duration-300 group-hover:rotate-90"
+            />
+            Add team member
+          </button>
         </div>
+      </section>
 
-        <button
-          type="button"
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-ink px-4 py-2.5 text-xs font-semibold text-white"
-        >
-          <Plus className="h-4 w-4" />
-          Add team member
-        </button>
-      </div>
+      {/* ------------------------------------------------------------------ */}
+      {/* Summary metrics                                                    */}
+      {/* ------------------------------------------------------------------ */}
 
-      {/* Summary */}
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <section
+        aria-label="Team summary"
+        className="grid grid-cols-2 gap-3 lg:grid-cols-4"
+      >
         <TeamStat
           icon={Users}
           label="Team members"
@@ -203,6 +242,7 @@ export function ProjectTeam() {
           label="Active"
           value={String(activeCount)}
           detail="Currently participating"
+          tone="green"
         />
 
         <TeamStat
@@ -210,6 +250,7 @@ export function ProjectTeam() {
           label="Verified"
           value={String(verifiedCount)}
           detail="Professional records verified"
+          tone="green"
         />
 
         <TeamStat
@@ -219,27 +260,49 @@ export function ProjectTeam() {
           detail="Awaiting acceptance"
           tone={invitedCount > 0 ? 'amber' : 'default'}
         />
-      </div>
+      </section>
 
-      {/* Core project roles */}
-      <div className="grid gap-6 lg:grid-cols-2">
-        <CoreRoleCard
-          title="Project Manager"
-          description="Primary project coordination and delivery oversight."
-          member={projectManager}
-          emptyLabel="No project manager assigned"
-        />
+      {/* ------------------------------------------------------------------ */}
+      {/* Core project roles                                                 */}
+      {/* ------------------------------------------------------------------ */}
 
-        <CoreRoleCard
-          title="Contractor"
-          description="Responsible for construction delivery and site execution."
-          member={contractor}
-          emptyLabel="No contractor assigned"
-        />
-      </div>
+      <section aria-label="Core project roles">
+        <div className="mb-4">
+          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-ink/35">
+            Project leadership
+          </p>
 
-      {/* Team list */}
-      <Card>
+          <h2 className="mt-1 font-display text-xl font-semibold tracking-[-0.025em] text-ink">
+            Core project roles
+          </h2>
+
+          <p className="mt-1 text-[11px] text-ink/40">
+            The primary people responsible for coordinating and delivering this project.
+          </p>
+        </div>
+
+        <div className="grid gap-4 lg:grid-cols-2">
+          <CoreRoleCard
+            title="Project Manager"
+            description="Primary project coordination and delivery oversight."
+            member={projectManager}
+            emptyLabel="No project manager assigned"
+          />
+
+          <CoreRoleCard
+            title="Contractor"
+            description="Responsible for construction delivery and site execution."
+            member={contractor}
+            emptyLabel="No contractor assigned"
+          />
+        </div>
+      </section>
+
+      {/* ------------------------------------------------------------------ */}
+      {/* Team directory                                                     */}
+      {/* ------------------------------------------------------------------ */}
+
+      <Card className="overflow-hidden">
         <CardHeader
           title="Assigned team"
           subtitle={`${filteredTeam.length} member${
@@ -247,22 +310,37 @@ export function ProjectTeam() {
           } shown`}
         />
 
-        <CardBody className="space-y-5">
+        <CardBody className="p-5 sm:p-6">
           {/* Search */}
           <div className="relative">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/30" />
+            <Search
+              className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-ink/25"
+              size={15}
+            />
 
             <input
               type="search"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search team members, organisations or roles..."
-              className="h-10 w-full rounded-lg border border-line bg-white pl-9 pr-3 text-xs text-ink outline-none placeholder:text-ink/30 focus:border-ink/30"
+              placeholder="Search people, organisations or roles..."
+              className="
+                h-11 w-full rounded-[14px]
+                border border-ink/[0.07]
+                bg-[#FAFBFA]
+                pl-11 pr-4
+                text-[11px] text-ink
+                outline-none
+                transition
+                placeholder:text-ink/25
+                focus:border-ink/[0.16]
+                focus:bg-white
+                focus:shadow-[0_8px_24px_rgba(20,40,30,0.04)]
+              "
             />
           </div>
 
           {/* Role filters */}
-          <div className="flex gap-1 overflow-x-auto pb-1">
+          <div className="mt-4 flex gap-1.5 overflow-x-auto pb-1">
             <RoleFilter
               active={activeRole === 'all'}
               onClick={() => setActiveRole('all')}
@@ -281,87 +359,132 @@ export function ProjectTeam() {
             ))}
           </div>
 
-          {/* Members */}
-          <div className="divide-y divide-line rounded-xl border border-line">
-            {filteredTeam.map((member) => (
-              <TeamMemberRow
-                key={member.id}
-                member={member}
-              />
-            ))}
+          {/* Directory */}
+          <div className="mt-5 overflow-hidden rounded-[18px] border border-ink/[0.07]">
+            {/* Desktop heading */}
+            <div className="hidden border-b border-ink/[0.06] bg-[#FAFBFA] px-4 py-3 lg:grid lg:grid-cols-[minmax(0,1.6fr)_minmax(150px,0.9fr)_120px_32px] lg:items-center lg:gap-4">
+              <span className="text-[8px] font-bold uppercase tracking-[0.13em] text-ink/30">
+                Member
+              </span>
 
-            {filteredTeam.length === 0 && (
-              <div className="px-6 py-12 text-center">
-                <Users className="mx-auto h-6 w-6 text-ink/20" />
+              <span className="text-[8px] font-bold uppercase tracking-[0.13em] text-ink/30">
+                Responsibility
+              </span>
 
-                <p className="mt-3 text-sm font-semibold text-ink">
-                  No team members found
-                </p>
+              <span className="text-[8px] font-bold uppercase tracking-[0.13em] text-ink/30">
+                Status
+              </span>
 
-                <p className="mt-1 text-xs text-ink/40">
-                  Try another search term or role.
-                </p>
-              </div>
-            )}
+              <span />
+            </div>
+
+            <div className="divide-y divide-ink/[0.06]">
+              {filteredTeam.map((member) => (
+                <TeamMemberRow
+                  key={member.id}
+                  member={member}
+                />
+              ))}
+
+              {filteredTeam.length === 0 && (
+                <div className="flex min-h-[260px] flex-col items-center justify-center px-6 py-12 text-center">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-ink/[0.05] text-ink/25">
+                    <Users size={18} />
+                  </div>
+
+                  <p className="mt-4 font-display text-sm font-semibold text-ink">
+                    No team members found
+                  </p>
+
+                  <p className="mt-1 max-w-xs text-[10px] leading-5 text-ink/35">
+                    Try another search term or select a different role.
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         </CardBody>
       </Card>
 
-      {/* Professional assignment */}
-      <Card>
-        <CardHeader
-          title="Professional assignment"
-          subtitle="Find and assign verified professionals to this project."
-        />
+      {/* ------------------------------------------------------------------ */}
+      {/* Professional assignment                                            */}
+      {/* ------------------------------------------------------------------ */}
 
-        <CardBody>
-          <div className="grid gap-4 md:grid-cols-3">
-            <AssignmentCard
-              title="Find professionals"
-              description="Browse professionals by discipline and project requirement."
-              action="Browse professionals"
-            />
+      <section aria-label="Professional assignment">
+        <div className="mb-4">
+          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-ink/35">
+            Professional network
+          </p>
 
-            <AssignmentCard
-              title="Project requirements"
-              description="Review the professional roles and expertise required for this project."
-              action="View requirements"
-            />
+          <h2 className="mt-1 font-display text-xl font-semibold tracking-[-0.025em] text-ink">
+            Professional assignment
+          </h2>
 
-            <AssignmentCard
-              title="Verification"
-              description="Only verified professional records should be used for project assignments."
-              action="View verification"
-            />
+          <p className="mt-1 text-[11px] text-ink/40">
+            Find, assess and assign verified professionals to the project.
+          </p>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-3">
+          <AssignmentCard
+            title="Find professionals"
+            description="Browse professionals by discipline, expertise and project requirement."
+            action="Browse professionals"
+          />
+
+          <AssignmentCard
+            title="Project requirements"
+            description="Review the disciplines and expertise required for this project's delivery."
+            action="View requirements"
+          />
+
+          <AssignmentCard
+            title="Verification"
+            description="Confirm professional records and verification status before assignment."
+            action="View verification"
+          />
+        </div>
+      </section>
+
+      {/* ------------------------------------------------------------------ */}
+      {/* Governance                                                         */}
+      {/* ------------------------------------------------------------------ */}
+
+      <section
+        aria-label="Team governance"
+        className="overflow-hidden rounded-[20px] border border-ink/[0.07] bg-white"
+      >
+        <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-start sm:p-6">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#EAF4EE] text-[#12613E]">
+            <ShieldCheck size={15} />
           </div>
-        </CardBody>
-      </Card>
 
-      {/* Governance note */}
-      <div className="rounded-xl border border-line bg-paper-2 p-4">
-        <div className="flex items-start gap-3">
-          <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-ink/35" />
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="text-[11px] font-bold text-ink">
+                Team governance
+              </p>
 
-          <div>
-            <p className="text-xs font-semibold text-ink">
-              Team governance
-            </p>
+              <span className="rounded-full bg-[#EAF4EE] px-2 py-1 text-[8px] font-bold uppercase tracking-[0.10em] text-[#12613E]">
+                Protected
+              </span>
+            </div>
 
-            <p className="mt-1 max-w-3xl text-xs leading-5 text-ink/45">
-              Project roles should remain tied to the platform's role and
-              permission model. Professional verification and project
-              assignment are separate from project-specific responsibilities,
-              approvals and audit records.
+            <p className="mt-1.5 max-w-4xl text-[10.5px] leading-5 text-ink/40">
+              Project roles remain tied to the platform's role and permission
+              model. Professional verification and project assignment are
+              maintained separately from project responsibilities, approvals
+              and audit records.
             </p>
           </div>
         </div>
-      </div>
+      </section>
     </div>
   )
 }
 
 /* -------------------------------------------------------------------------- */
-/* Components                                                                  */
+/* Components                                                                 */
 /* -------------------------------------------------------------------------- */
 
 function TeamStat({
@@ -375,28 +498,60 @@ function TeamStat({
   label: string
   value: string
   detail: string
-  tone?: 'default' | 'amber'
+  tone?: 'default' | 'green' | 'amber'
 }) {
-  return (
-    <div className="rounded-xl border border-line bg-white p-4">
-      <div className="flex items-center justify-between">
-        <span className="text-[10px] font-semibold uppercase tracking-wide text-ink/35">
-          {label}
-        </span>
+  const iconStyles = {
+    default: 'bg-ink/[0.05] text-ink/35',
+    green: 'bg-[#EAF4EE] text-[#12613E]',
+    amber: 'bg-[#F8EEE6] text-[#B85C12]',
+  }
 
-        <Icon className="h-4 w-4 text-ink/30" />
+  const valueStyles = {
+    default: 'text-ink',
+    green: 'text-[#12613E]',
+    amber: 'text-[#B85C12]',
+  }
+
+  return (
+    <div
+      className="
+        group relative overflow-hidden rounded-[18px]
+        border border-ink/[0.07] bg-white p-4
+        transition duration-300
+        hover:-translate-y-0.5
+        hover:shadow-[0_14px_35px_rgba(20,40,30,0.06)]
+        sm:p-5
+      "
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-ink/35 sm:text-[10px]">
+            {label}
+          </p>
+
+          <p
+            className={[
+              'mt-2 font-display text-[25px] font-semibold tracking-[-0.035em]',
+              valueStyles[tone],
+            ].join(' ')}
+          >
+            {value}
+          </p>
+        </div>
+
+        <div
+          className={[
+            'flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-105',
+            iconStyles[tone],
+          ].join(' ')}
+        >
+          <Icon size={16} />
+        </div>
       </div>
 
-      <p
-        className={[
-          'mt-3 font-display text-xl font-semibold',
-          tone === 'amber' ? 'text-amber-700' : 'text-ink',
-        ].join(' ')}
-      >
-        {value}
+      <p className="mt-2 text-[10px] leading-4 text-ink/40">
+        {detail}
       </p>
-
-      <p className="mt-1 text-[10px] text-ink/35">{detail}</p>
     </div>
   )
 }
@@ -413,7 +568,7 @@ function CoreRoleCard({
   emptyLabel: string
 }) {
   return (
-    <Card>
+    <Card className="group overflow-hidden transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_14px_35px_rgba(20,40,30,0.06)]">
       <CardHeader
         title={title}
         subtitle={description}
@@ -421,57 +576,72 @@ function CoreRoleCard({
 
       <CardBody>
         {member ? (
-          <div className="flex items-center gap-3">
-            <Avatar name={member.name} />
+          <div className="rounded-[17px] border border-ink/[0.06] bg-[#FCFDFC] p-4">
+            <div className="flex items-center gap-3">
+              <Avatar name={member.name} featured />
 
-            <div className="min-w-0 flex-1">
-              <div className="flex flex-wrap items-center gap-2">
-                <p className="text-xs font-semibold text-ink">
-                  {member.name}
-                </p>
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="truncate text-[11px] font-semibold text-ink">
+                    {member.name}
+                  </p>
 
-                {member.verified && (
-                  <Badge tone="teal">
-                    <span className="inline-flex items-center gap-1">
-                      <ShieldCheck className="h-3 w-3" />
+                  {member.verified && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-[#EAF4EE] px-2 py-1 text-[8px] font-bold text-[#12613E]">
+                      <ShieldCheck size={9} />
                       Verified
                     </span>
-                  </Badge>
+                  )}
+                </div>
+
+                {member.organisation && (
+                  <p className="mt-1 text-[10px] text-ink/40">
+                    {member.organisation}
+                  </p>
                 )}
               </div>
 
-              {member.organisation && (
-                <p className="mt-1 text-[10px] text-ink/40">
-                  {member.organisation}
-                </p>
-              )}
+              <button
+                type="button"
+                aria-label={`View ${member.name}`}
+                className="
+                  flex h-8 w-8 shrink-0 items-center justify-center
+                  rounded-lg text-ink/25
+                  transition
+                  hover:bg-white hover:text-ink
+                  hover:shadow-[0_3px_12px_rgba(20,40,30,0.05)]
+                "
+              >
+                <ChevronRight size={14} />
+              </button>
+            </div>
 
-              <p className="mt-1 text-[10px] text-ink/35">
+            <div className="mt-4 border-t border-ink/[0.06] pt-3">
+              <p className="text-[9px] font-bold uppercase tracking-[0.10em] text-ink/30">
+                Responsibility
+              </p>
+
+              <p className="mt-1 text-[10.5px] leading-5 text-ink/45">
                 {member.responsibility}
               </p>
             </div>
-
-            <button
-              type="button"
-              aria-label={`View ${member.name}`}
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-ink/30 hover:bg-ink/5 hover:text-ink"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </button>
           </div>
         ) : (
-          <div className="rounded-xl border border-dashed border-line p-5 text-center">
-            <UserRound className="mx-auto h-5 w-5 text-ink/20" />
+          <div className="rounded-[17px] border border-dashed border-ink/[0.10] bg-[#FAFBFA] p-6 text-center">
+            <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-ink/[0.05] text-ink/25">
+              <UserRound size={16} />
+            </div>
 
-            <p className="mt-2 text-xs font-semibold text-ink">
+            <p className="mt-3 text-[11px] font-semibold text-ink">
               {emptyLabel}
             </p>
 
             <button
               type="button"
-              className="mt-3 text-[11px] font-semibold text-ink"
+              className="mt-3 inline-flex items-center gap-1 text-[10px] font-bold text-ink/55 transition hover:text-[#B85C12]"
             >
               Assign {title}
+              <ChevronRight size={12} />
             </button>
           </div>
         )}
@@ -486,46 +656,76 @@ function TeamMemberRow({
   member: TeamMember
 }) {
   return (
-    <div className="group flex flex-col gap-4 p-4 transition-colors hover:bg-ink/[0.015] sm:flex-row sm:items-center">
-      <div className="flex min-w-0 flex-1 items-center gap-3">
+    <div
+      className="
+        group relative
+        flex flex-col gap-4 p-4
+        transition duration-200
+        hover:bg-[#FCFDFC]
+        lg:grid lg:grid-cols-[minmax(0,1.6fr)_minmax(150px,0.9fr)_120px_32px]
+        lg:items-center lg:gap-4
+      "
+    >
+      {/* Member */}
+      <div className="flex min-w-0 items-center gap-3">
         <Avatar name={member.name} />
 
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <p className="truncate text-xs font-semibold text-ink">
+            <p className="truncate text-[11px] font-semibold text-ink">
               {member.name}
             </p>
 
             {member.verified && (
-              <span className="inline-flex items-center gap-1 text-[9px] font-semibold text-teal">
-                <ShieldCheck className="h-3 w-3" />
+              <span className="inline-flex items-center gap-1 text-[8px] font-bold text-[#12613E]">
+                <ShieldCheck size={10} />
                 Verified
               </span>
             )}
           </div>
 
-          <p className="mt-1 text-[10px] text-ink/35">
+          <p className="mt-1 text-[9.5px] text-ink/35">
             {roleLabels[member.role]}
             {member.organisation ? ` · ${member.organisation}` : ''}
           </p>
 
-          <p className="mt-1 text-[10px] text-ink/30">
-            {member.responsibility}
+          <p className="mt-1 font-mono text-[8px] text-ink/20">
+            {member.id}
           </p>
         </div>
       </div>
 
-      <div className="flex items-center justify-between gap-4 sm:justify-end">
-        <TeamStatus status={member.status} />
-
-        <button
-          type="button"
-          className="flex h-8 w-8 items-center justify-center rounded-lg text-ink/30 hover:bg-ink/5 hover:text-ink"
-          aria-label={`Open ${member.name}`}
-        >
-          <ChevronRight className="h-4 w-4" />
-        </button>
+      {/* Responsibility */}
+      <div className="hidden min-w-0 lg:block">
+        <p className="text-[10px] leading-4 text-ink/45">
+          {member.responsibility}
+        </p>
       </div>
+
+      {/* Status */}
+      <div className="flex items-center justify-between lg:justify-start">
+        <span className="text-[8px] font-bold uppercase tracking-[0.10em] text-ink/25 lg:hidden">
+          Status
+        </span>
+
+        <TeamStatus status={member.status} />
+      </div>
+
+      {/* Action */}
+      <button
+        type="button"
+        className="
+          absolute right-4 top-4
+          flex h-8 w-8 items-center justify-center
+          rounded-lg text-ink/20
+          transition
+          hover:bg-white hover:text-ink
+          lg:static
+        "
+        aria-label={`Open ${member.name}`}
+      >
+        <ChevronRight size={14} />
+      </button>
     </div>
   )
 }
@@ -540,25 +740,50 @@ function AssignmentCard({
   action: string
 }) {
   return (
-    <div className="rounded-xl border border-line p-4">
-      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-ink/5">
-        <Users className="h-4 w-4 text-ink/40" />
+    <div
+      className="
+        group rounded-[18px] border border-ink/[0.07]
+        bg-white p-5
+        transition duration-300
+        hover:-translate-y-0.5
+        hover:border-ink/[0.11]
+        hover:shadow-[0_14px_35px_rgba(20,40,30,0.06)]
+      "
+    >
+      <div
+        className="
+          flex h-10 w-10 items-center justify-center
+          rounded-xl bg-ink/[0.05] text-ink/35
+          transition duration-300
+          group-hover:bg-[#EAF4EE]
+          group-hover:text-[#12613E]
+        "
+      >
+        <Users size={16} />
       </div>
 
-      <h3 className="mt-4 text-xs font-semibold text-ink">
+      <h3 className="mt-4 font-display text-sm font-semibold tracking-[-0.01em] text-ink">
         {title}
       </h3>
 
-      <p className="mt-1 text-[11px] leading-5 text-ink/40">
+      <p className="mt-1.5 min-h-[42px] text-[10.5px] leading-5 text-ink/40">
         {description}
       </p>
 
       <button
         type="button"
-        className="mt-4 inline-flex items-center gap-1.5 text-[11px] font-semibold text-ink"
+        className="
+          group/action mt-5 inline-flex items-center gap-1.5
+          text-[10px] font-bold text-ink/50
+          transition hover:text-[#B85C12]
+        "
       >
         {action}
-        <ChevronRight className="h-3.5 w-3.5" />
+
+        <ChevronRight
+          size={12}
+          className="transition-transform duration-200 group-hover/action:translate-x-0.5"
+        />
       </button>
     </div>
   )
@@ -578,10 +803,10 @@ function RoleFilter({
       type="button"
       onClick={onClick}
       className={[
-        'whitespace-nowrap rounded-lg px-3 py-2 text-[11px] font-semibold transition-colors',
+        'whitespace-nowrap rounded-full px-3.5 py-2 text-[9px] font-bold transition duration-200',
         active
-          ? 'bg-ink text-white'
-          : 'text-ink/40 hover:bg-ink/5 hover:text-ink',
+          ? 'bg-ink text-white shadow-[0_5px_15px_rgba(20,30,25,0.10)]'
+          : 'bg-ink/[0.04] text-ink/40 hover:bg-ink/[0.07] hover:text-ink/65',
       ].join(' ')}
     >
       {children}
@@ -595,20 +820,36 @@ function TeamStatus({
   status: TeamStatus
 }) {
   if (status === 'active') {
-    return <Badge tone="teal">Active</Badge>
+    return (
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-[#EAF4EE] px-2.5 py-1.5 text-[8px] font-bold text-[#12613E]">
+        <span className="h-1.5 w-1.5 rounded-full bg-[#12613E]" />
+        Active
+      </span>
+    )
   }
 
   if (status === 'invited') {
-    return <Badge tone="amber">Invite pending</Badge>
+    return (
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F8EEE6] px-2.5 py-1.5 text-[8px] font-bold text-[#B85C12]">
+        <Mail size={9} />
+        Invite pending
+      </span>
+    )
   }
 
-  return <Badge tone="neutral">Inactive</Badge>
+  return (
+    <span className="inline-flex items-center gap-1.5 rounded-full bg-ink/[0.05] px-2.5 py-1.5 text-[8px] font-bold text-ink/40">
+      Inactive
+    </span>
+  )
 }
 
 function Avatar({
   name,
+  featured = false,
 }: {
   name: string
+  featured?: boolean
 }) {
   const initials = name
     .split(' ')
@@ -619,7 +860,13 @@ function Avatar({
     .toUpperCase()
 
   return (
-    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-ink/5 font-display text-xs font-semibold text-ink/45">
+    <div
+      className={[
+        'flex shrink-0 items-center justify-center rounded-xl font-display font-semibold',
+        featured ? 'h-11 w-11 text-sm' : 'h-10 w-10 text-xs',
+        'bg-[#EAF4EE] text-[#12613E]',
+      ].join(' ')}
+    >
       {initials || 'U'}
     </div>
   )

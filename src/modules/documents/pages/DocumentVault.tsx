@@ -122,45 +122,76 @@ const statusTone: Record<DocumentStatus, 'teal' | 'amber' | 'brick'> = {
 
 export function DocumentVault() {
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
-        <div>
-          <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-ink/5">
-              <FolderOpen className="h-5 w-5 text-ink/60" />
+    <div className="space-y-7">
+      {/* ─────────────────────────────────────────────────────────────
+          PAGE HEADER
+      ───────────────────────────────────────────────────────────── */}
+      <section className="relative overflow-hidden rounded-[26px] border border-line bg-[#0B1220] shadow-[0_20px_55px_rgba(11,18,32,0.10)]">
+        <div className="absolute -right-24 -top-28 h-72 w-72 rounded-full bg-[#1657FF]/20 blur-3xl" />
+        <div className="absolute -bottom-32 right-24 h-64 w-64 rounded-full bg-[#34A6FF]/10 blur-3xl" />
+
+        <div className="relative flex flex-col gap-7 p-6 sm:p-7 lg:flex-row lg:items-center lg:justify-between lg:p-8">
+          <div className="min-w-0">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.06]">
+                <FolderOpen className="h-4.5 w-4.5 text-white/80" />
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#34A6FF]" />
+
+                <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/45">
+                  Secure document management
+                </span>
+              </div>
             </div>
 
-            <span className="text-xs font-semibold uppercase tracking-[0.16em] text-ink/40">
-              Documents
-            </span>
+            <div className="mt-5 flex flex-wrap items-center gap-3">
+              <h1 className="font-display text-3xl font-semibold tracking-[-0.035em] text-white sm:text-[34px]">
+                Document Vault
+              </h1>
+
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-[#34A6FF]/20 bg-[#34A6FF]/10 px-2.5 py-1 text-[10px] font-semibold text-[#7FC5FF]">
+                <ShieldCheck className="h-3 w-3" />
+                Secure
+              </span>
+            </div>
+
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-white/50">
+              A centralised record system for ownership, contracts, design,
+              procurement, inspections and project compliance.
+            </p>
+
+            <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-[10px] text-white/35">
+              <span className="flex items-center gap-2">
+                <span className="h-1 w-1 rounded-full bg-[#34A6FF]" />
+                {documents.length} active records
+              </span>
+
+              <span className="hidden h-3 w-px bg-white/10 sm:block" />
+
+              <span>Role-based access</span>
+
+              <span className="hidden h-3 w-px bg-white/10 sm:block" />
+
+              <span>Full audit trail</span>
+            </div>
           </div>
 
-          <div className="mt-3 flex flex-wrap items-center gap-3">
-            <h1 className="font-display text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
-              Document Vault
-            </h1>
-
-            <Badge tone="teal">Secure</Badge>
-          </div>
-
-          <p className="mt-1 max-w-2xl text-sm text-ink/50">
-            Centralised storage for project, ownership, contract, procurement,
-            inspection and compliance records.
-          </p>
+          <button
+            type="button"
+            className="group inline-flex w-fit shrink-0 items-center gap-2.5 rounded-xl bg-white px-4 py-2.5 text-xs font-semibold text-[#0B1220] shadow-lg shadow-black/10 transition duration-200 hover:-translate-y-0.5 hover:bg-[#F6F8FC]"
+          >
+            <Upload className="h-4 w-4 transition-transform duration-200 group-hover:-translate-y-0.5" />
+            Upload document
+          </button>
         </div>
+      </section>
 
-        <button
-          type="button"
-          className="inline-flex w-fit items-center gap-2 rounded-xl bg-ink px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-ink/90"
-        >
-          <Upload className="h-4 w-4" />
-          Upload document
-        </button>
-      </div>
-
-      {/* Vault summary */}
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      {/* ─────────────────────────────────────────────────────────────
+          VAULT METRICS
+      ───────────────────────────────────────────────────────────── */}
+      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <SummaryCard
           icon={FileText}
           label="Total documents"
@@ -189,81 +220,114 @@ export function DocumentVault() {
           label="Protected"
           value="100%"
           detail="Access-controlled storage"
+          tone="blue"
         />
-      </div>
+      </section>
 
-      <div className="grid gap-6 lg:grid-cols-[220px_minmax(0,1fr)]">
-        {/* Categories */}
-        <Card className="h-fit">
+      {/* ─────────────────────────────────────────────────────────────
+          MAIN WORKSPACE
+      ───────────────────────────────────────────────────────────── */}
+      <div className="grid gap-5 lg:grid-cols-[230px_minmax(0,1fr)] xl:grid-cols-[240px_minmax(0,1fr)]">
+        {/* Category navigation */}
+        <Card className="h-fit overflow-hidden rounded-[22px]">
           <CardHeader
             title="Categories"
             subtitle="Organise your records"
           />
 
-          <CardBody>
-            <div className="space-y-1">
+          <CardBody className="pt-1">
+            <nav className="space-y-1" aria-label="Document categories">
               {categories.map((category, index) => (
                 <button
                   key={category.label}
                   type="button"
-                  className={`flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left transition ${
+                  className={`group flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left transition-all duration-200 ${
                     index === 0
-                      ? 'bg-ink text-white'
-                      : 'text-ink/55 hover:bg-paper-2 hover:text-ink'
+                      ? 'bg-[#0B1220] text-white shadow-[0_7px_18px_rgba(11,18,32,0.12)]'
+                      : 'text-ink/50 hover:bg-[#F6F8FC] hover:text-ink'
                   }`}
                 >
-                  <span className="text-xs font-semibold">
-                    {category.label}
+                  <span className="flex min-w-0 items-center gap-2.5">
+                    {index === 0 && (
+                      <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#34A6FF]" />
+                    )}
+
+                    <span className="truncate text-[11px] font-semibold">
+                      {category.label}
+                    </span>
                   </span>
 
                   <span
-                    className={`font-mono text-[10px] ${
-                      index === 0 ? 'text-white/60' : 'text-ink/30'
+                    className={`ml-3 rounded-full px-2 py-0.5 font-mono text-[9px] ${
+                      index === 0
+                        ? 'bg-white/10 text-white/55'
+                        : 'bg-[#F6F8FC] text-ink/30'
                     }`}
                   >
                     {category.count}
                   </span>
                 </button>
               ))}
+            </nav>
+
+            <div className="mt-5 border-t border-line pt-5">
+              <div className="rounded-2xl border border-[#1657FF]/10 bg-[#1657FF]/[0.035] p-4">
+                <div className="flex items-center gap-2">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#1657FF]/10">
+                    <LockKeyhole className="h-3.5 w-3.5 text-[#1657FF]" />
+                  </div>
+
+                  <span className="text-[10px] font-semibold text-ink">
+                    Protected vault
+                  </span>
+                </div>
+
+                <p className="mt-2 text-[10px] leading-5 text-ink/40">
+                  Access is governed by project role and recorded for
+                  traceability.
+                </p>
+              </div>
             </div>
           </CardBody>
         </Card>
 
-        {/* Documents */}
-        <div className="min-w-0 space-y-6">
-          {/* Search */}
-          <Card>
+        {/* Documents workspace */}
+        <div className="min-w-0 space-y-5">
+          {/* Search toolbar */}
+          <Card className="overflow-hidden rounded-[22px]">
             <CardBody>
-              <div className="flex flex-col gap-3 sm:flex-row">
+              <div className="flex flex-col gap-3 md:flex-row">
                 <div className="relative min-w-0 flex-1">
-                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/30" />
+                  <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/25" />
 
                   <input
                     type="search"
                     placeholder="Search documents, projects or document IDs..."
-                    className="h-10 w-full rounded-xl border border-line bg-paper-2 pl-10 pr-4 text-xs text-ink outline-none placeholder:text-ink/30 focus:border-ink/20 focus:ring-2 focus:ring-ink/5"
+                    aria-label="Search documents"
+                    className="h-11 w-full rounded-xl border border-line bg-[#F6F8FC] pl-10 pr-4 text-xs font-medium text-ink outline-none transition placeholder:text-ink/25 focus:border-[#1657FF]/30 focus:bg-white focus:ring-4 focus:ring-[#1657FF]/[0.06]"
                   />
                 </div>
 
                 <button
                   type="button"
-                  className="h-10 rounded-xl border border-line bg-white px-4 text-xs font-semibold text-ink/55 transition hover:text-ink"
+                  className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-line bg-white px-4 text-xs font-semibold text-ink/50 transition hover:border-ink/10 hover:bg-[#F6F8FC] hover:text-ink"
                 >
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#1657FF]" />
                   Filter
                 </button>
               </div>
             </CardBody>
           </Card>
 
-          {/* Document list */}
-          <Card className="overflow-hidden">
+          {/* Document collection */}
+          <Card className="overflow-hidden rounded-[22px]">
             <CardHeader
               title="Project documents"
               subtitle={`${documents.length} documents currently associated with your projects`}
             />
 
             <CardBody>
-              <div className="space-y-2">
+              <div className="space-y-2.5">
                 {documents.map((document) => (
                   <DocumentRow
                     key={document.id}
@@ -276,39 +340,50 @@ export function DocumentVault() {
         </div>
       </div>
 
-      {/* Security notice */}
-      <Card>
-        <CardBody>
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10">
-              <LockKeyhole className="h-5 w-5 text-emerald-600" />
-            </div>
+      {/* ─────────────────────────────────────────────────────────────
+          SECURITY FOOTER
+      ───────────────────────────────────────────────────────────── */}
+      <section className="overflow-hidden rounded-[22px] border border-[#1657FF]/10 bg-white shadow-[0_8px_30px_rgba(11,18,32,0.04)]">
+        <div className="flex flex-col gap-5 p-5 sm:flex-row sm:items-center sm:p-6">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#1657FF]/[0.08]">
+            <LockKeyhole className="h-5 w-5 text-[#1657FF]" />
+          </div>
 
-            <div className="flex-1">
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2">
               <p className="text-sm font-semibold text-ink">
                 Your project records are protected
               </p>
 
-              <p className="mt-1 text-xs leading-5 text-ink/45">
-                Document access is role-based. Uploads, downloads, version
-                changes, verification actions and access events are recorded
-                in the project audit trail.
-              </p>
+              <span className="inline-flex items-center gap-1 rounded-full bg-[#1657FF]/[0.06] px-2 py-0.5 text-[9px] font-semibold text-[#1657FF]">
+                <ShieldCheck className="h-2.5 w-2.5" />
+                Protected
+              </span>
             </div>
 
-            <button
-              type="button"
-              className="inline-flex w-fit items-center gap-1.5 text-xs font-semibold text-ink/50 transition hover:text-ink"
-            >
-              View audit history
-              <ChevronRight className="h-3.5 w-3.5" />
-            </button>
+            <p className="mt-1 max-w-3xl text-xs leading-5 text-ink/40">
+              Document access is role-based. Uploads, downloads, version
+              changes, verification actions and access events are recorded
+              in the project audit trail.
+            </p>
           </div>
-        </CardBody>
-      </Card>
+
+          <button
+            type="button"
+            className="group inline-flex w-fit shrink-0 items-center gap-1.5 rounded-lg px-2 py-2 text-xs font-semibold text-ink/45 transition hover:text-[#1657FF]"
+          >
+            View audit history
+            <ChevronRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
+          </button>
+        </div>
+      </section>
     </div>
   )
 }
+
+/* ─────────────────────────────────────────────────────────────────────
+   DOCUMENT ROW
+───────────────────────────────────────────────────────────────────── */
 
 function DocumentRow({
   document,
@@ -316,16 +391,26 @@ function DocumentRow({
   document: DocumentItem
 }) {
   return (
-    <div className="group rounded-2xl border border-line bg-white p-4 transition hover:border-ink/10 hover:bg-paper-2/60">
+    <article className="group relative overflow-hidden rounded-[18px] border border-line bg-white p-4 transition-all duration-200 hover:-translate-y-[1px] hover:border-[#1657FF]/15 hover:shadow-[0_10px_28px_rgba(11,18,32,0.06)]">
+      {/* Hover accent */}
+      <div className="absolute inset-y-0 left-0 w-[2px] origin-bottom scale-y-0 bg-[#1657FF] transition-transform duration-200 group-hover:scale-y-100" />
+
       <div className="flex flex-col gap-4 xl:flex-row xl:items-center">
-        <div className="flex min-w-0 flex-1 items-center gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-paper-2">
-            <FileText className="h-5 w-5 text-ink/45" />
+        {/* Identity */}
+        <div className="flex min-w-0 flex-1 items-start gap-3">
+          <div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-line bg-[#F6F8FC] transition-colors duration-200 group-hover:border-[#1657FF]/10 group-hover:bg-[#1657FF]/[0.05]">
+            <FileText className="h-5 w-5 text-ink/40 transition-colors duration-200 group-hover:text-[#1657FF]" />
+
+            {document.status === 'Verified' && (
+              <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full border-2 border-white bg-[#1657FF]">
+                <CheckCircle2 className="h-2.5 w-2.5 text-white" />
+              </span>
+            )}
           </div>
 
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <p className="truncate text-xs font-semibold text-ink">
+              <p className="min-w-0 truncate text-xs font-semibold text-ink">
                 {document.name}
               </p>
 
@@ -334,88 +419,128 @@ function DocumentRow({
               </Badge>
             </div>
 
-            <p className="mt-1 truncate text-[11px] text-ink/40">
-              {document.project} · {document.projectId}
+            <p className="mt-1.5 truncate text-[10px] text-ink/35">
+              {document.project}
             </p>
+
+            <div className="mt-1.5 flex items-center gap-2">
+              <span className="font-mono text-[9px] font-medium text-ink/30">
+                {document.projectId}
+              </span>
+
+              <span className="h-0.5 w-0.5 rounded-full bg-ink/20" />
+
+              <span className="font-mono text-[9px] font-medium text-ink/30">
+                {document.id}
+              </span>
+            </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-x-6 gap-y-2 sm:grid-cols-4 xl:w-[520px]">
-          <Meta label="Category" value={document.category} />
+        {/* Metadata */}
+        <div className="grid grid-cols-2 gap-x-5 gap-y-3 sm:grid-cols-4 xl:w-[500px]">
+          <Meta
+            label="Category"
+            value={document.category}
+          />
 
-          <Meta label="Version" value={document.version} mono />
+          <Meta
+            label="Version"
+            value={document.version}
+            mono
+            accent
+          />
 
-          <Meta label="Size" value={document.size} />
+          <Meta
+            label="Size"
+            value={document.size}
+          />
 
-          <Meta label="Updated" value={document.updatedAt} />
+          <Meta
+            label="Updated"
+            value={document.updatedAt}
+          />
         </div>
 
-        <div className="flex items-center gap-2 xl:ml-auto">
+        {/* Actions */}
+        <div className="flex items-center gap-2 border-t border-line pt-3 xl:border-0 xl:pt-0">
           <button
             type="button"
-            className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-line bg-white px-3 text-[11px] font-semibold text-ink/50 transition hover:text-ink"
+            className="inline-flex h-9 flex-1 items-center justify-center gap-1.5 rounded-lg border border-line bg-white px-3 text-[10px] font-semibold text-ink/50 transition hover:border-ink/10 hover:bg-[#F6F8FC] hover:text-ink sm:flex-none"
           >
             View
+            <ChevronRight className="h-3 w-3" />
           </button>
 
           <button
             type="button"
             aria-label={`Download ${document.name}`}
-            className="flex h-9 w-9 items-center justify-center rounded-lg border border-line bg-white text-ink/45 transition hover:text-ink"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-line bg-white text-ink/35 transition hover:border-[#1657FF]/15 hover:bg-[#1657FF]/[0.04] hover:text-[#1657FF]"
           >
             <Download className="h-3.5 w-3.5" />
           </button>
         </div>
       </div>
 
-      <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-line pt-3">
-        <span className="text-[10px] text-ink/35">
-          Document ID
-        </span>
-
-        <span className="font-mono text-[10px] font-semibold text-ink/50">
-          {document.id}
-        </span>
-
-        <span className="h-1 w-1 rounded-full bg-ink/20" />
-
-        <span className="text-[10px] text-ink/35">
+      {/* Bottom metadata */}
+      <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1.5 border-t border-line pt-3">
+        <span className="text-[9px] uppercase tracking-[0.08em] text-ink/25">
           Uploaded by
         </span>
 
         <span className="text-[10px] font-semibold text-ink/50">
           {document.uploadedBy}
         </span>
+
+        <span className="h-1 w-1 rounded-full bg-ink/15" />
+
+        <span className="text-[9px] uppercase tracking-[0.08em] text-ink/25">
+          Last updated
+        </span>
+
+        <span className="font-mono text-[9px] font-medium text-ink/40">
+          {document.updatedAt}
+        </span>
       </div>
-    </div>
+    </article>
   )
 }
+
+/* ─────────────────────────────────────────────────────────────────────
+   METADATA
+───────────────────────────────────────────────────────────────────── */
 
 function Meta({
   label,
   value,
   mono = false,
+  accent = false,
 }: {
   label: string
   value: string
   mono?: boolean
+  accent?: boolean
 }) {
   return (
     <div className="min-w-0">
-      <p className="text-[9px] uppercase tracking-wide text-ink/30">
+      <p className="text-[8px] font-semibold uppercase tracking-[0.12em] text-ink/25">
         {label}
       </p>
 
       <p
-        className={`mt-1 truncate text-[10px] font-semibold text-ink/60 ${
-          mono ? 'font-mono' : ''
-        }`}
+        className={`mt-1 truncate text-[10px] font-semibold ${
+          accent ? 'text-[#1657FF]' : 'text-ink/55'
+        } ${mono ? 'font-mono' : ''}`}
       >
         {value}
       </p>
     </div>
   )
 }
+
+/* ─────────────────────────────────────────────────────────────────────
+   SUMMARY CARD
+───────────────────────────────────────────────────────────────────── */
 
 function SummaryCard({
   icon: Icon,
@@ -428,37 +553,55 @@ function SummaryCard({
   label: string
   value: string
   detail: string
-  tone?: 'neutral' | 'teal' | 'amber'
+  tone?: 'neutral' | 'teal' | 'amber' | 'blue'
 }) {
-  const iconClass =
-    tone === 'teal'
-      ? 'bg-emerald-500/10 text-emerald-600'
-      : tone === 'amber'
-        ? 'bg-amber-500/10 text-amber-600'
-        : 'bg-ink/5 text-ink/55'
+  const styles = {
+    neutral: {
+      icon: 'bg-[#F6F8FC] text-ink/50',
+      glow: 'bg-ink/[0.025]',
+    },
+    teal: {
+      icon: 'bg-emerald-500/10 text-emerald-600',
+      glow: 'bg-emerald-500/[0.025]',
+    },
+    amber: {
+      icon: 'bg-amber-500/10 text-amber-600',
+      glow: 'bg-amber-500/[0.025]',
+    },
+    blue: {
+      icon: 'bg-[#1657FF]/[0.08] text-[#1657FF]',
+      glow: 'bg-[#1657FF]/[0.025]',
+    },
+  }
+
+  const style = styles[tone]
 
   return (
-    <Card>
+    <Card className="group relative overflow-hidden rounded-[20px] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_30px_rgba(11,18,32,0.06)]">
+      <div
+        className={`absolute -right-10 -top-10 h-24 w-24 rounded-full blur-2xl ${style.glow}`}
+      />
+
       <CardBody>
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-ink/35">
+        <div className="relative flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <p className="text-[9px] font-semibold uppercase tracking-[0.15em] text-ink/30">
               {label}
             </p>
 
-            <p className="mt-2 font-display text-2xl font-semibold tracking-tight text-ink">
+            <p className="mt-2 font-display text-[28px] font-semibold tracking-[-0.035em] text-ink">
               {value}
             </p>
 
-            <p className="mt-1 text-[10px] text-ink/35">
+            <p className="mt-1 text-[10px] text-ink/30">
               {detail}
             </p>
           </div>
 
           <div
-            className={`flex h-9 w-9 items-center justify-center rounded-xl ${iconClass}`}
+            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${style.icon}`}
           >
-            <Icon className="h-4 w-4" />
+            <Icon className="h-[17px] w-[17px]" />
           </div>
         </div>
       </CardBody>

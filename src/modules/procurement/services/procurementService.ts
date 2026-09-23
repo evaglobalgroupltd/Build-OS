@@ -1,37 +1,55 @@
 // Procurement module — API service layer
 //
-// This is the single place where the procurement module talks to the network.
-// Pages/components should consume these methods and never call fetch/axios
-// directly.
+// Single network boundary for the procurement domain.
+// Pages and components should consume these methods instead of calling
+// fetch/axios directly.
 //
 // Backend reference: BRD Sec. 28.1
 // TODO: align endpoint names and response types with the final API contract.
 
 import type { MaterialRequest } from '@/modules/procurement/types'
 
-const API_BASE_URL = '/api'
+/* -------------------------------------------------------------------------- */
+/* Configuration                                                              */
+/* -------------------------------------------------------------------------- */
 
-type RequestStatus =
+const API_BASE_URL = '/api'
+const PROCUREMENT_BASE_PATH = '/procurement'
+
+/* -------------------------------------------------------------------------- */
+/* Domain types                                                               */
+/* -------------------------------------------------------------------------- */
+
+export type RequestStatus =
   | 'requested'
   | 'quoted'
   | 'ordered'
   | 'delivered'
   | 'verified'
 
-type QuoteStatus =
+export type QuoteStatus =
   | 'received'
   | 'under review'
   | 'recommended'
   | 'selected'
   | 'rejected'
 
-type PurchaseOrderStatus =
+export type PurchaseOrderStatus =
   | 'draft'
   | 'issued'
   | 'acknowledged'
   | 'in transit'
   | 'delivered'
   | 'completed'
+
+export type DeliveryStatus =
+  | 'pending verification'
+  | 'verified'
+  | 'rejected'
+
+/* -------------------------------------------------------------------------- */
+/* Material requests                                                          */
+/* -------------------------------------------------------------------------- */
 
 export type CreateMaterialRequestInput = {
   item: string
@@ -46,6 +64,10 @@ export type UpdateMaterialRequestInput = Partial<
 > & {
   status?: RequestStatus
 }
+
+/* -------------------------------------------------------------------------- */
+/* Quotations                                                                 */
+/* -------------------------------------------------------------------------- */
 
 export type ProcurementQuotation = {
   id: string
@@ -77,6 +99,10 @@ export type CreateQuotationInput = {
   notes?: string
 }
 
+/* -------------------------------------------------------------------------- */
+/* Purchase orders                                                            */
+/* -------------------------------------------------------------------------- */
+
 export type PurchaseOrder = {
   id: string
   requestId: string
@@ -99,18 +125,24 @@ export type CreatePurchaseOrderInput = {
   projectId?: string
 }
 
+/* -------------------------------------------------------------------------- */
+/* Deliveries                                                                 */
+/* -------------------------------------------------------------------------- */
+
+export type DeliveryItem = {
+  description: string
+  orderedQuantity: string
+  deliveredQuantity: string
+}
+
 export type Delivery = {
   id: string
   purchaseOrderId: string
   supplierName: string
   projectName?: string
   deliveredDate: string
-  status: 'pending verification' | 'verified' | 'rejected'
-  items: Array<{
-    description: string
-    orderedQuantity: string
-    deliveredQuantity: string
-  }>
+  status: DeliveryStatus
+  items: DeliveryItem[]
   notes?: string
 }
 
@@ -119,6 +151,10 @@ export type VerifyDeliveryInput = {
   accepted: boolean
   notes?: string
 }
+
+/* -------------------------------------------------------------------------- */
+/* Dashboard                                                                  */
+/* -------------------------------------------------------------------------- */
 
 export type ProcurementDashboard = {
   materialRequests: {
@@ -129,191 +165,392 @@ export type ProcurementDashboard = {
     delivered: number
     verified: number
   }
+
   quotations: {
     total: number
     pendingReview: number
     recommended: number
     selected: number
   }
+
   purchaseOrders: {
     total: number
     active: number
     delivered: number
     completed: number
   }
+
   deliveries: {
     pendingVerification: number
     verified: number
   }
 }
 
+/* -------------------------------------------------------------------------- */
+/* API errors                                                                 */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Structured procurement API error.
+ *
+ * Keeping the HTTP status available makes it easier for the UI to distinguish
+ * authentication, validation, conflict, and server failures without parsing
+ * error strings.
+ */
+export class ProcurementApiError extends Error {
+  readonly status: number
+  readonly code?: string
+  readonly details?: unknown
+
+  constructor(
+    message: string,
+    status: number,
+    options?: {
+      code?: string
+      details?: unknown
+    },
+  ) {
+    super(message)
+
+    this.name = 'ProcurementApiError'
+    this.status = status
+    this.code = options?.code
+    this.details = options?.details
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Request helpers                                                            */
+/* -------------------------------------------------------------------------- */
+
+type RequestOptions = RequestInit & {
+  /**
+   * Allows callers to explicitly omit the JSON content type.
+   * Useful later for multipart uploads or other non-JSON endpoints.
+   */
+  json?: boolean
+}
+
 async function request<T>(
   path: string,
-  options: RequestInit = {},
+  options: RequestOptions = {},
 ): Promise<T> {
+  const {
+    json = true,
+    headers: customHeaders,
+    ...requestOptions
+  } = options
+
+  const headers = new Headers(customHeaders)
+
+  if (json && !headers.has('Content-Type')) {
+    headers.set('Content-Type', 'application/json')
+  }
+
   const response = await fetch(`${API_BASE_URL}${path}`, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
+    ...requestOptions,
+    headers,
   })
 
   if (!response.ok) {
     let message = `Procurement request failed (${response.status})`
+    let code: string | undefined
+    let details: unknown
 
     try {
-      const body = await response.json()
+      const body: unknown = await response.json()
 
-      if (body?.message) {
-        message = body.message
+      if (
+        typeof body === 'object' &&
+        body !== null
+      ) {
+        const errorBody = body as {
+          message?: unknown
+          code?: unknown
+          details?: unknown
+          error?: unknown
+        }
+
+        if (typeof errorBody.message === 'string') {
+          message = errorBody.message
+        } else if (typeof errorBody.error === 'string') {
+          message = errorBody.error
+        }
+
+        if (typeof errorBody.code === 'string') {
+          code = errorBody.code
+        }
+
+        details = errorBody.details
       }
     } catch {
-      // Keep the generic HTTP error when the response isn't JSON.
+      // Keep the fallback HTTP message when the response isn't JSON.
     }
 
-    throw new Error(message)
+    throw new ProcurementApiError(message, response.status, {
+      code,
+      details,
+    })
   }
 
   if (response.status === 204) {
     return undefined as T
   }
 
+  const contentType =
+    response.headers.get('content-type') ?? ''
+
+  if (!contentType.includes('application/json')) {
+    return undefined as T
+  }
+
   return response.json() as Promise<T>
 }
 
+/* -------------------------------------------------------------------------- */
+/* HTTP verbs                                                                 */
+/* -------------------------------------------------------------------------- */
+
 function get<T>(path: string) {
-  return request<T>(path)
+  return request<T>(path, {
+    method: 'GET',
+  })
 }
 
-function post<T>(path: string, body: unknown) {
+function post<T>(
+  path: string,
+  body: unknown,
+) {
   return request<T>(path, {
     method: 'POST',
     body: JSON.stringify(body),
   })
 }
 
-function patch<T>(path: string, body: unknown) {
+function patch<T>(
+  path: string,
+  body: unknown,
+) {
   return request<T>(path, {
     method: 'PATCH',
     body: JSON.stringify(body),
   })
 }
 
+/* -------------------------------------------------------------------------- */
+/* Query helpers                                                              */
+/* -------------------------------------------------------------------------- */
+
+function withQuery(
+  path: string,
+  params: Record<string, string | undefined>,
+) {
+  const searchParams = new URLSearchParams()
+
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== '') {
+      searchParams.set(key, value)
+    }
+  })
+
+  const query = searchParams.toString()
+
+  return query ? `${path}?${query}` : path
+}
+
+/* -------------------------------------------------------------------------- */
+/* Procurement service                                                        */
+/* -------------------------------------------------------------------------- */
+
 export const procurementService = {
   /**
    * Procurement dashboard
+   *
+   * Returns the aggregated operational state used by procurement dashboards
+   * and command-centre views.
    */
   dashboard: () =>
-    get<ProcurementDashboard>('/procurement/dashboard'),
+    get<ProcurementDashboard>(
+      `${PROCUREMENT_BASE_PATH}/dashboard`,
+    ),
 
-  /**
-   * Material requests
-   */
+  /* ------------------------------------------------------------------------ */
+  /* Material requests                                                        */
+  /* ------------------------------------------------------------------------ */
+
   materialRequests: {
+    /**
+     * List all material requests.
+     */
     list: () =>
-      get<MaterialRequest[]>('/procurement/material-requests'),
+      get<MaterialRequest[]>(
+        `${PROCUREMENT_BASE_PATH}/material-requests`,
+      ),
 
+    /**
+     * Retrieve a single material request.
+     */
     get: (id: string) =>
-      get<MaterialRequest>(`/procurement/material-requests/${id}`),
+      get<MaterialRequest>(
+        `${PROCUREMENT_BASE_PATH}/material-requests/${encodeURIComponent(id)}`,
+      ),
 
+    /**
+     * Create a new material request.
+     */
     create: (input: CreateMaterialRequestInput) =>
       post<MaterialRequest>(
-        '/procurement/material-requests',
+        `${PROCUREMENT_BASE_PATH}/material-requests`,
         input,
       ),
 
+    /**
+     * Update an existing material request.
+     */
     update: (
       id: string,
       input: UpdateMaterialRequestInput,
     ) =>
       patch<MaterialRequest>(
-        `/procurement/material-requests/${id}`,
+        `${PROCUREMENT_BASE_PATH}/material-requests/${encodeURIComponent(id)}`,
         input,
       ),
   },
 
-  /**
-   * Supplier quotations
-   */
-  quotations: {
-    list: (requestId?: string) => {
-      const query = requestId
-        ? `?requestId=${encodeURIComponent(requestId)}`
-        : ''
+  /* ------------------------------------------------------------------------ */
+  /* Supplier quotations                                                      */
+  /* ------------------------------------------------------------------------ */
 
-      return get<ProcurementQuotation[]>(
-        `/procurement/quotations${query}`,
+  quotations: {
+    /**
+     * List quotations.
+     *
+     * Pass requestId to scope the result to a specific material request.
+     */
+    list: (requestId?: string) => {
+      const path = withQuery(
+        `${PROCUREMENT_BASE_PATH}/quotations`,
+        {
+          requestId,
+        },
       )
+
+      return get<ProcurementQuotation[]>(path)
     },
 
+    /**
+     * Retrieve a single quotation.
+     */
     get: (id: string) =>
       get<ProcurementQuotation>(
-        `/procurement/quotations/${id}`,
+        `${PROCUREMENT_BASE_PATH}/quotations/${encodeURIComponent(id)}`,
       ),
 
+    /**
+     * Submit a supplier quotation.
+     */
     create: (input: CreateQuotationInput) =>
       post<ProcurementQuotation>(
-        '/procurement/quotations',
+        `${PROCUREMENT_BASE_PATH}/quotations`,
         input,
       ),
 
+    /**
+     * Select a quotation for procurement.
+     */
     select: (id: string) =>
       post<ProcurementQuotation>(
-        `/procurement/quotations/${id}/select`,
+        `${PROCUREMENT_BASE_PATH}/quotations/${encodeURIComponent(id)}/select`,
         {},
       ),
   },
 
-  /**
-   * Purchase orders
-   */
+  /* ------------------------------------------------------------------------ */
+  /* Purchase orders                                                          */
+  /* ------------------------------------------------------------------------ */
+
   purchaseOrders: {
+    /**
+     * List purchase orders.
+     */
     list: () =>
       get<PurchaseOrder[]>(
-        '/procurement/purchase-orders',
+        `${PROCUREMENT_BASE_PATH}/purchase-orders`,
       ),
 
+    /**
+     * Retrieve a single purchase order.
+     */
     get: (id: string) =>
       get<PurchaseOrder>(
-        `/procurement/purchase-orders/${id}`,
+        `${PROCUREMENT_BASE_PATH}/purchase-orders/${encodeURIComponent(id)}`,
       ),
 
+    /**
+     * Create a purchase order from a selected quotation.
+     */
     create: (input: CreatePurchaseOrderInput) =>
       post<PurchaseOrder>(
-        '/procurement/purchase-orders',
+        `${PROCUREMENT_BASE_PATH}/purchase-orders`,
         input,
       ),
 
+    /**
+     * Update the lifecycle status of a purchase order.
+     */
     updateStatus: (
       id: string,
       status: PurchaseOrderStatus,
     ) =>
       patch<PurchaseOrder>(
-        `/procurement/purchase-orders/${id}`,
+        `${PROCUREMENT_BASE_PATH}/purchase-orders/${encodeURIComponent(id)}`,
         { status },
       ),
   },
 
-  /**
-   * Deliveries
-   */
-  deliveries: {
-    list: () =>
-      get<Delivery[]>('/procurement/deliveries'),
+  /* ------------------------------------------------------------------------ */
+  /* Deliveries                                                               */
+  /* ------------------------------------------------------------------------ */
 
-    get: (id: string) =>
-      get<Delivery>(
-        `/procurement/deliveries/${id}`,
+  deliveries: {
+    /**
+     * List delivery records.
+     */
+    list: () =>
+      get<Delivery[]>(
+        `${PROCUREMENT_BASE_PATH}/deliveries`,
       ),
 
+    /**
+     * Retrieve a single delivery record.
+     */
+    get: (id: string) =>
+      get<Delivery>(
+        `${PROCUREMENT_BASE_PATH}/deliveries/${encodeURIComponent(id)}`,
+      ),
+
+    /**
+     * Verify or reject a delivered procurement order.
+     */
     verify: (input: VerifyDeliveryInput) =>
       post<Delivery>(
-        `/procurement/deliveries/${input.deliveryId}/verify`,
+        `${PROCUREMENT_BASE_PATH}/deliveries/${encodeURIComponent(input.deliveryId)}/verify`,
         {
           accepted: input.accepted,
           notes: input.notes,
         },
       ),
   },
-}
+} as const
+
+/* -------------------------------------------------------------------------- */
+/* Convenience type                                                           */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * The public service surface.
+ *
+ * Useful for dependency injection, testing, or mocking the procurement
+ * network layer without duplicating the complete service shape.
+ */
+export type ProcurementService = typeof procurementService

@@ -1,15 +1,26 @@
+
 // Approvals module — API service layer
-// BRD references: Sec. 43.3, 43.4
 //
-// This is the single network boundary for the Approvals module.
-// Pages and components should consume these methods instead of calling
-// fetch/axios directly.
+// BRD references:
+// - Sec. 43.3 — Approval workflow
+// - Sec. 43.4 — Approval history / controls
+// - Sec. 28.1 — Backend / API architecture
 //
-// The current implementation uses typed mock data so the UI can be
-// developed before the backend API is available.
+// Architecture:
+// - This file is the single network boundary for the Approvals module.
+// - Pages/components must consume these methods instead of calling
+//   fetch/axios directly.
+// - Domain models remain frontend-friendly and API-ready.
+// - Mock implementations can be replaced with the shared API client
+//   without changing consumers.
 //
-// TODO: replace the mock implementations with the real API client once
-// the backend contract in Sec. 28.1 is implemented.
+// TODO:
+// Replace the mock implementations with the real API client once the
+// backend contract in Sec. 28.1 is implemented.
+
+/* -------------------------------------------------------------------------- */
+/* Domain enums                                                               */
+/* -------------------------------------------------------------------------- */
 
 export type ApprovalOutcome =
   | 'PENDING'
@@ -32,43 +43,71 @@ export type PaymentStatus =
   | 'RELEASED'
   | 'FROZEN'
 
+export type ApprovalEvidenceType =
+  | 'PHOTO'
+  | 'VIDEO'
+  | 'REPORT'
+  | 'INVOICE'
+  | 'DELIVERY_NOTE'
+  | 'INSPECTION_REPORT'
+  | 'TEST_REPORT'
+  | 'OTHER'
+
+/* -------------------------------------------------------------------------- */
+/* Shared API primitives                                                      */
+/* -------------------------------------------------------------------------- */
+
 export interface ApprovalEvidence {
   id: string
-  type:
-    | 'PHOTO'
-    | 'VIDEO'
-    | 'REPORT'
-    | 'INVOICE'
-    | 'DELIVERY_NOTE'
-    | 'INSPECTION_REPORT'
-    | 'TEST_REPORT'
-    | 'OTHER'
+
+  type: ApprovalEvidenceType
+
   name: string
+
   url?: string
+
   verified: boolean
+
   uploadedAt: string
+
   uploadedBy: string
 }
 
 export interface ApprovalInspection {
   id: string
+
   status: InspectionStatus
+
   inspectedBy?: string
+
   inspectedAt?: string
+
   comments?: string
+
   defectCount: number
 }
 
 export interface ApprovalDecision {
   id: string
+
   outcome: ApprovalOutcome
+
   decidedBy: string
+
   decidedByName: string
+
   decidedByRole: string
+
   decidedAt: string
+
   comment?: string
+
   paymentStatus: PaymentStatus
 }
+
+/* -------------------------------------------------------------------------- */
+/* Approval resources                                                         */
+/* -------------------------------------------------------------------------- */
 
 export interface Approval {
   id: string
@@ -93,11 +132,13 @@ export interface Approval {
   priority: ApprovalPriority
 
   submittedAt: string
+
   dueAt?: string
 
   inspection: ApprovalInspection
 
   outcome: ApprovalOutcome
+
   paymentStatus: PaymentStatus
 
   description?: string
@@ -128,6 +169,7 @@ export interface ApprovalHistoryItem {
   decidedBy: string
   decidedByName: string
   decidedByRole: string
+
   decidedAt: string
 
   paymentStatus: PaymentStatus
@@ -149,48 +191,73 @@ export interface ApprovalDetail extends Approval {
   actualEnd?: string
 
   allocatedAmount: number
+
   approvedAmount?: number
 
   clientName?: string
+
   projectManagerName?: string
 
   previousDecisions: ApprovalDecision[]
 }
 
+/* -------------------------------------------------------------------------- */
+/* Query / filter contracts                                                   */
+/* -------------------------------------------------------------------------- */
+
 export interface ApprovalFilters {
   projectId?: string
+
   milestoneId?: string
+
   contractorId?: string
 
   outcome?: ApprovalOutcome
+
   priority?: ApprovalPriority
+
   paymentStatus?: PaymentStatus
+
   inspectionStatus?: InspectionStatus
 
   search?: string
 
   page?: number
+
   limit?: number
 }
 
 export interface ApprovalListResponse {
   data: Approval[]
+
   total: number
+
   page: number
+
   limit: number
+
   totalPages: number
 }
 
 export interface ApprovalHistoryResponse {
   data: ApprovalHistoryItem[]
+
   total: number
+
   page: number
+
   limit: number
+
   totalPages: number
 }
 
+/* -------------------------------------------------------------------------- */
+/* Dashboard summary                                                          */
+/* -------------------------------------------------------------------------- */
+
 export interface ApprovalSummary {
   pending: number
+
   highPriority: number
 
   totalPendingValue: number
@@ -198,9 +265,15 @@ export interface ApprovalSummary {
   readyForApproval: number
 
   correctionRequired: number
+
   rejected: number
+
   approved: number
 }
+
+/* -------------------------------------------------------------------------- */
+/* Mutation payloads                                                          */
+/* -------------------------------------------------------------------------- */
 
 export interface ApprovalDecisionPayload {
   comment?: string
@@ -208,6 +281,7 @@ export interface ApprovalDecisionPayload {
 
 export interface ApprovalCorrectionPayload {
   reason: string
+
   requiredActions: string[]
 }
 
@@ -215,11 +289,35 @@ export interface ApprovalRejectionPayload {
   reason: string
 }
 
+/* -------------------------------------------------------------------------- */
+/* Service configuration                                                      */
+/* -------------------------------------------------------------------------- */
+
+const APPROVALS_BASE_PATH = '/approvals'
+
+const DEFAULT_PAGE = 1
+
+const DEFAULT_LIMIT = 20
+
+const createPagination = (
+  filters: ApprovalFilters,
+) => ({
+  page: filters.page ?? DEFAULT_PAGE,
+  limit: filters.limit ?? DEFAULT_LIMIT,
+})
+
+/* -------------------------------------------------------------------------- */
+/* Approvals service                                                           */
+/* -------------------------------------------------------------------------- */
+
 export const approvalsService = {
   /**
    * Get approvals currently awaiting the authenticated user's decision.
    *
    * BRD: Sec. 43.3
+   *
+   * Backend:
+   * GET /approvals
    */
   list: async (
     filters: ApprovalFilters = {},
@@ -227,18 +325,19 @@ export const approvalsService = {
     /*
      * TODO:
      *
-     * return api.get<ApprovalListResponse>('/approvals', {
-     *   params: filters,
-     * })
+     * return api.get<ApprovalListResponse>(
+     *   APPROVALS_BASE_PATH,
+     *   { params: filters },
+     * )
      */
 
-    console.log('approvalsService.list', filters)
+    const pagination = createPagination(filters)
 
     return {
       data: [],
       total: 0,
-      page: filters.page ?? 1,
-      limit: filters.limit ?? 20,
+      page: pagination.page,
+      limit: pagination.limit,
       totalPages: 0,
     }
   },
@@ -246,19 +345,29 @@ export const approvalsService = {
   /**
    * Get complete approval context.
    *
-   * Includes milestone, project, contractor, evidence,
-   * inspection and previous decisions.
+   * Includes:
+   * - project
+   * - milestone
+   * - contractor
+   * - evidence
+   * - inspection
+   * - previous decisions
    *
    * BRD: Sec. 43.3
+   *
+   * Backend:
+   * GET /approvals/:id
    */
-  get: async (id: string): Promise<ApprovalDetail> => {
+  get: async (
+    id: string,
+  ): Promise<ApprovalDetail> => {
     /*
      * TODO:
      *
-     * return api.get<ApprovalDetail>(`/approvals/${id}`)
+     * return api.get<ApprovalDetail>(
+     *   `${APPROVALS_BASE_PATH}/${id}`,
+     * )
      */
-
-    console.log('approvalsService.get', id)
 
     throw new Error(
       'Approval details API is not implemented yet.',
@@ -269,6 +378,9 @@ export const approvalsService = {
    * Get historical approval decisions.
    *
    * BRD: Sec. 43.3
+   *
+   * Backend:
+   * GET /approvals/history
    */
   history: async (
     filters: ApprovalFilters = {},
@@ -277,30 +389,40 @@ export const approvalsService = {
      * TODO:
      *
      * return api.get<ApprovalHistoryResponse>(
-     *   '/approvals/history',
+     *   `${APPROVALS_BASE_PATH}/history`,
      *   { params: filters },
      * )
      */
 
-    console.log('approvalsService.history', filters)
+    const pagination = createPagination(filters)
 
     return {
       data: [],
       total: 0,
-      page: filters.page ?? 1,
-      limit: filters.limit ?? 20,
+      page: pagination.page,
+      limit: pagination.limit,
       totalPages: 0,
     }
   },
 
   /**
-   * Get approval queue summary for dashboard metrics.
+   * Get approval queue summary.
+   *
+   * Used by:
+   * - Approval dashboard
+   * - Approval inbox
+   * - Executive/project control metrics
+   *
+   * Backend:
+   * GET /approvals/summary
    */
   summary: async (): Promise<ApprovalSummary> => {
     /*
      * TODO:
      *
-     * return api.get<ApprovalSummary>('/approvals/summary')
+     * return api.get<ApprovalSummary>(
+     *   `${APPROVALS_BASE_PATH}/summary`,
+     * )
      */
 
     return {
@@ -316,6 +438,9 @@ export const approvalsService = {
 
   /**
    * Get all evidence attached to an approval.
+   *
+   * Backend:
+   * GET /approvals/:approvalId/evidence
    */
   evidence: async (
     approvalId: string,
@@ -324,17 +449,18 @@ export const approvalsService = {
      * TODO:
      *
      * return api.get<ApprovalEvidence[]>(
-     *   `/approvals/${approvalId}/evidence`,
+     *   `${APPROVALS_BASE_PATH}/${approvalId}/evidence`,
      * )
      */
-
-    console.log('approvalsService.evidence', approvalId)
 
     return []
   },
 
   /**
    * Get inspection information for an approval.
+   *
+   * Backend:
+   * GET /approvals/:approvalId/inspection
    */
   inspection: async (
     approvalId: string,
@@ -343,11 +469,9 @@ export const approvalsService = {
      * TODO:
      *
      * return api.get<ApprovalInspection>(
-     *   `/approvals/${approvalId}/inspection`,
+     *   `${APPROVALS_BASE_PATH}/${approvalId}/inspection`,
      * )
      */
-
-    console.log('approvalsService.inspection', approvalId)
 
     throw new Error(
       'Approval inspection API is not implemented yet.',
@@ -357,14 +481,20 @@ export const approvalsService = {
   /**
    * Approve a milestone.
    *
-   * Expected backend behaviour:
+   * Expected backend transaction:
+   *
    * 1. Validate required evidence.
    * 2. Validate PM inspection.
-   * 3. Record immutable approval decision.
-   * 4. Create payment approval/release instruction.
-   * 5. Write audit log.
+   * 3. Validate approval authority.
+   * 4. Record immutable approval decision.
+   * 5. Create payment approval/release instruction.
+   * 6. Write audit log.
+   * 7. Return the resulting decision.
    *
    * BRD: Sec. 43.3
+   *
+   * Backend:
+   * POST /approvals/:approvalId/approve
    */
   approve: async (
     approvalId: string,
@@ -374,16 +504,10 @@ export const approvalsService = {
      * TODO:
      *
      * return api.post<ApprovalDecision>(
-     *   `/approvals/${approvalId}/approve`,
+     *   `${APPROVALS_BASE_PATH}/${approvalId}/approve`,
      *   payload,
      * )
      */
-
-    console.log(
-      'approvalsService.approve',
-      approvalId,
-      payload,
-    )
 
     throw new Error(
       'Approval action API is not implemented yet.',
@@ -395,6 +519,9 @@ export const approvalsService = {
    *
    * Payment must remain frozen.
    *
+   * Backend:
+   * POST /approvals/:approvalId/reject
+   *
    * BRD: Sec. 43.3
    */
   reject: async (
@@ -405,16 +532,10 @@ export const approvalsService = {
      * TODO:
      *
      * return api.post<ApprovalDecision>(
-     *   `/approvals/${approvalId}/reject`,
+     *   `${APPROVALS_BASE_PATH}/${approvalId}/reject`,
      *   payload,
      * )
      */
-
-    console.log(
-      'approvalsService.reject',
-      approvalId,
-      payload,
-    )
 
     throw new Error(
       'Approval rejection API is not implemented yet.',
@@ -424,7 +545,11 @@ export const approvalsService = {
   /**
    * Request correction from the contractor.
    *
-   * The milestone remains unapproved and payment remains frozen.
+   * The milestone remains unapproved and payment remains frozen
+   * until the requested corrections are submitted and reviewed.
+   *
+   * Backend:
+   * POST /approvals/:approvalId/correction
    *
    * BRD: Sec. 43.3
    */
@@ -436,16 +561,10 @@ export const approvalsService = {
      * TODO:
      *
      * return api.post<ApprovalDecision>(
-     *   `/approvals/${approvalId}/correction`,
+     *   `${APPROVALS_BASE_PATH}/${approvalId}/correction`,
      *   payload,
      * )
      */
-
-    console.log(
-      'approvalsService.requestCorrection',
-      approvalId,
-      payload,
-    )
 
     throw new Error(
       'Approval correction API is not implemented yet.',
@@ -453,8 +572,11 @@ export const approvalsService = {
   },
 
   /**
-   * Re-open an approval after the contractor has submitted
-   * the requested corrections.
+   * Re-open an approval after requested corrections
+   * have been submitted by the contractor.
+   *
+   * Backend:
+   * POST /approvals/:approvalId/resubmit
    */
   resubmit: async (
     approvalId: string,
@@ -463,14 +585,9 @@ export const approvalsService = {
      * TODO:
      *
      * return api.post<Approval>(
-     *   `/approvals/${approvalId}/resubmit`,
+     *   `${APPROVALS_BASE_PATH}/${approvalId}/resubmit`,
      * )
      */
-
-    console.log(
-      'approvalsService.resubmit',
-      approvalId,
-    )
 
     throw new Error(
       'Approval resubmission API is not implemented yet.',

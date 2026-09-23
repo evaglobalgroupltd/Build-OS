@@ -1,12 +1,22 @@
 // Evidence module — API/service layer
 //
-// This is intentionally the single place where the Evidence module
-// communicates with data/network services.
+// This module is the single domain boundary between Evidence features
+// and the underlying data/network layer.
 //
-// For now the backend contract is not available, so the service uses
-// deterministic mock data. When Sec. 28.1 is implemented, replace the
-// mock implementations below with the real HTTP calls without changing
-// the pages/components.
+// Current state:
+// - Uses deterministic in-memory mock data.
+// - Exposes the same async contract expected from a real API.
+// - Keeps pages/components independent from the transport layer.
+//
+// Backend migration:
+// When Sec. 28.1 is implemented, replace the mock implementations
+// inside evidenceService with HTTP calls. Consumers should not need
+// to change.
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Domain types
+// ─────────────────────────────────────────────────────────────────────────────
 
 export type EvidenceStatus =
   | 'submitted'
@@ -24,6 +34,11 @@ export type EvidenceReviewDecision =
   | 'verified'
   | 'request_more'
   | 'flagged'
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Domain models
+// ─────────────────────────────────────────────────────────────────────────────
 
 export interface EvidenceFile {
   id: string
@@ -50,6 +65,14 @@ export interface EvidenceSubmitter {
   role: string
 }
 
+export interface EvidenceReview {
+  assignedTo?: string
+  assignedRole?: string
+  lastDecision?: EvidenceReviewDecision
+  lastReviewedAt?: string
+  reviewerComment?: string
+}
+
 export interface EvidenceRecord {
   id: string
   status: EvidenceStatus
@@ -65,16 +88,21 @@ export interface EvidenceRecord {
 
   files: EvidenceFile[]
 
+  /**
+   * Reported milestone progress associated with the submission.
+   *
+   * This represents the submitted claim until the evidence
+   * has been independently verified.
+   */
   progress: number
 
-  review: {
-    assignedTo?: string
-    assignedRole?: string
-    lastDecision?: EvidenceReviewDecision
-    lastReviewedAt?: string
-    reviewerComment?: string
-  }
+  review: EvidenceReview
 }
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Query / mutation contracts
+// ─────────────────────────────────────────────────────────────────────────────
 
 export interface EvidenceListFilters {
   search?: string
@@ -91,11 +119,85 @@ export interface UploadEvidencePayload {
   files: File[]
 }
 
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Service errors
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type EvidenceServiceErrorCode =
+  | 'INVALID_ID'
+  | 'INVALID_TITLE'
+  | 'INVALID_DESCRIPTION'
+  | 'NO_FILES'
+  | 'INVALID_DECISION'
+  | 'NOT_FOUND'
+  | 'UNKNOWN'
+
+export class EvidenceServiceError extends Error {
+  readonly code: EvidenceServiceErrorCode
+  readonly cause?: unknown
+
+  constructor(
+    message: string,
+    code: EvidenceServiceErrorCode,
+    cause?: unknown,
+  ) {
+    super(message)
+
+    this.name = 'EvidenceServiceError'
+    this.code = code
+    this.cause = cause
+
+    Object.setPrototypeOf(
+      this,
+      EvidenceServiceError.prototype,
+    )
+  }
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Internal constants
+// ─────────────────────────────────────────────────────────────────────────────
+
+const MOCK_NOW = '27 Aug 2026 · 10:45'
+
+const CURRENT_USER = {
+  id: 'CURRENT-USER',
+  name: 'Current User',
+  role: 'Contractor',
+} as const
+
+const DECISION_STATUS_MAP: Record<
+  EvidenceReviewDecision,
+  EvidenceStatus
+> = {
+  verified: 'verified',
+  request_more: 'under_review',
+  flagged: 'blocked',
+}
+
+const VALID_REVIEW_DECISIONS: readonly EvidenceReviewDecision[] = [
+  'verified',
+  'request_more',
+  'flagged',
+]
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Mock repository
+// ─────────────────────────────────────────────────────────────────────────────
+//
+// Keep mock persistence private to this module.
+// Consumers interact only through evidenceService.
+
 const mockEvidence: EvidenceRecord[] = [
   {
     id: 'EVD-2026-00482',
     status: 'under_review',
+
     title: 'Internal Finishing Milestone Evidence',
+
     description:
       'Evidence submitted to support completion of the internal finishing milestone, including site photographs, progress documentation and supporting completion records.',
 
@@ -161,7 +263,9 @@ const mockEvidence: EvidenceRecord[] = [
   {
     id: 'EVD-2026-00479',
     status: 'verified',
+
     title: 'Roofing Completion Evidence',
+
     description:
       'Completion evidence for roofing works including installation photographs and contractor completion records.',
 
@@ -224,7 +328,9 @@ const mockEvidence: EvidenceRecord[] = [
   {
     id: 'EVD-2026-00471',
     status: 'submitted',
+
     title: 'MEP Rough-In Progress Evidence',
+
     description:
       'Photographs and progress documentation covering electrical and plumbing rough-in works.',
 
@@ -273,7 +379,9 @@ const mockEvidence: EvidenceRecord[] = [
   {
     id: 'EVD-2026-00458',
     status: 'rejected',
+
     title: 'External Works Completion Evidence',
+
     description:
       'Evidence previously submitted for external works completion but returned because required supporting records were incomplete.',
 
@@ -318,98 +426,129 @@ const mockEvidence: EvidenceRecord[] = [
   },
 ]
 
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Public service
+// ─────────────────────────────────────────────────────────────────────────────
+
 export const evidenceService = {
+  /**
+   * List evidence records using optional filters.
+   */
   async list(
     filters: EvidenceListFilters = {},
   ): Promise<EvidenceRecord[]> {
-    const search = filters.search?.trim().toLowerCase()
+    const search = normalizeSearch(filters.search)
 
-    return mockEvidence.filter((record) => {
-      const matchesSearch =
-        !search ||
-        record.id.toLowerCase().includes(search) ||
-        record.title.toLowerCase().includes(search) ||
-        record.project.name.toLowerCase().includes(search) ||
-        record.milestone.name.toLowerCase().includes(search) ||
-        record.submittedBy.name.toLowerCase().includes(search)
+    return mockEvidence
+      .filter((record) => {
+        if (search && !matchesSearch(record, search)) {
+          return false
+        }
 
-      const matchesStatus =
-        !filters.status ||
-        filters.status === 'all' ||
-        record.status === filters.status
+        if (
+          filters.status &&
+          filters.status !== 'all' &&
+          record.status !== filters.status
+        ) {
+          return false
+        }
 
-      const matchesProject =
-        !filters.projectId ||
-        record.project.id === filters.projectId
+        if (
+          filters.projectId &&
+          record.project.id !== filters.projectId
+        ) {
+          return false
+        }
 
-      const matchesMilestone =
-        !filters.milestoneId ||
-        record.milestone.id === filters.milestoneId
+        if (
+          filters.milestoneId &&
+          record.milestone.id !== filters.milestoneId
+        ) {
+          return false
+        }
 
-      return (
-        matchesSearch &&
-        matchesStatus &&
-        matchesProject &&
-        matchesMilestone
+        return true
+      })
+      .map(cloneEvidenceRecord)
+  },
+
+  /**
+   * Retrieve one evidence record by ID.
+   */
+  async get(
+    id: string,
+  ): Promise<EvidenceRecord | null> {
+    const normalizedId = normalizeId(id)
+
+    if (!normalizedId) {
+      throw new EvidenceServiceError(
+        'Evidence ID is required.',
+        'INVALID_ID',
       )
-    })
-  },
+    }
 
-  async get(id: string): Promise<EvidenceRecord | null> {
-    return (
-      mockEvidence.find((record) => record.id === id) ?? null
+    const record = mockEvidence.find(
+      (item) => item.id === normalizedId,
     )
+
+    return record
+      ? cloneEvidenceRecord(record)
+      : null
   },
 
+  /**
+   * Upload a new evidence package.
+   *
+   * The mock implementation creates an in-memory record.
+   * Replace only this method with the real multipart/form-data
+   * request when the backend contract becomes available.
+   */
   async upload(
     payload: UploadEvidencePayload,
   ): Promise<EvidenceRecord> {
-    // Replace this implementation with:
-    //
-    // return api.post<EvidenceRecord>('/evidence', formData)
-    //
-    // once the backend contract is available.
+    validateUploadPayload(payload)
 
-    const now = new Date()
+    const recordNumber =
+      getNextMockRecordNumber()
 
     const record: EvidenceRecord = {
-      id: `EVD-${now.getFullYear()}-${String(
-        mockEvidence.length + 500,
-      ).padStart(5, '0')}`,
+      id: `EVD-${getMockYear()}-${recordNumber}`,
 
       status: 'submitted',
 
-      title: payload.title,
+      title: payload.title.trim(),
 
-      description: payload.description,
+      description: payload.description.trim(),
 
       project: {
-        id: payload.projectId,
+        id: payload.projectId.trim(),
         name: 'Selected Project',
         location: 'Project location',
       },
 
       milestone: {
-        id: payload.milestoneId,
+        id: payload.milestoneId.trim(),
         name: 'Selected Milestone',
       },
 
       submittedBy: {
-        id: 'CURRENT-USER',
-        name: 'Current User',
-        role: 'Contractor',
+        ...CURRENT_USER,
       },
 
-      submittedAt: '27 Aug 2026 · 10:45',
-      updatedAt: '27 Aug 2026 · 10:45',
+      submittedAt: MOCK_NOW,
+      updatedAt: MOCK_NOW,
 
-      files: payload.files.map((file, index) => ({
-        id: `FILE-NEW-${index + 1}`,
-        name: file.name,
-        type: getFileType(file),
-        size: formatFileSize(file.size),
-        uploadedAt: '27 Aug 2026 · 10:45',
-      })),
+      files: payload.files.map(
+        (file, index) =>
+          ({
+            id: `FILE-NEW-${String(index + 1).padStart(3, '0')}`,
+            name: file.name,
+            type: getFileType(file),
+            size: formatFileSize(file.size),
+            uploadedAt: MOCK_NOW,
+          }) satisfies EvidenceFile,
+      ),
 
       progress: 0,
 
@@ -418,51 +557,171 @@ export const evidenceService = {
 
     mockEvidence.unshift(record)
 
-    return record
+    return cloneEvidenceRecord(record)
   },
 
+  /**
+   * Record an independent review decision.
+   *
+   * Decision mapping:
+   * - verified     → verified
+   * - request_more → under_review
+   * - flagged      → blocked
+   */
   async review(
     id: string,
     decision: EvidenceReviewDecision,
     comment?: string,
   ): Promise<EvidenceRecord | null> {
+    const normalizedId = normalizeId(id)
+
+    if (!normalizedId) {
+      throw new EvidenceServiceError(
+        'Evidence ID is required.',
+        'INVALID_ID',
+      )
+    }
+
+    if (!isEvidenceReviewDecision(decision)) {
+      throw new EvidenceServiceError(
+        'Invalid evidence review decision.',
+        'INVALID_DECISION',
+      )
+    }
+
     const record = mockEvidence.find(
-      (item) => item.id === id,
+      (item) => item.id === normalizedId,
     )
 
     if (!record) {
       return null
     }
 
-    const statusMap: Record<
-      EvidenceReviewDecision,
-      EvidenceStatus
-    > = {
-      verified: 'verified',
-      request_more: 'under_review',
-      flagged: 'blocked',
-    }
+    const normalizedComment =
+      comment?.trim() || undefined
 
-    record.status = statusMap[decision]
+    record.status = DECISION_STATUS_MAP[decision]
 
-    record.updatedAt = '27 Aug 2026 · 10:45'
+    record.updatedAt = MOCK_NOW
 
     record.review = {
       ...record.review,
       lastDecision: decision,
-      lastReviewedAt: '27 Aug 2026 · 10:45',
-      reviewerComment: comment,
+      lastReviewedAt: MOCK_NOW,
+      reviewerComment: normalizedComment,
     }
 
     if (decision === 'verified') {
       record.progress = 100
     }
 
-    return record
+    return cloneEvidenceRecord(record)
   },
+} as const
+
+export type EvidenceService =
+  typeof evidenceService
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Search helpers
+// ─────────────────────────────────────────────────────────────────────────────
+
+function normalizeSearch(
+  value?: string,
+): string {
+  return value?.trim().toLowerCase() ?? ''
 }
 
-function getFileType(file: File): EvidenceFileType {
+function normalizeId(
+  value?: string,
+): string {
+  return value?.trim() ?? ''
+}
+
+function matchesSearch(
+  record: EvidenceRecord,
+  search: string,
+): boolean {
+  const searchableValues = [
+    record.id,
+    record.title,
+    record.description,
+    record.project.id,
+    record.project.name,
+    record.project.location,
+    record.milestone.id,
+    record.milestone.name,
+    record.submittedBy.id,
+    record.submittedBy.name,
+    record.submittedBy.role,
+  ]
+
+  return searchableValues.some((value) =>
+    value.toLowerCase().includes(search),
+  )
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Validation
+// ─────────────────────────────────────────────────────────────────────────────
+
+function validateUploadPayload(
+  payload: UploadEvidencePayload,
+): void {
+  if (!payload.title?.trim()) {
+    throw new EvidenceServiceError(
+      'Evidence title is required.',
+      'INVALID_TITLE',
+    )
+  }
+
+  if (!payload.description?.trim()) {
+    throw new EvidenceServiceError(
+      'Evidence description is required.',
+      'INVALID_DESCRIPTION',
+    )
+  }
+
+  if (!payload.projectId?.trim()) {
+    throw new EvidenceServiceError(
+      'Project ID is required.',
+      'INVALID_ID',
+    )
+  }
+
+  if (!payload.milestoneId?.trim()) {
+    throw new EvidenceServiceError(
+      'Milestone ID is required.',
+      'INVALID_ID',
+    )
+  }
+
+  if (!payload.files?.length) {
+    throw new EvidenceServiceError(
+      'At least one evidence file is required.',
+      'NO_FILES',
+    )
+  }
+}
+
+function isEvidenceReviewDecision(
+  value: string,
+): value is EvidenceReviewDecision {
+  return VALID_REVIEW_DECISIONS.includes(
+    value as EvidenceReviewDecision,
+  )
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// File helpers
+// ─────────────────────────────────────────────────────────────────────────────
+
+function getFileType(
+  file: File,
+): EvidenceFileType {
   if (file.type.startsWith('image/')) {
     return 'image'
   }
@@ -474,7 +733,13 @@ function getFileType(file: File): EvidenceFileType {
   return 'document'
 }
 
-function formatFileSize(bytes: number) {
+function formatFileSize(
+  bytes: number,
+): string {
+  if (!Number.isFinite(bytes) || bytes < 0) {
+    return 'Unknown size'
+  }
+
   if (bytes < 1024) {
     return `${bytes} B`
   }
@@ -483,5 +748,79 @@ function formatFileSize(bytes: number) {
     return `${(bytes / 1024).toFixed(1)} KB`
   }
 
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+  if (bytes < 1024 * 1024 * 1024) {
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+  }
+
+  return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Mock ID / record helpers
+// ─────────────────────────────────────────────────────────────────────────────
+
+function getMockYear(): number {
+  return 2026
+}
+
+function getNextMockRecordNumber(): string {
+  const highestNumber = mockEvidence.reduce(
+    (highest, record) => {
+      const match = record.id.match(
+        /EVD-\d{4}-(\d+)/,
+      )
+
+      if (!match) {
+        return highest
+      }
+
+      const number = Number(match[1])
+
+      return Number.isFinite(number)
+        ? Math.max(highest, number)
+        : highest
+    },
+    0,
+  )
+
+  return String(highestNumber + 1).padStart(5, '0')
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Defensive cloning
+// ─────────────────────────────────────────────────────────────────────────────
+//
+// Prevent callers from accidentally mutating the private mock repository.
+//
+// This also mirrors the practical expectation of an API service: consumers
+// receive their own response object rather than a reference to internal state.
+
+function cloneEvidenceRecord(
+  record: EvidenceRecord,
+): EvidenceRecord {
+  return {
+    ...record,
+
+    project: {
+      ...record.project,
+    },
+
+    milestone: {
+      ...record.milestone,
+    },
+
+    submittedBy: {
+      ...record.submittedBy,
+    },
+
+    files: record.files.map((file) => ({
+      ...file,
+    })),
+
+    review: {
+      ...record.review,
+    },
+  }
 }

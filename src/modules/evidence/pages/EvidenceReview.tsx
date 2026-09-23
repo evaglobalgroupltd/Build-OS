@@ -56,6 +56,17 @@ const evidenceStatusTone: Record<
   rejected: 'brick',
 }
 
+const evidenceStatusLabels: Record<
+  EvidenceStatus,
+  string
+> = {
+  submitted: 'Submitted',
+  under_review: 'Under review',
+  verified: 'Verified',
+  blocked: 'Blocked',
+  rejected: 'Rejected',
+}
+
 const evidence = {
   id: 'EVD-2026-00482',
   status: 'under_review' as EvidenceStatus,
@@ -167,114 +178,151 @@ export function EvidenceReview() {
   const allChecksPassed =
     passedChecks === verificationChecks.length
 
+  const verificationPercentage = Math.round(
+    (passedChecks / verificationChecks.length) * 100,
+  )
+
+  const statusLabel =
+    evidenceStatusLabels[evidence.status]
+
   return (
-    <div className="space-y-6">
-      {/* Navigation */}
+    <div className="space-y-7">
+      {/* =========================================================
+          BACK NAVIGATION
+      ========================================================= */}
       <button
         type="button"
-        className="inline-flex items-center gap-2 text-xs font-semibold text-ink/45 transition hover:text-ink"
+        className="group inline-flex items-center gap-2 text-xs font-semibold text-ink/40 transition-colors hover:text-ink"
       >
-        <ArrowLeft className="h-4 w-4" />
+        <span className="flex h-7 w-7 items-center justify-center rounded-full border border-ink/[0.07] bg-white transition-all group-hover:border-ink/[0.14] group-hover:shadow-sm">
+          <ArrowLeft className="h-3.5 w-3.5 transition-transform group-hover:-translate-x-0.5" />
+        </span>
+
         Back to review queue
       </button>
 
-      {/* Header */}
-      <div className="flex flex-col justify-between gap-5 xl:flex-row xl:items-start">
+      {/* =========================================================
+          HEADER
+      ========================================================= */}
+      <header className="flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-ink/5">
-              <ShieldCheck className="h-5 w-5 text-ink/55" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-[13px] border border-ink/[0.07] bg-white shadow-[0_6px_20px_rgba(20,30,25,0.035)]">
+              <ShieldCheck className="h-[18px] w-[18px] text-ink/55" />
             </div>
 
-            <Badge
-              tone={
-                evidenceStatusTone[evidence.status]
-              }
-            >
-              {evidence.status
-                .replaceAll('_', ' ')
-                .replace(/\b\w/g, (letter) =>
-                  letter.toUpperCase(),
-                )}
-            </Badge>
+            <span className="h-px w-6 bg-ink/10" />
 
-            <span className="rounded-full bg-paper-2 px-2.5 py-1 font-mono text-[9px] font-semibold text-ink/40">
+            <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-ink/30">
+              Verification dossier
+            </span>
+
+            <Badge tone={evidenceStatusTone[evidence.status]}>
+              {statusLabel}
+            </Badge>
+          </div>
+
+          <div className="mt-4 flex flex-wrap items-end gap-x-3 gap-y-2">
+            <h1 className="font-display text-[30px] font-semibold tracking-[-0.035em] text-ink sm:text-[36px]">
+              Review Evidence
+            </h1>
+
+            <span className="mb-1 rounded-full bg-[#F7F8F6] px-2.5 py-1 font-mono text-[9px] font-semibold text-ink/35">
               {evidence.id}
             </span>
           </div>
 
-          <h1 className="mt-4 font-display text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
-            Review Evidence
-          </h1>
-
           <p className="mt-2 max-w-3xl text-sm leading-6 text-ink/50">
-            Verify whether the submitted records sufficiently
-            support the claimed milestone completion before
-            recommending payment.
+            Determine whether the submitted records sufficiently
+            support the claimed milestone completion before the
+            associated payment can proceed.
           </p>
         </div>
 
-        <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            className="inline-flex items-center gap-2 rounded-xl border border-line bg-white px-4 py-2.5 text-xs font-semibold text-ink/55 transition hover:text-ink"
-          >
-            <Download className="h-4 w-4" />
-            Export record
-          </button>
+        <button
+          type="button"
+          className="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-full border border-ink/[0.08] bg-white px-4 text-xs font-semibold text-ink/60 shadow-[0_6px_20px_rgba(20,30,25,0.035)] transition-all hover:-translate-y-0.5 hover:border-ink/[0.15] hover:text-ink hover:shadow-[0_10px_28px_rgba(20,30,25,0.05)]"
+        >
+          <Download className="h-3.5 w-3.5" />
+          Export record
+        </button>
+      </header>
+
+      {/* =========================================================
+          REVIEW STATE
+      ========================================================= */}
+      <div className="relative overflow-hidden rounded-[20px] border border-[#C28A2C]/[0.14] bg-[#F7F1E7]">
+        <div className="absolute inset-y-0 left-0 w-1 bg-[#C28A2C]" />
+
+        <div className="flex flex-col gap-4 p-4 pl-5 sm:flex-row sm:items-start sm:p-5 sm:pl-6">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[13px] bg-white shadow-[0_4px_16px_rgba(20,30,25,0.04)]">
+            <Clock3 className="h-[18px] w-[18px] text-[#C28A2C]" />
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="text-sm font-semibold text-ink">
+                Independent verification required
+              </p>
+
+              <span className="rounded-full bg-[#C28A2C]/[0.09] px-2 py-1 text-[9px] font-semibold text-[#C28A2C]">
+                {verificationPercentage}% reviewed
+              </span>
+            </div>
+
+            <p className="mt-1 max-w-4xl text-xs leading-5 text-ink/50">
+              The submission has passed the initial evidence
+              checks, but independent verification remains
+              outstanding. The associated milestone payment should
+              not proceed until the required verification chain is
+              complete.
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* Review banner */}
-      <div className="flex items-start gap-3 rounded-2xl border border-amber/20 bg-amber/[0.05] p-4">
-        <Clock3 className="mt-0.5 h-5 w-5 shrink-0 text-amber-dark" />
-
-        <div>
-          <p className="text-sm font-semibold text-ink">
-            Verification required
-          </p>
-
-          <p className="mt-1 text-xs leading-5 text-ink/50">
-            This submission has passed the initial evidence
-            checks but still requires independent verification
-            before the associated milestone payment can proceed.
-          </p>
-        </div>
-      </div>
-
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.55fr)_minmax(340px,0.8fr)]">
-        {/* Main review workspace */}
-        <div className="space-y-6">
-          {/* Claim */}
+      {/* =========================================================
+          WORKSPACE
+      ========================================================= */}
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.55fr)_minmax(330px,0.8fr)]">
+        {/* =======================================================
+            MAIN REVIEW COLUMN
+        ======================================================= */}
+        <main className="space-y-6">
+          {/* -------------------------------------------------------
+              MILESTONE CLAIM
+          ------------------------------------------------------- */}
           <Card>
             <CardHeader
               title="Milestone claim"
               subtitle="What the submitted evidence is intended to prove"
             />
 
-            <CardBody>
-              <div className="rounded-2xl border border-line bg-paper-2 p-4">
-                <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
-                  <div>
-                    <p className="font-mono text-[9px] font-semibold uppercase tracking-wide text-ink/35">
+            <CardBody className="p-4 sm:p-5">
+              <div className="relative overflow-hidden rounded-[18px] border border-ink/[0.07] bg-[#F7F8F6]">
+                <div className="absolute inset-y-0 left-0 w-1 bg-[#12613E]/50" />
+
+                <div className="flex flex-col gap-5 p-4 pl-5 sm:flex-row sm:items-start sm:justify-between sm:p-5 sm:pl-6">
+                  <div className="min-w-0">
+                    <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-ink/30">
                       {evidence.milestone.id}
                     </p>
 
-                    <h2 className="mt-1 text-sm font-semibold text-ink">
+                    <h2 className="mt-1.5 font-display text-lg font-semibold tracking-[-0.02em] text-ink">
                       {evidence.milestone.name}
                     </h2>
 
-                    <p className="mt-2 text-xs leading-5 text-ink/45">
+                    <p className="mt-2 max-w-2xl text-xs leading-5 text-ink/45">
                       {evidence.description}
                     </p>
                   </div>
 
-                  <div className="shrink-0 rounded-xl bg-white px-3 py-2 text-right">
-                    <p className="text-[9px] font-semibold uppercase tracking-wide text-ink/30">
+                  <div className="shrink-0 rounded-[14px] border border-ink/[0.06] bg-white px-4 py-3 sm:min-w-[118px] sm:text-right">
+                    <p className="text-[8px] font-semibold uppercase tracking-[0.16em] text-ink/30">
                       Completion claim
                     </p>
 
-                    <p className="mt-1 font-display text-xl font-semibold text-ink">
+                    <p className="mt-1 font-display text-[26px] font-semibold tracking-[-0.03em] text-ink">
                       {evidence.milestone.completionClaim}%
                     </p>
                   </div>
@@ -283,15 +331,17 @@ export function EvidenceReview() {
             </CardBody>
           </Card>
 
-          {/* Evidence preview */}
+          {/* -------------------------------------------------------
+              EVIDENCE
+          ------------------------------------------------------- */}
           <Card className="overflow-hidden">
             <CardHeader
               title="Evidence submitted"
               subtitle={`${evidence.files.length} records available for inspection`}
             />
 
-            <CardBody>
-              <div className="space-y-5">
+            <CardBody className="p-4 sm:p-5">
+              <div className="space-y-6">
                 {/* Images */}
                 {imageFiles.length > 0 && (
                   <section>
@@ -305,31 +355,39 @@ export function EvidenceReview() {
                       {imageFiles.map((file) => (
                         <div
                           key={file.id}
-                          className="overflow-hidden rounded-xl border border-line bg-paper-2"
+                          className="group overflow-hidden rounded-[16px] border border-ink/[0.07] bg-white transition-all duration-200 hover:-translate-y-0.5 hover:border-ink/[0.12] hover:shadow-[0_12px_30px_rgba(20,30,25,0.05)]"
                         >
-                          <div className="flex aspect-[16/10] items-center justify-center bg-ink/[0.03]">
-                            <Image className="h-9 w-9 text-ink/20" />
+                          <div className="relative flex aspect-[16/10] items-center justify-center overflow-hidden bg-[#F7F8F6]">
+                            <Image className="h-9 w-9 text-ink/15 transition-transform duration-300 group-hover:scale-105" />
+
+                            <span className="absolute left-3 top-3 rounded-full bg-white/90 px-2 py-1 text-[8px] font-semibold uppercase tracking-[0.14em] text-ink/40 backdrop-blur">
+                              Image
+                            </span>
+
+                            <button
+                              type="button"
+                              className="absolute bottom-3 right-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/95 text-ink/45 opacity-0 shadow-sm transition-all group-hover:opacity-100 hover:text-ink"
+                              aria-label={`View ${file.name}`}
+                            >
+                              <Eye className="h-3.5 w-3.5" />
+                            </button>
                           </div>
 
-                          <div className="p-3">
+                          <div className="p-3.5">
                             <div className="flex items-start justify-between gap-3">
                               <div className="min-w-0">
                                 <p className="truncate text-xs font-semibold text-ink">
                                   {file.name}
                                 </p>
 
-                                <p className="mt-1 text-[10px] text-ink/35">
+                                <p className="mt-1 font-mono text-[9px] text-ink/30">
                                   {file.size} · {file.uploadedAt}
                                 </p>
                               </div>
 
-                              <button
-                                type="button"
-                                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-line text-ink/40 transition hover:text-ink"
-                                aria-label={`View ${file.name}`}
-                              >
-                                <Eye className="h-3.5 w-3.5" />
-                              </button>
+                              <span className="font-mono text-[8px] text-ink/20">
+                                {file.id}
+                              </span>
                             </div>
                           </div>
                         </div>
@@ -347,7 +405,7 @@ export function EvidenceReview() {
                       count={videoFiles.length}
                     />
 
-                    <div className="space-y-3">
+                    <div className="space-y-2.5">
                       {videoFiles.map((file) => (
                         <EvidenceFileRow
                           key={file.id}
@@ -367,7 +425,7 @@ export function EvidenceReview() {
                       count={documentFiles.length}
                     />
 
-                    <div className="space-y-3">
+                    <div className="space-y-2.5">
                       {documentFiles.map((file) => (
                         <EvidenceFileRow
                           key={file.id}
@@ -381,15 +439,17 @@ export function EvidenceReview() {
             </CardBody>
           </Card>
 
-          {/* Verification checklist */}
+          {/* -------------------------------------------------------
+              VERIFICATION CHECKLIST
+          ------------------------------------------------------- */}
           <Card>
             <CardHeader
               title="Verification checklist"
-              subtitle={`${passedChecks} of ${verificationChecks.length} verification requirements currently satisfied`}
+              subtitle={`${passedChecks} of ${verificationChecks.length} requirements currently satisfied`}
             />
 
-            <CardBody>
-              <div className="space-y-3">
+            <CardBody className="p-4 sm:p-5">
+              <div className="space-y-2.5">
                 {verificationChecks.map((check) => (
                   <VerificationCheck
                     key={check.id}
@@ -401,27 +461,40 @@ export function EvidenceReview() {
               </div>
 
               {!allChecksPassed && (
-                <div className="mt-4 flex items-start gap-2 rounded-xl border border-amber/15 bg-amber/[0.04] p-3">
-                  <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-dark" />
+                <div className="relative mt-4 overflow-hidden rounded-[15px] border border-[#C28A2C]/[0.12] bg-[#F7F1E7] p-3.5 pl-4">
+                  <div className="absolute inset-y-0 left-0 w-1 bg-[#C28A2C]/60" />
 
-                  <p className="text-[10px] leading-5 text-ink/45">
-                    Independent verification remains outstanding.
-                    Do not treat this submission as payment-approved
-                    until the required verification is completed.
-                  </p>
+                  <div className="flex items-start gap-2.5">
+                    <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-[#C28A2C]" />
+
+                    <div>
+                      <p className="text-[10px] font-semibold text-ink">
+                        Verification chain incomplete
+                      </p>
+
+                      <p className="mt-1 text-[10px] leading-5 text-ink/45">
+                        Independent verification remains
+                        outstanding. This evidence must not be
+                        treated as payment-approved until the
+                        required review is completed.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               )}
             </CardBody>
           </Card>
 
-          {/* Decision */}
+          {/* -------------------------------------------------------
+              DECISION
+          ------------------------------------------------------- */}
           <Card>
             <CardHeader
               title="Review decision"
               subtitle="Select the action that should be recorded against this evidence"
             />
 
-            <CardBody>
+            <CardBody className="p-4 sm:p-5">
               <div className="grid gap-3 md:grid-cols-3">
                 <DecisionButton
                   icon={CheckCircle2}
@@ -446,19 +519,19 @@ export function EvidenceReview() {
                 />
               </div>
 
-              <div className="mt-4">
-                <label className="text-[10px] font-semibold uppercase tracking-wide text-ink/35">
+              <div className="mt-5">
+                <label className="text-[9px] font-semibold uppercase tracking-[0.16em] text-ink/30">
                   Reviewer notes
                 </label>
 
                 <textarea
                   rows={4}
                   placeholder="Record observations, verification notes or reasons for requesting additional evidence..."
-                  className="mt-2 w-full resize-none rounded-xl border border-line bg-paper-2 px-3 py-2.5 text-xs leading-5 text-ink outline-none transition placeholder:text-ink/30 focus:border-ink/20 focus:bg-white"
+                  className="mt-2 w-full resize-none rounded-[14px] border border-ink/[0.07] bg-[#F7F8F6] px-3.5 py-3 text-xs leading-5 text-ink outline-none transition-all placeholder:text-ink/30 focus:border-ink/[0.16] focus:bg-white focus:ring-4 focus:ring-ink/[0.025]"
                 />
               </div>
 
-              <div className="mt-4 flex items-center justify-between gap-3 border-t border-line pt-4">
+              <div className="mt-4 flex flex-col gap-3 border-t border-ink/[0.06] pt-4 sm:flex-row sm:items-center sm:justify-between">
                 <p className="flex items-center gap-2 text-[10px] text-ink/35">
                   <LockKeyhole className="h-3.5 w-3.5" />
                   Decision will be added to the audit trail.
@@ -466,7 +539,7 @@ export function EvidenceReview() {
 
                 <button
                   type="button"
-                  className="inline-flex items-center gap-2 rounded-xl bg-ink px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-ink/90"
+                  className="inline-flex h-10 items-center justify-center gap-2 rounded-full bg-ink px-5 text-xs font-semibold text-white shadow-[0_6px_18px_rgba(20,30,25,0.10)] transition-all hover:-translate-y-0.5 hover:bg-ink/90 hover:shadow-[0_10px_24px_rgba(20,30,25,0.14)]"
                 >
                   Record review
                   <ChevronRight className="h-3.5 w-3.5" />
@@ -474,27 +547,26 @@ export function EvidenceReview() {
               </div>
             </CardBody>
           </Card>
-        </div>
+        </main>
 
-        {/* Review sidebar */}
+        {/* =======================================================
+            SIDEBAR
+        ======================================================= */}
         <aside className="space-y-6">
-          {/* Verification progress */}
+          {/* -------------------------------------------------------
+              VERIFICATION PROGRESS
+          ------------------------------------------------------- */}
           <Card>
             <CardHeader
               title="Verification progress"
               subtitle="Current review state"
             />
 
-            <CardBody>
-              <div className="flex items-end justify-between gap-3">
+            <CardBody className="p-4 sm:p-5">
+              <div className="flex items-end justify-between gap-4">
                 <div>
-                  <p className="font-display text-3xl font-semibold text-ink">
-                    {Math.round(
-                      (passedChecks /
-                        verificationChecks.length) *
-                        100,
-                    )}
-                    %
+                  <p className="font-display text-[34px] font-semibold tracking-[-0.04em] text-ink">
+                    {verificationPercentage}%
                   </p>
 
                   <p className="mt-1 text-[10px] text-ink/35">
@@ -502,40 +574,49 @@ export function EvidenceReview() {
                   </p>
                 </div>
 
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber/[0.08]">
-                  <ShieldCheck className="h-5 w-5 text-amber-dark" />
+                <div className="flex h-10 w-10 items-center justify-center rounded-[12px] bg-[#F7F1E7]">
+                  <ShieldCheck className="h-[18px] w-[18px] text-[#C28A2C]" />
                 </div>
               </div>
 
-              <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-paper-2">
+              <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-[#F7F8F6]">
                 <div
-                  className="h-full rounded-full bg-amber"
+                  className="h-full rounded-full bg-[#C28A2C] transition-all duration-500"
                   style={{
-                    width: `${
-                      (passedChecks /
-                        verificationChecks.length) *
-                      100
-                    }%`,
+                    width: `${verificationPercentage}%`,
                   }}
                 />
               </div>
 
-              <p className="mt-3 text-[10px] leading-5 text-ink/40">
+              <div className="mt-4 flex items-center justify-between text-[9px]">
+                <span className="text-ink/30">
+                  {passedChecks} passed
+                </span>
+
+                <span className="font-semibold text-[#C28A2C]">
+                  {verificationChecks.length - passedChecks}{' '}
+                  outstanding
+                </span>
+              </div>
+
+              <p className="mt-4 border-t border-ink/[0.06] pt-4 text-[10px] leading-5 text-ink/40">
                 Independent verification is the remaining
-                control before this evidence can support
-                payment approval.
+                control before this evidence can support payment
+                approval.
               </p>
             </CardBody>
           </Card>
 
-          {/* Project context */}
+          {/* -------------------------------------------------------
+              PROJECT CONTEXT
+          ------------------------------------------------------- */}
           <Card>
             <CardHeader
               title="Project context"
               subtitle="Record linkage"
             />
 
-            <CardBody>
+            <CardBody className="p-4 sm:p-5">
               <div className="space-y-4">
                 <ContextItem
                   icon={FileText}
@@ -560,17 +641,19 @@ export function EvidenceReview() {
             </CardBody>
           </Card>
 
-          {/* Submitter */}
+          {/* -------------------------------------------------------
+              SUBMITTER
+          ------------------------------------------------------- */}
           <Card>
             <CardHeader
               title="Submitted by"
               subtitle="Evidence source"
             />
 
-            <CardBody>
+            <CardBody className="p-4 sm:p-5">
               <div className="flex items-start gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-paper-2">
-                  <User className="h-4 w-4 text-ink/45" />
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] bg-[#F7F8F6]">
+                  <User className="h-4 w-4 text-ink/40" />
                 </div>
 
                 <div className="min-w-0">
@@ -578,11 +661,11 @@ export function EvidenceReview() {
                     {evidence.submittedBy.name}
                   </p>
 
-                  <p className="mt-1 text-xs text-ink/40">
+                  <span className="mt-1 inline-flex rounded-full bg-[#F7F8F6] px-2 py-1 text-[9px] font-semibold text-ink/40">
                     {evidence.submittedBy.role}
-                  </p>
+                  </span>
 
-                  <div className="mt-3 flex items-center gap-1.5 font-mono text-[9px] text-ink/35">
+                  <div className="mt-3 flex items-center gap-1.5 font-mono text-[9px] text-ink/30">
                     <CalendarDays className="h-3 w-3" />
                     {evidence.submittedAt}
                   </div>
@@ -591,23 +674,32 @@ export function EvidenceReview() {
             </CardBody>
           </Card>
 
-          {/* Audit protection */}
-          <div className="rounded-2xl border border-line bg-paper-2 p-4">
-            <div className="flex items-start gap-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white">
-                <LockKeyhole className="h-4 w-4 text-ink/45" />
+          {/* -------------------------------------------------------
+              PROTECTED REVIEW
+          ------------------------------------------------------- */}
+          <div className="relative overflow-hidden rounded-[18px] border border-[#12613E]/[0.10] bg-[#F4F7F4] p-4">
+            <div className="absolute inset-y-0 left-0 w-1 bg-[#12613E]" />
+
+            <div className="flex items-start gap-3 pl-1">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[11px] bg-white shadow-[0_4px_14px_rgba(20,30,25,0.035)]">
+                <LockKeyhole className="h-4 w-4 text-[#12613E]" />
               </div>
 
               <div>
-                <p className="text-xs font-semibold text-ink">
-                  Protected review
-                </p>
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="text-xs font-semibold text-[#12613E]">
+                    Protected review
+                  </p>
 
-                <p className="mt-1 text-[11px] leading-5 text-ink/45">
+                  <span className="rounded-full bg-[#12613E]/[0.08] px-2 py-1 text-[8px] font-semibold text-[#12613E]">
+                    Audited
+                  </span>
+                </div>
+
+                <p className="mt-1.5 text-[10px] leading-5 text-ink/40">
                   Reviewer actions, notes and decisions are
-                  permanently associated with the evidence
-                  record and retained in the Build OS audit
-                  trail.
+                  permanently associated with this evidence
+                  record and retained in the Build OS audit trail.
                 </p>
               </div>
             </div>
@@ -628,16 +720,20 @@ function EvidenceSectionHeader({
   count: number
 }) {
   return (
-    <div className="mb-3 flex items-center gap-2">
-      <Icon className="h-4 w-4 text-ink/40" />
+    <div className="mb-3 flex items-center gap-2.5">
+      <div className="flex h-7 w-7 items-center justify-center rounded-[9px] bg-[#F7F8F6]">
+        <Icon className="h-3.5 w-3.5 text-ink/40" />
+      </div>
 
       <p className="text-xs font-semibold text-ink">
         {title}
       </p>
 
-      <span className="rounded-full bg-paper-2 px-2 py-0.5 font-mono text-[9px] text-ink/40">
+      <span className="rounded-full bg-[#F7F8F6] px-2 py-0.5 font-mono text-[9px] font-semibold text-ink/35">
         {count}
       </span>
+
+      <span className="h-px flex-1 bg-ink/[0.06]" />
     </div>
   )
 }
@@ -647,16 +743,20 @@ function EvidenceFileRow({
 }: {
   file: EvidenceFile
 }) {
-  const Icon =
-    file.type === 'video'
-      ? Video
-      : FileText
+  const isVideo = file.type === 'video'
+  const Icon = isVideo ? Video : FileText
 
   return (
-    <div className="flex items-center justify-between gap-3 rounded-xl border border-line bg-white p-3">
+    <div className="group flex items-center justify-between gap-3 rounded-[15px] border border-ink/[0.07] bg-white p-3.5 transition-all duration-200 hover:border-ink/[0.12] hover:shadow-[0_8px_24px_rgba(20,30,25,0.04)]">
       <div className="flex min-w-0 items-center gap-3">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-paper-2">
-          <Icon className="h-4 w-4 text-ink/40" />
+        <div
+          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[11px] ${
+            isVideo
+              ? 'bg-[#F7F1E7] text-[#C28A2C]'
+              : 'bg-[#F7F8F6] text-ink/40'
+          }`}
+        >
+          <Icon className="h-4 w-4" />
         </div>
 
         <div className="min-w-0">
@@ -664,18 +764,22 @@ function EvidenceFileRow({
             {file.name}
           </p>
 
-          <p className="mt-1 text-[10px] text-ink/35">
-            {file.size} · {file.uploadedAt}
-          </p>
+          <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[9px] text-ink/30">
+            <span>{file.id}</span>
+            <span className="text-ink/15">•</span>
+            <span>{file.size}</span>
+            <span className="text-ink/15">•</span>
+            <span>{file.uploadedAt}</span>
+          </div>
         </div>
       </div>
 
       <button
         type="button"
-        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-line text-ink/40 transition hover:text-ink"
-        aria-label={`View ${file.name}`}
+        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] border border-ink/[0.07] text-ink/30 transition-all group-hover:border-ink/[0.13] group-hover:text-ink"
+        aria-label={`${isVideo ? 'Play' : 'View'} ${file.name}`}
       >
-        {file.type === 'video' ? (
+        {isVideo ? (
           <Play className="h-3.5 w-3.5" />
         ) : (
           <Eye className="h-3.5 w-3.5" />
@@ -697,41 +801,53 @@ function VerificationCheck({
   const passed = status === 'passed'
 
   return (
-    <div className="flex items-start gap-3 rounded-xl border border-line bg-white p-3">
+    <div
+      className={`relative overflow-hidden rounded-[15px] border p-3.5 transition-colors ${
+        passed
+          ? 'border-[#12613E]/[0.08] bg-[#F4F7F4]'
+          : 'border-[#C28A2C]/[0.12] bg-[#F7F1E7]'
+      }`}
+    >
       <div
-        className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${
-          passed
-            ? 'bg-teal-light'
-            : 'bg-amber/[0.08]'
+        className={`absolute inset-y-0 left-0 w-[3px] ${
+          passed ? 'bg-[#12613E]/50' : 'bg-[#C28A2C]/60'
         }`}
-      >
-        {passed ? (
-          <CheckCircle2 className="h-4 w-4 text-teal" />
-        ) : (
-          <Clock3 className="h-4 w-4 text-amber-dark" />
-        )}
-      </div>
+      />
 
-      <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-2">
-          <p className="text-xs font-semibold text-ink">
-            {label}
-          </p>
-
-          <span
-            className={`rounded-full px-2 py-0.5 text-[9px] font-semibold ${
-              passed
-                ? 'bg-teal-light text-teal'
-                : 'bg-amber/[0.08] text-amber-dark'
-            }`}
-          >
-            {passed ? 'Passed' : 'Pending'}
-          </span>
+      <div className="flex items-start gap-3 pl-1">
+        <div
+          className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] bg-white ${
+            passed ? 'text-[#12613E]' : 'text-[#C28A2C]'
+          }`}
+        >
+          {passed ? (
+            <CheckCircle2 className="h-4 w-4" />
+          ) : (
+            <Clock3 className="h-4 w-4" />
+          )}
         </div>
 
-        <p className="mt-1 text-[10px] leading-5 text-ink/40">
-          {description}
-        </p>
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="text-xs font-semibold text-ink">
+              {label}
+            </p>
+
+            <span
+              className={`rounded-full px-2 py-0.5 text-[8px] font-semibold ${
+                passed
+                  ? 'bg-[#12613E]/[0.08] text-[#12613E]'
+                  : 'bg-[#C28A2C]/[0.09] text-[#C28A2C]'
+              }`}
+            >
+              {passed ? 'Passed' : 'Pending'}
+            </span>
+          </div>
+
+          <p className="mt-1 text-[10px] leading-5 text-ink/40">
+            {description}
+          </p>
+        </div>
       </div>
     </div>
   )
@@ -751,28 +867,39 @@ function DecisionButton({
   disabled?: boolean
 }) {
   const styles = {
-    teal: 'border-teal/15 hover:border-teal/35',
-    amber: 'border-amber/20 hover:border-amber/40',
-    brick: 'border-brick/15 hover:border-brick/35',
-  }
-
-  const iconStyles = {
-    teal: 'text-teal',
-    amber: 'text-amber-dark',
-    brick: 'text-brick',
+    teal: {
+      border: 'border-[#12613E]/[0.10] hover:border-[#12613E]/[0.28]',
+      icon: 'bg-[#F4F7F4] text-[#12613E]',
+    },
+    amber: {
+      border: 'border-[#C28A2C]/[0.12] hover:border-[#C28A2C]/[0.30]',
+      icon: 'bg-[#F7F1E7] text-[#C28A2C]',
+    },
+    brick: {
+      border: 'border-[#B85C12]/[0.10] hover:border-[#B85C12]/[0.28]',
+      icon: 'bg-[#F8EEE6] text-[#B85C12]',
+    },
   }
 
   return (
     <button
       type="button"
       disabled={disabled}
-      className={`rounded-xl border bg-white p-4 text-left transition disabled:cursor-not-allowed disabled:opacity-40 ${styles[tone]}`}
+      className={`group rounded-[16px] border bg-white p-4 text-left transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_10px_28px_rgba(20,30,25,0.045)] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0 disabled:hover:shadow-none ${styles[tone].border}`}
     >
-      <Icon className={`h-5 w-5 ${iconStyles[tone]}`} />
+      <div
+        className={`flex h-9 w-9 items-center justify-center rounded-[11px] ${styles[tone].icon}`}
+      >
+        <Icon className="h-4 w-4" />
+      </div>
 
-      <p className="mt-3 text-xs font-semibold text-ink">
-        {title}
-      </p>
+      <div className="mt-3 flex items-center justify-between gap-2">
+        <p className="text-xs font-semibold text-ink">
+          {title}
+        </p>
+
+        <ChevronRight className="h-3.5 w-3.5 text-ink/20 transition-transform group-hover:translate-x-0.5" />
+      </div>
 
       <p className="mt-1 text-[10px] leading-5 text-ink/40">
         {description}
@@ -793,20 +920,22 @@ function ContextItem({
   meta?: string
 }) {
   return (
-    <div className="flex items-start gap-2.5">
-      <Icon className="mt-0.5 h-4 w-4 shrink-0 text-ink/30" />
+    <div className="flex items-start gap-3">
+      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] bg-[#F7F8F6]">
+        <Icon className="h-3.5 w-3.5 text-ink/35" />
+      </div>
 
       <div className="min-w-0">
-        <p className="text-[9px] font-semibold uppercase tracking-wide text-ink/30">
+        <p className="text-[8px] font-semibold uppercase tracking-[0.16em] text-ink/30">
           {label}
         </p>
 
-        <p className="mt-1 text-xs font-semibold text-ink/65">
+        <p className="mt-1 text-xs font-semibold leading-5 text-ink/65">
           {value}
         </p>
 
         {meta && (
-          <p className="mt-1 font-mono text-[9px] text-ink/35">
+          <p className="mt-1 font-mono text-[9px] text-ink/30">
             {meta}
           </p>
         )}

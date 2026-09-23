@@ -1,18 +1,16 @@
+import type { ComponentType } from 'react'
+
 import {
   AlertTriangle,
   CalendarDays,
-  Check,
   CheckCircle2,
   ChevronRight,
   Clock3,
   FileCheck2,
-  FileText,
   MapPin,
   Plus,
   ShieldCheck,
   UserCheck,
-  Users,
-  X,
 } from 'lucide-react'
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
@@ -174,72 +172,89 @@ export function Inspections() {
     (item) => item.status === 'Requires Action',
   ).length
 
+  const totalFindings = inspections.reduce(
+    (total, inspection) => total + inspection.findings,
+    0,
+  )
+
+  const totalEvidence = inspections.reduce(
+    (total, inspection) => total + inspection.evidenceCount,
+    0,
+  )
+
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <Card className="overflow-hidden">
-        <div className="border-b border-line bg-paper-2 px-6 py-7 sm:px-8">
-          <div className="flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
-            <div>
+    <div className="space-y-6 pb-8">
+      {/* Hero */}
+      <Card className="relative overflow-hidden">
+        <div className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-[#12613E]/[0.07] blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-32 left-1/3 h-56 w-56 rounded-full bg-[#B85C12]/[0.05] blur-3xl" />
+
+        <div className="relative border-b border-ink/[0.06] bg-[#F8FAF8] px-6 py-7 sm:px-8 sm:py-8">
+          <div className="flex flex-col gap-7 xl:flex-row xl:items-end xl:justify-between">
+            <div className="max-w-3xl">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded-full bg-ink/5 px-2.5 py-1 font-mono text-[10px] font-semibold uppercase tracking-wide text-ink/45">
-                  Monitoring
+                <span className="inline-flex items-center gap-2 rounded-full bg-[#12613E]/[0.08] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#12613E]">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#12613E]" />
+                  Construction monitoring
                 </span>
 
-                <span className="rounded-full bg-blue-500/10 px-2.5 py-1 text-[10px] font-semibold text-blue-700">
-                  Site Inspections
+                <span className="rounded-full border border-ink/[0.07] bg-white px-3 py-1.5 text-[10px] font-medium text-ink/45">
+                  {inspections.length} inspection records
                 </span>
               </div>
 
-              <h1 className="mt-3 font-display text-2xl font-semibold tracking-tight text-ink">
-                Inspections
+              <h1 className="mt-5 font-display text-3xl font-semibold tracking-[-0.035em] text-ink sm:text-[34px]">
+                Site inspections
               </h1>
 
-              <p className="mt-1 max-w-2xl text-sm leading-6 text-ink/45">
-                Schedule, conduct and verify site inspections across projects,
-                milestones, material deliveries, quality and safety checks.
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-ink/50">
+                Coordinate field inspections, verify evidence, track findings
+                and maintain an auditable record of project quality, safety
+                and milestone decisions.
               </p>
 
-              <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-xs text-ink/45">
-                <span className="inline-flex items-center gap-1.5">
-                  <CalendarDays className="h-3.5 w-3.5" />
-                  {scheduledCount} scheduled
-                </span>
+              <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2.5">
+                <HeroMeta
+                  icon={CalendarDays}
+                  label={`${scheduledCount} scheduled`}
+                />
 
-                <span className="inline-flex items-center gap-1.5">
-                  <FileCheck2 className="h-3.5 w-3.5" />
-                  {pendingCount} pending review
-                </span>
+                <HeroMeta
+                  icon={FileCheck2}
+                  label={`${pendingCount} pending review`}
+                />
 
-                <span className="inline-flex items-center gap-1.5">
-                  <CheckCircle2 className="h-3.5 w-3.5" />
-                  {completedCount} completed
-                </span>
+                <HeroMeta
+                  icon={CheckCircle2}
+                  label={`${completedCount} verified`}
+                />
 
-                <span className="inline-flex items-center gap-1.5">
-                  <AlertTriangle className="h-3.5 w-3.5" />
-                  {actionCount} requiring action
-                </span>
+                <HeroMeta
+                  icon={AlertTriangle}
+                  label={`${actionCount} require action`}
+                  emphasis={actionCount > 0}
+                />
               </div>
             </div>
 
             <button
               type="button"
-              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-ink px-4 py-2.5 text-xs font-semibold text-white transition-opacity hover:opacity-90"
+              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-[13px] bg-ink px-4.5 py-3 text-xs font-semibold text-white shadow-[0_12px_28px_rgba(20,40,30,0.16)] transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_34px_rgba(20,40,30,0.2)]"
             >
               <Plus className="h-4 w-4" />
-              Schedule Inspection
+              Schedule inspection
             </button>
           </div>
         </div>
 
-        {/* Summary metrics */}
-        <div className="grid divide-y divide-line sm:grid-cols-2 sm:divide-x sm:divide-y-0 xl:grid-cols-4">
+        {/* Metrics */}
+        <div className="grid divide-y divide-ink/[0.06] sm:grid-cols-2 sm:divide-x sm:divide-y-0 xl:grid-cols-4">
           <InspectionMetric
             icon={CalendarDays}
             label="Scheduled"
             value={String(scheduledCount)}
-            description="Upcoming inspections"
+            description="Upcoming field inspections"
+            tone="green"
           />
 
           <InspectionMetric
@@ -247,68 +262,82 @@ export function Inspections() {
             label="Pending review"
             value={String(pendingCount)}
             description="Reports awaiting verification"
+            tone="bronze"
           />
 
           <InspectionMetric
             icon={CheckCircle2}
             label="Completed"
             value={String(completedCount)}
-            description="Verified inspections"
+            description="Verified inspection records"
+            tone="green"
           />
 
           <InspectionMetric
             icon={AlertTriangle}
             label="Action required"
             value={String(actionCount)}
-            description="Open inspection findings"
+            description={`${totalFindings} open finding${totalFindings === 1 ? '' : 's'}`}
+            tone={actionCount > 0 ? 'rose' : 'neutral'}
           />
         </div>
       </Card>
 
-      {/* Control notice */}
-      <div className="flex items-start gap-3 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3.5">
-        <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-blue-600" />
+      {/* Governance notice */}
+      <div className="relative overflow-hidden rounded-[18px] border border-[#12613E]/[0.10] bg-[#12613E]/[0.045] px-5 py-4 sm:px-6">
+        <div className="pointer-events-none absolute right-0 top-0 h-24 w-24 rounded-full bg-[#12613E]/[0.06] blur-2xl" />
 
-        <div>
-          <p className="text-xs font-semibold text-blue-900">
-            Inspection-controlled monitoring
-          </p>
+        <div className="relative flex items-start gap-3.5">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[11px] bg-white text-[#12613E] shadow-sm">
+            <ShieldCheck className="h-4 w-4" />
+          </div>
 
-          <p className="mt-1 text-xs leading-5 text-blue-800/75">
-            Inspection findings can affect milestone verification, material
-            acceptance, risk status and payment recommendations. Inspection
-            records and decisions are retained in the project audit trail.
-          </p>
+          <div>
+            <p className="text-xs font-semibold text-[#12613E]">
+              Inspection-controlled monitoring
+            </p>
+
+            <p className="mt-1 max-w-4xl text-xs leading-5 text-ink/50">
+              Inspection findings can influence milestone verification,
+              material acceptance, project risk and payment recommendations.
+              Inspection records and decisions remain part of the project
+              audit trail.
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* Filters */}
+      {/* Queue controls */}
       <Card>
-        <CardBody>
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <CardBody className="p-5 sm:p-6">
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <p className="text-sm font-semibold text-ink">
-                Inspection queue
-              </p>
+              <div className="flex items-center gap-2">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#12613E]" />
 
-              <p className="mt-1 text-xs text-ink/40">
-                Review scheduled, active and completed inspections.
+                <p className="text-sm font-semibold tracking-[-0.01em] text-ink">
+                  Inspection queue
+                </p>
+              </div>
+
+              <p className="mt-1.5 text-xs text-ink/40">
+                Review scheduled, active and completed field records.
               </p>
             </div>
 
             <div className="flex flex-wrap gap-2">
               <FilterButton label="All" active />
               <FilterButton label="Scheduled" />
-              <FilterButton label="Pending Review" />
+              <FilterButton label="Pending review" />
               <FilterButton label="Completed" />
-              <FilterButton label="Action Required" />
+              <FilterButton label="Action required" />
             </div>
           </div>
         </CardBody>
       </Card>
 
-      {/* Inspection list */}
-      <div className="space-y-3">
+      {/* Queue */}
+      <div className="space-y-4">
         {inspections.map((inspection) => (
           <InspectionRow
             key={inspection.id}
@@ -317,56 +346,59 @@ export function Inspections() {
         ))}
       </div>
 
-      {/* Inspection workflow */}
-      <Card>
+      {/* Operational overview */}
+      <Card className="overflow-hidden">
         <CardHeader
           title="Inspection workflow"
-          subtitle="Standard monitoring and verification sequence"
+          subtitle="The standard sequence from field scheduling to verified project record."
         />
 
-        <CardBody>
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+        <CardBody className="pt-2">
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
             <WorkflowStep
               number="01"
               title="Schedule"
               description="Create an inspection against a project, milestone or delivery."
+              tone="green"
             />
 
             <WorkflowStep
               number="02"
               title="Inspect"
-              description="Inspector reviews site conditions, workmanship or materials."
+              description="Review site conditions, workmanship, materials or safety controls."
             />
 
             <WorkflowStep
               number="03"
               title="Evidence"
-              description="Photos, videos, documents and inspection notes are attached."
+              description="Attach photographs, videos, documents and inspection notes."
             />
 
             <WorkflowStep
               number="04"
               title="Findings"
-              description="Issues are recorded and corrective actions assigned where required."
+              description="Record issues and assign corrective actions where required."
+              tone="bronze"
             />
 
             <WorkflowStep
               number="05"
               title="Verify"
-              description="Report is reviewed and linked to the relevant project record."
+              description="Review the report and connect the decision to the project record."
+              tone="green"
             />
           </div>
         </CardBody>
       </Card>
 
-      {/* Inspection principles */}
+      {/* Controls */}
       <Card>
         <CardHeader
           title="Inspection controls"
-          subtitle="Governance rules supporting reliable project monitoring"
+          subtitle="Governance principles supporting reliable project monitoring."
         />
 
-        <CardBody>
+        <CardBody className="pt-2">
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
             <ControlCard
               icon={UserCheck}
@@ -384,38 +416,46 @@ export function Inspections() {
               icon={AlertTriangle}
               title="Risk escalation"
               description="Critical findings can trigger corrective action or payment controls."
+              tone="bronze"
             />
 
             <ControlCard
               icon={ShieldCheck}
               title="Audit trail"
-              description="Inspection decisions and status changes are permanently recorded."
+              description="Inspection decisions and status changes remain permanently recorded."
+              tone="green"
             />
           </div>
         </CardBody>
       </Card>
 
-      {/* Footer action */}
-      <Card>
-        <CardBody>
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+      {/* Footer */}
+      <Card className="overflow-hidden">
+        <CardBody className="p-5 sm:p-6">
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
             <div>
               <p className="text-sm font-semibold text-ink">
                 Need to schedule another inspection?
               </p>
 
-              <p className="mt-1 text-xs leading-5 text-ink/45">
+              <p className="mt-1.5 max-w-2xl text-xs leading-5 text-ink/45">
                 Create a project-linked inspection and assign the appropriate
                 Project Manager or professional expert.
               </p>
+
+              <div className="mt-3 flex flex-wrap gap-4 text-[10px] font-medium text-ink/35">
+                <span>{totalEvidence} evidence items recorded</span>
+                <span>{inspections.length} inspection records</span>
+                <span>Audit trail enabled</span>
+              </div>
             </div>
 
             <button
               type="button"
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-line bg-white px-4 py-2.5 text-xs font-semibold text-ink/60 transition-colors hover:bg-paper-2"
+              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-[12px] border border-ink/[0.08] bg-white px-4 py-2.5 text-xs font-semibold text-ink/60 shadow-sm transition-all hover:-translate-y-0.5 hover:border-ink/[0.12] hover:bg-[#F8FAF8] hover:text-ink"
             >
               <Plus className="h-4 w-4" />
-              Create Inspection
+              Create inspection
             </button>
           </div>
         </CardBody>
@@ -429,14 +469,23 @@ function InspectionRow({
 }: {
   inspection: Inspection
 }) {
+  const isCritical = inspection.priority === 'Critical'
+  const hasFindings = inspection.findings > 0
+
   return (
-    <Card className="overflow-hidden">
+    <Card
+      className={`group overflow-hidden transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_18px_45px_rgba(20,40,30,0.08)] ${
+        isCritical
+          ? 'border-rose-500/[0.14]'
+          : 'border-ink/[0.06]'
+      }`}
+    >
       <div className="p-5 sm:p-6">
-        <div className="flex flex-col gap-5 xl:flex-row xl:items-center">
+        <div className="flex flex-col gap-6 xl:flex-row xl:items-center">
           {/* Main */}
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="font-mono text-[10px] font-semibold uppercase tracking-wide text-ink/35">
+              <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-ink/30">
                 {inspection.id}
               </span>
 
@@ -444,13 +493,13 @@ function InspectionRow({
 
               <PriorityBadge priority={inspection.priority} />
 
-              <span className="rounded-full bg-ink/5 px-2.5 py-1 text-[10px] font-semibold text-ink/45">
+              <span className="rounded-full bg-ink/[0.045] px-2.5 py-1 text-[10px] font-semibold text-ink/45">
                 {inspection.type}
               </span>
             </div>
 
-            <div className="mt-3">
-              <h2 className="text-sm font-semibold text-ink">
+            <div className="mt-4">
+              <h2 className="font-display text-[16px] font-semibold tracking-[-0.015em] text-ink">
                 {inspection.title}
               </h2>
 
@@ -459,19 +508,19 @@ function InspectionRow({
               </p>
             </div>
 
-            <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-xs text-ink/45">
+            <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2.5 text-[11px] text-ink/45">
               <span className="inline-flex items-center gap-1.5">
-                <MapPin className="h-3.5 w-3.5" />
+                <MapPin className="h-3.5 w-3.5 text-ink/30" />
                 {inspection.location}
               </span>
 
               <span className="inline-flex items-center gap-1.5">
-                <CalendarDays className="h-3.5 w-3.5" />
+                <CalendarDays className="h-3.5 w-3.5 text-ink/30" />
                 {inspection.scheduledDate}
               </span>
 
               <span className="inline-flex items-center gap-1.5">
-                <Clock3 className="h-3.5 w-3.5" />
+                <Clock3 className="h-3.5 w-3.5 text-ink/30" />
                 {inspection.scheduledTime}
               </span>
             </div>
@@ -481,8 +530,8 @@ function InspectionRow({
             </p>
           </div>
 
-          {/* Details */}
-          <div className="grid gap-3 sm:grid-cols-2 xl:w-[360px]">
+          {/* Detail grid */}
+          <div className="grid gap-2.5 sm:grid-cols-2 xl:w-[370px]">
             <CompactInfo
               label="Inspector"
               value={inspection.inspector}
@@ -495,7 +544,10 @@ function InspectionRow({
 
             <CompactInfo
               label="Evidence"
-              value={`${inspection.evidenceCount} items`}
+              value={`${inspection.evidenceCount} ${
+                inspection.evidenceCount === 1 ? 'item' : 'items'
+              }`}
+              tone={inspection.evidenceCount > 0 ? 'green' : 'neutral'}
             />
 
             <CompactInfo
@@ -503,50 +555,68 @@ function InspectionRow({
               value={`${inspection.findings} ${
                 inspection.findings === 1 ? 'finding' : 'findings'
               }`}
+              tone={hasFindings ? 'bronze' : 'green'}
             />
           </div>
 
-          {/* Action */}
+          {/* Open */}
           <button
             type="button"
-            className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-line text-ink/40 transition-colors hover:bg-paper-2 hover:text-ink"
+            className="inline-flex h-10 w-full shrink-0 items-center justify-center gap-2 rounded-[12px] border border-ink/[0.07] bg-white px-3 text-xs font-semibold text-ink/50 transition-all hover:border-[#12613E]/20 hover:bg-[#12613E]/[0.035] hover:text-[#12613E] sm:w-auto xl:h-11 xl:w-11 xl:px-0"
             aria-label={`Open ${inspection.title}`}
           >
+            <span className="xl:hidden">Open inspection</span>
+
             <ChevronRight className="h-4 w-4" />
           </button>
         </div>
       </div>
 
-      {/* Bottom metadata */}
-      <div className="flex flex-col gap-3 border-t border-line bg-paper-2 px-5 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+      {/* Metadata */}
+      <div className="flex flex-col gap-3 border-t border-ink/[0.06] bg-[#FAFBFA] px-5 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
           {inspection.milestone && (
-            <span className="text-[10px] text-ink/40">
-              Milestone:{' '}
-              <span className="font-semibold text-ink/55">
-                {inspection.milestone}
-              </span>
-            </span>
+            <MetadataItem
+              label="Milestone"
+              value={inspection.milestone}
+            />
           )}
 
           {inspection.professional && (
-            <span className="text-[10px] text-ink/40">
-              Professional:{' '}
-              <span className="font-semibold text-ink/55">
-                {inspection.professional}
-              </span>
-            </span>
+            <MetadataItem
+              label="Professional"
+              value={inspection.professional}
+            />
           )}
         </div>
 
-        <span className="text-[10px] text-ink/40">
-          Report:{' '}
-          <span className="font-semibold text-ink/55">
-            {inspection.reportStatus}
-          </span>
-        </span>
+        <MetadataItem
+          label="Report"
+          value={inspection.reportStatus}
+        />
       </div>
     </Card>
+  )
+}
+
+function HeroMeta({
+  icon: Icon,
+  label,
+  emphasis = false,
+}: {
+  icon: ComponentType<{ className?: string }>
+  label: string
+  emphasis?: boolean
+}) {
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 text-[11px] font-medium ${
+        emphasis ? 'text-rose-600' : 'text-ink/40'
+      }`}
+    >
+      <Icon className="h-3.5 w-3.5" />
+      {label}
+    </span>
   )
 }
 
@@ -556,12 +626,12 @@ function InspectionStatusBadge({
   status: InspectionStatus
 }) {
   const styles: Record<InspectionStatus, string> = {
-    Scheduled: 'bg-blue-500/10 text-blue-700',
-    'In Progress': 'bg-amber-500/10 text-amber-700',
-    'Pending Review': 'bg-amber-500/10 text-amber-700',
-    Completed: 'bg-emerald-500/10 text-emerald-700',
-    'Requires Action': 'bg-rose-500/10 text-rose-700',
-    Cancelled: 'bg-ink/5 text-ink/45',
+    Scheduled: 'bg-[#12613E]/[0.08] text-[#12613E]',
+    'In Progress': 'bg-amber-500/[0.10] text-amber-700',
+    'Pending Review': 'bg-[#B85C12]/[0.10] text-[#A44F0B]',
+    Completed: 'bg-emerald-500/[0.09] text-emerald-700',
+    'Requires Action': 'bg-rose-500/[0.09] text-rose-700',
+    Cancelled: 'bg-ink/[0.045] text-ink/40',
   }
 
   return (
@@ -579,9 +649,9 @@ function PriorityBadge({
   priority: Inspection['priority']
 }) {
   const styles = {
-    Normal: 'bg-ink/5 text-ink/40',
-    High: 'bg-amber-500/10 text-amber-700',
-    Critical: 'bg-rose-500/10 text-rose-700',
+    Normal: 'bg-ink/[0.045] text-ink/40',
+    High: 'bg-[#B85C12]/[0.10] text-[#A44F0B]',
+    Critical: 'bg-rose-500/[0.09] text-rose-700',
   }
 
   return (
@@ -598,25 +668,50 @@ function InspectionMetric({
   label,
   value,
   description,
+  tone,
 }: {
-  icon: React.ComponentType<{ className?: string }>
+  icon: ComponentType<{ className?: string }>
   label: string
   value: string
   description: string
+  tone: 'green' | 'bronze' | 'rose' | 'neutral'
 }) {
+  const toneStyles = {
+    green: {
+      icon: 'bg-[#12613E]/[0.08] text-[#12613E]',
+      value: 'text-[#12613E]',
+    },
+    bronze: {
+      icon: 'bg-[#B85C12]/[0.09] text-[#A44F0B]',
+      value: 'text-[#A44F0B]',
+    },
+    rose: {
+      icon: 'bg-rose-500/[0.08] text-rose-600',
+      value: 'text-rose-700',
+    },
+    neutral: {
+      icon: 'bg-ink/[0.05] text-ink/50',
+      value: 'text-ink',
+    },
+  }
+
   return (
     <div className="px-6 py-5 sm:px-7">
       <div className="flex items-center gap-3">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-ink/5">
-          <Icon className="h-4 w-4 text-ink/55" />
+        <div
+          className={`flex h-9 w-9 items-center justify-center rounded-[11px] ${toneStyles[tone].icon}`}
+        >
+          <Icon className="h-4 w-4" />
         </div>
 
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-wide text-ink/35">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.10em] text-ink/30">
             {label}
           </p>
 
-          <p className="mt-0.5 font-display text-xl font-semibold text-ink">
+          <p
+            className={`mt-0.5 font-display text-xl font-semibold ${toneStyles[tone].value}`}
+          >
             {value}
           </p>
         </div>
@@ -639,10 +734,10 @@ function FilterButton({
   return (
     <button
       type="button"
-      className={`rounded-xl px-3 py-2 text-[10px] font-semibold transition-colors ${
+      className={`rounded-[11px] px-3.5 py-2 text-[10px] font-semibold transition-all ${
         active
-          ? 'bg-ink text-white'
-          : 'border border-line bg-white text-ink/45 hover:bg-paper-2'
+          ? 'bg-ink text-white shadow-[0_7px_18px_rgba(20,40,30,0.12)]'
+          : 'border border-ink/[0.07] bg-white text-ink/45 hover:border-ink/[0.12] hover:bg-[#FAFBFA] hover:text-ink/70'
       }`}
     >
       {label}
@@ -653,20 +748,47 @@ function FilterButton({
 function CompactInfo({
   label,
   value,
+  tone = 'neutral',
+}: {
+  label: string
+  value: string
+  tone?: 'green' | 'bronze' | 'neutral'
+}) {
+  const accents = {
+    green: 'border-[#12613E]/[0.10] bg-[#12613E]/[0.025]',
+    bronze: 'border-[#B85C12]/[0.10] bg-[#B85C12]/[0.025]',
+    neutral: 'border-ink/[0.06] bg-white',
+  }
+
+  return (
+    <div
+      className={`min-w-0 rounded-[13px] border p-3.5 ${accents[tone]}`}
+    >
+      <p className="text-[9px] font-semibold uppercase tracking-[0.10em] text-ink/30">
+        {label}
+      </p>
+
+      <p className="mt-1 truncate text-[11px] font-semibold text-ink">
+        {value}
+      </p>
+    </div>
+  )
+}
+
+function MetadataItem({
+  label,
+  value,
 }: {
   label: string
   value: string
 }) {
   return (
-    <div className="rounded-xl border border-line bg-white p-3">
-      <p className="text-[9px] font-semibold uppercase tracking-wide text-ink/30">
-        {label}
-      </p>
-
-      <p className="mt-1 truncate text-xs font-semibold text-ink">
+    <span className="text-[10px] text-ink/35">
+      {label}:{' '}
+      <span className="font-semibold text-ink/55">
         {value}
-      </p>
-    </div>
+      </span>
+    </span>
   )
 }
 
@@ -674,15 +796,25 @@ function WorkflowStep({
   number,
   title,
   description,
+  tone = 'neutral',
 }: {
   number: string
   title: string
   description: string
+  tone?: 'green' | 'bronze' | 'neutral'
 }) {
+  const numberStyles = {
+    green: 'bg-[#12613E]/[0.08] text-[#12613E]',
+    bronze: 'bg-[#B85C12]/[0.09] text-[#A44F0B]',
+    neutral: 'bg-ink/[0.045] text-ink/45',
+  }
+
   return (
-    <div className="rounded-xl border border-line bg-white p-4">
+    <div className="group rounded-[16px] border border-ink/[0.06] bg-white p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-ink/[0.10] hover:shadow-[0_14px_30px_rgba(20,40,30,0.06)]">
       <div className="flex items-center gap-2.5">
-        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-ink/5 font-mono text-[9px] font-semibold text-ink/45">
+        <span
+          className={`flex h-7 w-7 items-center justify-center rounded-full font-mono text-[9px] font-semibold ${numberStyles[tone]}`}
+        >
           {number}
         </span>
 
@@ -702,18 +834,28 @@ function ControlCard({
   icon: Icon,
   title,
   description,
+  tone = 'neutral',
 }: {
-  icon: React.ComponentType<{ className?: string }>
+  icon: ComponentType<{ className?: string }>
   title: string
   description: string
+  tone?: 'green' | 'bronze' | 'neutral'
 }) {
+  const iconStyles = {
+    green: 'bg-[#12613E]/[0.08] text-[#12613E]',
+    bronze: 'bg-[#B85C12]/[0.09] text-[#A44F0B]',
+    neutral: 'bg-ink/[0.045] text-ink/50',
+  }
+
   return (
-    <div className="rounded-xl border border-line bg-white p-4">
-      <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-ink/5">
-        <Icon className="h-4 w-4 text-ink/50" />
+    <div className="rounded-[16px] border border-ink/[0.06] bg-white p-4.5 transition-all duration-300 hover:-translate-y-0.5 hover:border-ink/[0.10] hover:shadow-[0_14px_30px_rgba(20,40,30,0.06)]">
+      <div
+        className={`flex h-9 w-9 items-center justify-center rounded-[11px] ${iconStyles[tone]}`}
+      >
+        <Icon className="h-4 w-4" />
       </div>
 
-      <p className="mt-3 text-xs font-semibold text-ink">
+      <p className="mt-3.5 text-xs font-semibold text-ink">
         {title}
       </p>
 

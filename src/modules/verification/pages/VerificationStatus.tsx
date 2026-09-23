@@ -42,20 +42,23 @@ const statusHistory = [
   },
   {
     status: 'Submitted',
-    description: 'Required verification information was submitted for review.',
+    description:
+      'Required verification information was submitted for review.',
     date: '28 Aug 2026 · 10:42',
     completed: true,
   },
   {
     status: 'Under Review',
-    description: 'Build OS verification team is reviewing submitted information.',
+    description:
+      'Build OS verification team is reviewing submitted information.',
     date: '28 Aug 2026 · 11:05',
     completed: true,
     current: true,
   },
   {
     status: 'Verified',
-    description: 'Verification is approved and full platform access is enabled.',
+    description:
+      'Verification is approved and full platform access is enabled.',
     date: 'Pending',
     completed: false,
   },
@@ -109,67 +112,76 @@ const accessControls = [
 
 export function VerificationStatus() {
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <Card className="overflow-hidden">
-        <div className="border-b border-line bg-paper-2 px-6 py-6 sm:px-8">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+    <div className="space-y-7">
+      {/* ------------------------------------------------------------------ */}
+      {/* Header                                                              */}
+      {/* ------------------------------------------------------------------ */}
+
+      <Card className="relative overflow-hidden border-ink/[0.07] shadow-[0_18px_50px_rgba(20,40,30,0.055)]">
+        <div className="pointer-events-none absolute -right-24 -top-28 h-72 w-72 rounded-full bg-[#12613E]/[0.055] blur-3xl" />
+
+        <div className="relative border-b border-ink/[0.06] px-6 py-7 sm:px-8">
+          <div className="flex flex-col gap-7 lg:flex-row lg:items-end lg:justify-between">
             <div className="flex items-start gap-4">
-              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-ink text-white shadow-sm">
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[18px] bg-ink text-white shadow-[0_10px_24px_rgba(20,40,30,0.12)]">
                 <ShieldCheck className="h-6 w-6" />
               </div>
 
-              <div>
+              <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
-                  <h1 className="font-display text-2xl font-semibold tracking-tight text-ink">
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-ink/35">
+                    Compliance record
+                  </span>
+
+                  <span className="h-1 w-1 rounded-full bg-[#B85C12]" />
+                </div>
+
+                <div className="mt-2 flex flex-wrap items-center gap-2.5">
+                  <h1 className="font-display text-[30px] font-semibold tracking-[-0.035em] text-ink">
                     Verification status
                   </h1>
 
                   <StatusBadge status={verification.status} />
                 </div>
 
-                <p className="mt-1 max-w-2xl text-sm leading-6 text-ink/50">
-                  Track the progress of your Build OS verification and see
-                  which platform activities are currently available.
+                <p className="mt-2 max-w-2xl text-[13px] leading-6 text-ink/45">
+                  Track the progress of your Build OS verification and
+                  understand which platform activities are currently
+                  available.
                 </p>
 
-                <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-xs text-ink/40">
-                  <span>
-                    Verification ID:{' '}
-                    <span className="font-medium text-ink/60">
-                      {verification.id}
-                    </span>
-                  </span>
+                <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2">
+                  <HeaderMeta
+                    label="Verification ID"
+                    value={verification.id}
+                  />
 
-                  <span>
-                    Profile:{' '}
-                    <span className="font-medium text-ink/60">
-                      {verification.profileType}
-                    </span>
-                  </span>
+                  <HeaderMeta
+                    label="Profile"
+                    value={verification.profileType}
+                  />
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                className="inline-flex items-center gap-2 rounded-xl border border-line bg-white px-4 py-2.5 text-xs font-semibold text-ink transition-colors hover:bg-ink/[0.03]"
-              >
-                <FileText className="h-3.5 w-3.5" />
-                View documents
-              </button>
-            </div>
+            <button
+              type="button"
+              className="inline-flex w-fit items-center gap-2 rounded-full border border-ink/[0.08] bg-white px-4 py-2.5 text-[10px] font-semibold text-ink/60 shadow-[0_4px_14px_rgba(20,40,30,0.03)] transition-all hover:border-ink/15 hover:bg-paper-2 hover:text-ink"
+            >
+              <FileText className="h-3.5 w-3.5" />
+              View documents
+            </button>
           </div>
         </div>
 
         {/* Summary metrics */}
-        <div className="grid divide-y divide-line sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+        <div className="grid divide-y divide-ink/[0.06] sm:grid-cols-3 sm:divide-x sm:divide-y-0">
           <SummaryMetric
             icon={Clock3}
             label="Current status"
             value={verification.status}
             description="Awaiting verification decision"
+            tone="bronze"
           />
 
           <SummaryMetric
@@ -177,6 +189,7 @@ export function VerificationStatus() {
             label="Completion"
             value={`${verification.completion}%`}
             description="Verification information submitted"
+            tone="green"
           />
 
           <SummaryMetric
@@ -184,24 +197,29 @@ export function VerificationStatus() {
             label="Review time"
             value={verification.estimatedReview}
             description="Estimated processing period"
+            tone="neutral"
           />
         </div>
       </Card>
 
-      <div className="grid gap-6 xl:grid-cols-3">
-        {/* Main content */}
-        <div className="space-y-6 xl:col-span-2">
-          {/* Status timeline */}
-          <Card>
+      <div className="grid gap-7 xl:grid-cols-3">
+        {/* ---------------------------------------------------------------- */}
+        {/* Main content                                                       */}
+        {/* ---------------------------------------------------------------- */}
+
+        <div className="space-y-7 xl:col-span-2">
+          {/* Verification timeline */}
+          <Card className="border-ink/[0.07] shadow-[0_14px_40px_rgba(20,40,30,0.035)]">
             <CardHeader
               title="Verification timeline"
               subtitle="History of your verification status"
             />
 
             <CardBody>
-              <div className="space-y-1">
+              <div className="space-y-0">
                 {statusHistory.map((item, index) => {
                   const isLast = index === statusHistory.length - 1
+                  const isCurrent = item.current
 
                   return (
                     <div
@@ -210,20 +228,20 @@ export function VerificationStatus() {
                     >
                       <div className="flex flex-col items-center">
                         <div
-                          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${
-                            item.completed
-                              ? item.current
-                                ? 'bg-amber-500/10'
-                                : 'bg-emerald-500/10'
-                              : 'bg-ink/5'
+                          className={`relative flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] border ${
+                            isCurrent
+                              ? 'border-[#B85C12]/10 bg-[#F8EEE6] text-[#B85C12]'
+                              : item.completed
+                                ? 'border-[#12613E]/10 bg-[#EAF4EE] text-[#12613E]'
+                                : 'border-ink/[0.06] bg-paper-2 text-ink/30'
                           }`}
                         >
-                          {item.current ? (
-                            <Clock3 className="h-4 w-4 text-amber-600" />
+                          {isCurrent ? (
+                            <Clock3 className="h-4 w-4" />
                           ) : item.completed ? (
-                            <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                            <CheckCircle2 className="h-4 w-4" />
                           ) : (
-                            <span className="text-xs font-semibold text-ink/30">
+                            <span className="text-[10px] font-semibold">
                               {index + 1}
                             </span>
                           )}
@@ -231,33 +249,50 @@ export function VerificationStatus() {
 
                         {!isLast && (
                           <div
-                            className={`my-1 h-10 w-px ${
+                            className={`my-1.5 h-11 w-px ${
                               item.completed
-                                ? 'bg-emerald-500/20'
-                                : 'bg-line'
+                                ? 'bg-[#12613E]/20'
+                                : 'bg-ink/[0.07]'
                             }`}
                           />
                         )}
                       </div>
 
-                      <div className="min-w-0 pb-8">
+                      <div
+                        className={`min-w-0 ${
+                          isLast ? 'pb-0' : 'pb-8'
+                        }`}
+                      >
                         <div className="flex flex-wrap items-center gap-2">
-                          <h3 className="text-sm font-semibold text-ink">
+                          <h3 className="text-[13px] font-semibold tracking-[-0.01em] text-ink">
                             {item.status}
                           </h3>
 
-                          {item.current && (
-                            <span className="rounded-full bg-amber-500/10 px-2 py-1 text-[10px] font-semibold text-amber-700">
+                          {isCurrent && (
+                            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F8EEE6] px-2.5 py-1 text-[8px] font-semibold uppercase tracking-[0.1em] text-[#B85C12]">
+                              <span className="h-1 w-1 rounded-full bg-[#B85C12]" />
                               Current
+                            </span>
+                          )}
+
+                          {!isCurrent && item.completed && (
+                            <span className="rounded-full bg-[#EAF4EE] px-2.5 py-1 text-[8px] font-semibold uppercase tracking-[0.1em] text-[#12613E]">
+                              Complete
                             </span>
                           )}
                         </div>
 
-                        <p className="mt-1 text-xs leading-5 text-ink/45">
+                        <p className="mt-1 text-[11px] leading-5 text-ink/40">
                           {item.description}
                         </p>
 
-                        <p className="mt-2 text-[10px] font-medium text-ink/30">
+                        <p
+                          className={`mt-2 text-[9px] font-medium ${
+                            item.date === 'Pending'
+                              ? 'text-ink/25'
+                              : 'text-ink/30'
+                          }`}
+                        >
                           {item.date}
                         </p>
                       </div>
@@ -268,44 +303,66 @@ export function VerificationStatus() {
             </CardBody>
           </Card>
 
-          {/* Document summary */}
-          <Card className="overflow-hidden">
+          {/* Document review */}
+          <Card className="overflow-hidden border-ink/[0.07] shadow-[0_14px_40px_rgba(20,40,30,0.035)]">
             <CardHeader
               title="Document review"
               subtitle="Current status of submitted verification documents"
             />
 
-            <div className="divide-y divide-line">
-              {documents.map((document) => (
-                <div
-                  key={document.name}
-                  className="flex items-center justify-between gap-4 px-6 py-4 transition-colors hover:bg-ink/[0.02]"
-                >
-                  <div className="flex min-w-0 items-center gap-3">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-ink/5">
-                      <FileText className="h-4 w-4 text-ink/50" />
+            <div className="divide-y divide-ink/[0.055]">
+              {documents.map((document) => {
+                const approved = document.status === 'Approved'
+
+                return (
+                  <div
+                    key={document.name}
+                    className="group flex flex-col gap-3 px-6 py-5 transition-colors hover:bg-[#12613E]/[0.012] sm:flex-row sm:items-center sm:justify-between"
+                  >
+                    <div className="flex min-w-0 items-center gap-3.5">
+                      <div
+                        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[13px] border ${
+                          approved
+                            ? 'border-[#12613E]/10 bg-[#EAF4EE] text-[#12613E]'
+                            : 'border-[#B85C12]/10 bg-[#F8EEE6] text-[#B85C12]'
+                        }`}
+                      >
+                        <FileText className="h-4 w-4" />
+                      </div>
+
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className="text-[12px] font-semibold text-ink">
+                            {document.name}
+                          </p>
+
+                          <DocumentStatus
+                            status={document.status}
+                          />
+                        </div>
+
+                        <p className="mt-1 text-[10px] leading-5 text-ink/40">
+                          {document.description}
+                        </p>
+                      </div>
                     </div>
 
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium text-ink">
-                        {document.name}
-                      </p>
-
-                      <p className="mt-0.5 text-xs text-ink/40">
-                        {document.description}
-                      </p>
-                    </div>
+                    <button
+                      type="button"
+                      className="inline-flex w-fit shrink-0 items-center gap-1.5 rounded-full border border-ink/[0.07] bg-white px-3 py-2 text-[9px] font-semibold text-ink/50 transition-all hover:border-ink/15 hover:bg-paper-2 hover:text-ink sm:self-center"
+                    >
+                      View
+                      <ChevronRight className="h-3 w-3 text-ink/25" />
+                    </button>
                   </div>
-
-                  <DocumentStatus status={document.status} />
-                </div>
-              ))}
+                )
+              })}
             </div>
 
-            <div className="border-t border-line px-6 py-4">
+            <div className="border-t border-ink/[0.06] bg-paper-2/50 px-6 py-4">
               <button
                 type="button"
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-ink/60 transition-colors hover:text-ink"
+                className="inline-flex items-center gap-1.5 text-[10px] font-semibold text-ink/55 transition-colors hover:text-ink"
               >
                 Manage verification documents
                 <ChevronRight className="h-3.5 w-3.5" />
@@ -314,26 +371,35 @@ export function VerificationStatus() {
           </Card>
 
           {/* Review notice */}
-          <Card>
+          <Card className="border-[#B85C12]/10 bg-[#F8EEE6]/35 shadow-[0_14px_40px_rgba(20,40,30,0.025)]">
             <CardBody>
-              <div className="flex gap-4">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/10">
-                  <Info className="h-4 w-4 text-amber-600" />
+              <div className="flex gap-3.5">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[13px] bg-[#F8EEE6] text-[#B85C12]">
+                  <Info className="h-4 w-4" />
                 </div>
 
                 <div>
-                  <p className="text-sm font-semibold text-ink">
-                    Verification is currently under review
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="text-[12px] font-semibold text-ink">
+                      Verification is currently under review
+                    </p>
+
+                    <span className="rounded-full bg-[#F8EEE6] px-2 py-1 text-[8px] font-semibold uppercase tracking-[0.1em] text-[#B85C12]">
+                      In review
+                    </span>
+                  </div>
+
+                  <p className="mt-1.5 max-w-2xl text-[11px] leading-5 text-ink/45">
+                    Your submitted information has been received
+                    successfully. Build OS may request additional
+                    documentation if any information requires clarification.
                   </p>
 
-                  <p className="mt-1 max-w-2xl text-xs leading-5 text-ink/45">
-                    Your submitted information has been received successfully.
-                    Build OS may request additional documentation if any
-                    information requires clarification.
-                  </p>
-
-                  <p className="mt-3 text-xs font-medium text-ink/60">
-                    Last updated: {verification.lastUpdated}
+                  <p className="mt-3 text-[9px] font-semibold uppercase tracking-[0.1em] text-ink/30">
+                    Last updated{' '}
+                    <span className="ml-1 normal-case tracking-normal text-ink/50">
+                      {verification.lastUpdated}
+                    </span>
                   </p>
                 </div>
               </div>
@@ -341,88 +407,89 @@ export function VerificationStatus() {
           </Card>
         </div>
 
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Identity */}
-          <Card>
+        {/* ---------------------------------------------------------------- */}
+        {/* Sidebar                                                           */}
+        {/* ---------------------------------------------------------------- */}
+
+        <div className="space-y-7">
+          {/* Verification profile */}
+          <Card className="border-ink/[0.07] shadow-[0_14px_40px_rgba(20,40,30,0.035)]">
             <CardHeader
               title="Verification profile"
               subtitle="Account currently under review"
             />
 
             <CardBody>
-              <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-ink/5">
-                  <UserRound className="h-5 w-5 text-ink/50" />
+              <div className="flex items-center gap-3.5">
+                <div className="flex h-12 w-12 items-center justify-center rounded-[15px] bg-ink text-white">
+                  <UserRound className="h-5 w-5" />
                 </div>
 
-                <div>
-                  <p className="text-sm font-semibold text-ink">
+                <div className="min-w-0">
+                  <p className="truncate text-[13px] font-semibold text-ink">
                     {verification.submittedBy}
                   </p>
 
-                  <p className="mt-0.5 text-xs text-ink/40">
+                  <p className="mt-0.5 text-[10px] leading-4 text-ink/40">
                     {verification.profileType}
                   </p>
                 </div>
               </div>
 
-              <div className="mt-5 border-t border-line pt-5">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-ink/40">
-                    Verification ID
-                  </span>
+              <div className="mt-5 rounded-[14px] bg-paper-2 p-3.5">
+                <p className="text-[8px] font-semibold uppercase tracking-[0.13em] text-ink/30">
+                  Verification ID
+                </p>
 
-                  <span className="font-semibold text-ink">
-                    {verification.id}
-                  </span>
-                </div>
+                <p className="mt-1 font-mono text-[11px] font-semibold text-ink/70">
+                  {verification.id}
+                </p>
               </div>
             </CardBody>
           </Card>
 
           {/* Access controls */}
-          <Card>
+          <Card className="border-ink/[0.07] shadow-[0_14px_40px_rgba(20,40,30,0.035)]">
             <CardHeader
               title="Platform access"
               subtitle="Access changes based on verification status"
             />
 
             <CardBody>
-              <div className="space-y-3">
+              <div className="space-y-2.5">
                 {accessControls.map((item) => {
                   const available = item.status === 'Available'
 
                   return (
                     <div
                       key={item.label}
-                      className="flex items-center justify-between gap-3 rounded-xl bg-paper-2 px-3 py-3"
+                      className="flex items-center justify-between gap-3 rounded-[14px] border border-ink/[0.045] bg-paper-2/70 px-3 py-3"
                     >
                       <div className="flex min-w-0 items-center gap-3">
                         <div
-                          className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${
+                          className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-[9px] ${
                             available
-                              ? 'bg-emerald-500/10'
-                              : 'bg-amber-500/10'
+                              ? 'bg-[#EAF4EE] text-[#12613E]'
+                              : 'bg-[#F8EEE6] text-[#B85C12]'
                           }`}
                         >
                           {available ? (
-                            <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
+                            <CheckCircle2 className="h-3.5 w-3.5" />
                           ) : (
-                            <LockKeyhole className="h-3.5 w-3.5 text-amber-600" />
+                            <LockKeyhole className="h-3.5 w-3.5" />
                           )}
                         </div>
 
-                        <span className="text-xs font-medium text-ink/60">
+                        <span className="text-[10px] font-medium leading-4 text-ink/60">
                           {item.label}
                         </span>
                       </div>
 
                       <span
-                        className={`shrink-0 text-[10px] font-semibold ${
+                        className={`shrink-0 text-[8px] font-semibold uppercase tracking-[0.08em] ${
                           available
-                            ? 'text-emerald-700'
-                            : 'text-amber-700'
+                            ? 'text-[#12613E]'
+                            : 'text-[#B85C12]'
                         }`}
                       >
                         {item.status}
@@ -434,15 +501,15 @@ export function VerificationStatus() {
             </CardBody>
           </Card>
 
-          {/* Lifecycle explanation */}
-          <Card>
+          {/* Lifecycle */}
+          <Card className="border-ink/[0.07] shadow-[0_14px_40px_rgba(20,40,30,0.035)]">
             <CardHeader
               title="Verification lifecycle"
               subtitle="Build OS verification states"
             />
 
             <CardBody>
-              <div className="space-y-4">
+              <div className="space-y-1">
                 <LifecycleItem
                   icon={FileText}
                   title="Draft"
@@ -481,57 +548,115 @@ export function VerificationStatus() {
   )
 }
 
+/* -------------------------------------------------------------------------- */
+/* Header metadata                                                            */
+/* -------------------------------------------------------------------------- */
+
+function HeaderMeta({
+  label,
+  value,
+}: {
+  label: string
+  value: string
+}) {
+  return (
+    <div className="flex flex-wrap items-center gap-1.5 text-[9px]">
+      <span className="font-semibold uppercase tracking-[0.1em] text-ink/30">
+        {label}
+      </span>
+
+      <span className="font-medium text-ink/60">
+        {value}
+      </span>
+    </div>
+  )
+}
+
+/* -------------------------------------------------------------------------- */
+/* Summary metric                                                             */
+/* -------------------------------------------------------------------------- */
+
 function SummaryMetric({
   icon: Icon,
   label,
   value,
   description,
+  tone,
 }: {
   icon: React.ComponentType<{ className?: string }>
   label: string
   value: string
   description: string
+  tone: 'neutral' | 'bronze' | 'green'
 }) {
+  const toneStyles = {
+    neutral: {
+      icon: 'bg-ink/[0.045] text-ink/50',
+      value: 'text-ink',
+    },
+    bronze: {
+      icon: 'bg-[#F8EEE6] text-[#B85C12]',
+      value: 'text-[#B85C12]',
+    },
+    green: {
+      icon: 'bg-[#EAF4EE] text-[#12613E]',
+      value: 'text-[#12613E]',
+    },
+  }
+
+  const styles = toneStyles[tone]
+
   return (
     <div className="px-6 py-5">
       <div className="flex items-center gap-3">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-ink/5">
-          <Icon className="h-4 w-4 text-ink/55" />
+        <div
+          className={`flex h-10 w-10 items-center justify-center rounded-[12px] ${styles.icon}`}
+        >
+          <Icon className="h-4 w-4" />
         </div>
 
-        <div>
-          <p className="text-[10px] font-semibold uppercase tracking-wide text-ink/35">
+        <div className="min-w-0">
+          <p className="text-[9px] font-semibold uppercase tracking-[0.13em] text-ink/30">
             {label}
           </p>
 
-          <p className="mt-0.5 font-display text-lg font-semibold text-ink">
+          <p
+            className={`mt-0.5 truncate font-display text-[17px] font-semibold tracking-[-0.02em] ${styles.value}`}
+          >
             {value}
           </p>
         </div>
       </div>
 
-      <p className="mt-3 text-xs text-ink/40">
+      <p className="mt-3 text-[10px] leading-4 text-ink/40">
         {description}
       </p>
     </div>
   )
 }
 
+/* -------------------------------------------------------------------------- */
+/* Status badge                                                               */
+/* -------------------------------------------------------------------------- */
+
 function StatusBadge({
   status,
 }: {
   status: VerificationStatusType
 }) {
-  const styles = {
-    Draft: 'bg-ink/5 text-ink/50',
-    Submitted: 'bg-amber-500/10 text-amber-700',
-    'Need More Information': 'bg-orange-500/10 text-orange-700',
-    Verified: 'bg-emerald-500/10 text-emerald-700',
-    Suspended: 'bg-rose-500/10 text-rose-700',
-    Rejected: 'bg-rose-500/10 text-rose-700',
+  const styles: Record<VerificationStatusType, string> = {
+    Draft: 'bg-ink/[0.045] text-ink/50',
+    Submitted: 'bg-[#F8EEE6] text-[#B85C12]',
+    'Need More Information': 'bg-[#F8EEE6] text-[#B85C12]',
+    Verified: 'bg-[#EAF4EE] text-[#12613E]',
+    Suspended: 'bg-brick-light/45 text-brick',
+    Rejected: 'bg-brick-light/45 text-brick',
   }
 
-  const icons = {
+  const icons: Record<
+    VerificationStatusType,
+    React.ComponentType<{ className?: string }>
+  > = {
     Draft: FileText,
     Submitted: Clock3,
     'Need More Information': Info,
@@ -544,7 +669,7 @@ function StatusBadge({
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold ${styles[status]}`}
+      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[9px] font-semibold ${styles[status]}`}
     >
       <Icon className="h-3.5 w-3.5" />
       {status}
@@ -552,31 +677,39 @@ function StatusBadge({
   )
 }
 
+/* -------------------------------------------------------------------------- */
+/* Document status                                                            */
+/* -------------------------------------------------------------------------- */
+
 function DocumentStatus({
   status,
 }: {
   status: string
 }) {
-  const isApproved = status === 'Approved'
+  const approved = status === 'Approved'
 
   return (
     <span
-      className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold ${
-        isApproved
-          ? 'bg-emerald-500/10 text-emerald-700'
-          : 'bg-amber-500/10 text-amber-700'
+      className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-[8px] font-semibold uppercase tracking-[0.08em] ${
+        approved
+          ? 'bg-[#EAF4EE] text-[#12613E]'
+          : 'bg-[#F8EEE6] text-[#B85C12]'
       }`}
     >
-      {isApproved ? (
-        <CheckCircle2 className="h-3.5 w-3.5" />
+      {approved ? (
+        <CheckCircle2 className="h-3 w-3" />
       ) : (
-        <Clock3 className="h-3.5 w-3.5" />
+        <Clock3 className="h-3 w-3" />
       )}
 
       {status}
     </span>
   )
 }
+
+/* -------------------------------------------------------------------------- */
+/* Lifecycle item                                                             */
+/* -------------------------------------------------------------------------- */
 
 function LifecycleItem({
   icon: Icon,
@@ -588,17 +721,17 @@ function LifecycleItem({
   description: string
 }) {
   return (
-    <div className="flex gap-3">
-      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-ink/5">
-        <Icon className="h-3.5 w-3.5 text-ink/50" />
+    <div className="group flex gap-3 rounded-[13px] px-2 py-2.5 transition-colors hover:bg-paper-2">
+      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] bg-paper-2 text-ink/45 group-hover:bg-white">
+        <Icon className="h-3.5 w-3.5" />
       </div>
 
-      <div>
-        <p className="text-xs font-semibold text-ink">
+      <div className="min-w-0">
+        <p className="text-[10px] font-semibold text-ink">
           {title}
         </p>
 
-        <p className="mt-0.5 text-[11px] leading-4 text-ink/40">
+        <p className="mt-0.5 text-[9px] leading-4 text-ink/40">
           {description}
         </p>
       </div>

@@ -1,20 +1,26 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
+import type { ComponentType, ReactNode } from 'react'
 import {
   ArrowLeft,
   CalendarDays,
+  Check,
   CheckCircle2,
   ClipboardCheck,
+  FileCheck2,
   FileText,
   Image,
   Info,
-  Plus,
+  PlayCircle,
   ShieldCheck,
-  Upload,
+  Sparkles,
   Wallet,
-  X,
 } from 'lucide-react'
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
+
+/* -------------------------------------------------------------------------- */
+/* Types                                                                      */
+/* -------------------------------------------------------------------------- */
 
 type MilestoneStatus = 'Draft' | 'Pending Approval'
 
@@ -42,6 +48,10 @@ interface MilestoneFormData {
   evidenceTypes: MilestoneEvidenceType[]
 }
 
+/* -------------------------------------------------------------------------- */
+/* Configuration                                                              */
+/* -------------------------------------------------------------------------- */
+
 const milestonePhases = [
   'Site Clearing',
   'Excavation',
@@ -65,24 +75,24 @@ const evidenceOptions: {
   value: MilestoneEvidenceType
   label: string
   description: string
-  icon: React.ComponentType<{ className?: string }>
+  icon: ComponentType<{ className?: string }>
 }[] = [
   {
     value: 'Photos',
-    label: 'Photos',
-    description: 'Site photos showing completed work.',
+    label: 'Site photos',
+    description: 'Visual evidence showing completed work.',
     icon: Image,
   },
   {
     value: 'Videos',
-    label: 'Videos',
-    description: 'Video evidence of completed work.',
-    icon: Image,
+    label: 'Site videos',
+    description: 'Video evidence demonstrating completion.',
+    icon: PlayCircle,
   },
   {
     value: 'Completion Notes',
     label: 'Completion notes',
-    description: 'Contractor completion statement.',
+    description: 'Contractor statement confirming completion.',
     icon: FileText,
   },
   {
@@ -100,22 +110,26 @@ const evidenceOptions: {
   {
     value: 'Inspection Request',
     label: 'Inspection request',
-    description: 'Request for PM/professional inspection.',
-    icon: ShieldCheck,
+    description: 'Request for PM or professional inspection.',
+    icon: FileCheck2,
   },
   {
     value: 'Receipts',
     label: 'Receipts',
-    description: 'Relevant procurement or expenditure records.',
+    description: 'Relevant procurement and expenditure records.',
     icon: FileText,
   },
   {
     value: 'Professional Sign-off',
     label: 'Professional sign-off',
-    description: 'Required technical approval where applicable.',
+    description: 'Technical approval where required.',
     icon: ShieldCheck,
   },
 ]
+
+/* -------------------------------------------------------------------------- */
+/* Component                                                                  */
+/* -------------------------------------------------------------------------- */
 
 export function CreateMilestone() {
   const [form, setForm] = useState<MilestoneFormData>({
@@ -134,6 +148,7 @@ export function CreateMilestone() {
 
   const [status, setStatus] = useState<MilestoneStatus>('Draft')
   const [showSuccess, setShowSuccess] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const updateField = <K extends keyof MilestoneFormData>(
     field: K,
@@ -143,6 +158,8 @@ export function CreateMilestone() {
       ...current,
       [field]: value,
     }))
+
+    setError(null)
   }
 
   const toggleEvidence = (evidence: MilestoneEvidenceType) => {
@@ -152,10 +169,56 @@ export function CreateMilestone() {
         ? current.evidenceTypes.filter((item) => item !== evidence)
         : [...current.evidenceTypes, evidence],
     }))
+
+    setError(null)
   }
+
+  const validationError = useMemo(() => {
+    if (!form.name.trim()) {
+      return 'Add a milestone name before continuing.'
+    }
+
+    if (!form.phase) {
+      return 'Select the project phase for this milestone.'
+    }
+
+    if (!form.amount || Number(form.amount) <= 0) {
+      return 'Enter a valid milestone payment amount.'
+    }
+
+    if (!form.dueDate) {
+      return 'Set a target completion date.'
+    }
+
+    if (
+      form.startDate &&
+      new Date(form.dueDate) < new Date(form.startDate)
+    ) {
+      return 'The target completion date cannot be before the start date.'
+    }
+
+    if (
+      form.paymentPercentage &&
+      (Number(form.paymentPercentage) <= 0 ||
+        Number(form.paymentPercentage) > 100)
+    ) {
+      return 'Payment percentage must be between 1% and 100%.'
+    }
+
+    if (!form.description.trim()) {
+      return 'Describe the expected milestone outcome.'
+    }
+
+    if (form.evidenceTypes.length === 0) {
+      return 'Select at least one evidence requirement.'
+    }
+
+    return null
+  }, [form])
 
   const handleSaveDraft = () => {
     setStatus('Draft')
+    setError(null)
     setShowSuccess(true)
 
     window.setTimeout(() => {
@@ -164,7 +227,13 @@ export function CreateMilestone() {
   }
 
   const handleSubmit = () => {
+    if (validationError) {
+      setError(validationError)
+      return
+    }
+
     setStatus('Pending Approval')
+    setError(null)
     setShowSuccess(true)
 
     window.setTimeout(() => {
@@ -172,96 +241,142 @@ export function CreateMilestone() {
     }, 2500)
   }
 
+  const formattedAmount = form.amount
+    ? `₦${Number(form.amount).toLocaleString()}`
+    : 'Not set'
+
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <Card className="overflow-hidden">
-        <div className="border-b border-line bg-paper-2 px-6 py-6 sm:px-8">
-          <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+      {/* ------------------------------------------------------------------ */}
+      {/* Hero                                                               */}
+      {/* ------------------------------------------------------------------ */}
+
+      <Card className="overflow-hidden border-0 shadow-sm">
+        <div className="relative overflow-hidden bg-[#0B1220] px-6 py-7 text-white sm:px-8 sm:py-8">
+          <div className="pointer-events-none absolute -right-20 -top-32 h-80 w-80 rounded-full bg-[#1657FF]/20 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-32 left-1/3 h-64 w-64 rounded-full bg-[#34A6FF]/10 blur-3xl" />
+
+          <div
+            className="pointer-events-none absolute inset-0 opacity-[0.035]"
+            style={{
+              backgroundImage:
+                'linear-gradient(rgba(255,255,255,.8) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.8) 1px, transparent 1px)',
+              backgroundSize: '32px 32px',
+            }}
+          />
+
+          <div className="relative flex flex-col gap-7 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex items-start gap-4">
               <button
                 type="button"
-                className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-line bg-white text-ink/55 transition-colors hover:bg-paper-2 hover:text-ink"
                 onClick={() => window.history.back()}
                 aria-label="Go back"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.06] text-white/70 transition hover:bg-white/[0.1] hover:text-white"
               >
                 <ArrowLeft className="h-4 w-4" />
               </button>
 
               <div>
-                <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-ink/40">
-                  Milestones / Create
-                </p>
+                <div className="mb-3 flex items-center gap-2">
+                  <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-white/40">
+                    Project controls
+                  </span>
 
-                <h1 className="mt-1 font-display text-2xl font-semibold tracking-tight text-ink">
-                  Create Milestone
+                  <span className="h-1 w-1 rounded-full bg-[#34A6FF]" />
+
+                  <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/40">
+                    Milestone creation
+                  </span>
+                </div>
+
+                <h1 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">
+                  Create milestone
                 </h1>
 
-                <p className="mt-2 max-w-2xl text-sm leading-6 text-ink/50">
-                  Define a project milestone, its payment amount, evidence
-                  requirements and approval chain before work is released for
-                  payment.
+                <p className="mt-3 max-w-2xl text-sm leading-6 text-white/50">
+                  Define the work, payment, evidence and approval conditions
+                  that must be satisfied before this milestone can progress.
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
-              <span
-                className={
-                  status === 'Pending Approval'
-                    ? 'inline-flex items-center gap-1.5 rounded-full bg-amber-500/10 px-3 py-1.5 text-xs font-semibold text-amber-700'
-                    : 'inline-flex items-center gap-1.5 rounded-full bg-ink/5 px-3 py-1.5 text-xs font-semibold text-ink/50'
-                }
-              >
-                <span className="h-1.5 w-1.5 rounded-full bg-current" />
-                {status}
-              </span>
+            <div className="shrink-0">
+              <StatusBadge status={status} />
             </div>
           </div>
-        </div>
 
-        <div className="grid divide-y divide-line sm:grid-cols-3 sm:divide-x sm:divide-y-0">
-          <HeaderMetric
-            label="Approval"
-            value="PM + Client"
-            description="Required before payment"
-          />
+          <div className="relative mt-8 grid gap-3 sm:grid-cols-3">
+            <HeroMetric
+              label="Approval chain"
+              value="PM + Client"
+              description="Verification before release"
+            />
 
-          <HeaderMetric
-            label="Evidence"
-            value={`${form.evidenceTypes.length} requirements`}
-            description="Supporting milestone proof"
-          />
+            <HeroMetric
+              label="Evidence"
+              value={`${form.evidenceTypes.length} requirements`}
+              description="Supporting milestone proof"
+            />
 
-          <HeaderMetric
-            label="Payment"
-            value={form.amount ? `₦${form.amount}` : 'Not set'}
-            description="Released after verification"
-          />
+            <HeroMetric
+              label="Payment"
+              value={formattedAmount}
+              description="Protected through escrow"
+            />
+          </div>
         </div>
       </Card>
 
-      {/* Success message */}
-      {showSuccess && (
-        <div className="flex items-center gap-3 rounded-xl border border-emerald-500/20 bg-emerald-500/5 px-4 py-3 text-sm text-emerald-700">
-          <CheckCircle2 className="h-4 w-4 shrink-0" />
+      {/* ------------------------------------------------------------------ */}
+      {/* Feedback                                                            */}
+      {/* ------------------------------------------------------------------ */}
 
-          <span>
-            {status === 'Pending Approval'
-              ? 'Milestone submitted for approval.'
-              : 'Milestone draft saved successfully.'}
-          </span>
+      {showSuccess && (
+        <div className="flex items-start gap-3 rounded-2xl border border-emerald-500/15 bg-emerald-500/[0.05] px-4 py-3.5">
+          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600">
+            <CheckCircle2 className="h-4 w-4" />
+          </div>
+
+          <div>
+            <p className="text-xs font-semibold text-emerald-800">
+              {status === 'Pending Approval'
+                ? 'Milestone submitted'
+                : 'Draft saved'}
+            </p>
+
+            <p className="mt-0.5 text-[11px] leading-5 text-emerald-700/70">
+              {status === 'Pending Approval'
+                ? 'The milestone has entered the configured approval workflow.'
+                : 'Your milestone configuration has been saved as a draft.'}
+            </p>
+          </div>
         </div>
       )}
 
-      <div className="grid gap-6 xl:grid-cols-3">
-        {/* Main form */}
-        <div className="space-y-6 xl:col-span-2">
+      {error && (
+        <div className="flex items-start gap-3 rounded-2xl border border-rose-500/15 bg-rose-500/[0.04] px-4 py-3.5 text-rose-700">
+          <Info className="mt-0.5 h-4 w-4 shrink-0" />
+
+          <div>
+            <p className="text-xs font-semibold">Review required</p>
+            <p className="mt-0.5 text-[11px] leading-5 text-rose-700/70">
+              {error}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* ------------------------------------------------------------------ */}
+      {/* Main workspace                                                      */}
+      {/* ------------------------------------------------------------------ */}
+
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
+        <div className="space-y-6">
           {/* Basic details */}
           <Card>
             <CardHeader
               title="Milestone details"
-              subtitle="Define what must be completed before this milestone can be approved."
+              subtitle="Define the scope and commercial value of the work."
             />
 
             <CardBody>
@@ -302,18 +417,19 @@ export function CreateMilestone() {
 
                 <FormField label="Payment amount" required>
                   <div className="relative">
-                    <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-medium text-ink/35">
+                    <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-medium text-ink/35">
                       ₦
                     </span>
 
                     <input
                       type="number"
                       min="0"
+                      inputMode="decimal"
                       value={form.amount}
                       onChange={(event) =>
                         updateField('amount', event.target.value)
                       }
-                      placeholder="0"
+                      placeholder="0.00"
                       className={`${inputClassName} pl-8`}
                     />
                   </div>
@@ -334,12 +450,13 @@ export function CreateMilestone() {
                   </div>
                 </FormField>
 
-                <FormField label="Target completion date" required>
+                <FormField label="Target completion" required>
                   <div className="relative">
                     <CalendarDays className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/30" />
 
                     <input
                       type="date"
+                      min={form.startDate || undefined}
                       value={form.dueDate}
                       onChange={(event) =>
                         updateField('dueDate', event.target.value)
@@ -349,12 +466,13 @@ export function CreateMilestone() {
                   </div>
                 </FormField>
 
-                <FormField label="Payment percentage">
+                <FormField label="Payment allocation">
                   <div className="relative">
                     <input
                       type="number"
                       min="0"
                       max="100"
+                      inputMode="decimal"
                       value={form.paymentPercentage}
                       onChange={(event) =>
                         updateField(
@@ -373,29 +491,34 @@ export function CreateMilestone() {
                 </FormField>
 
                 <FormField
-                  label="Description"
+                  label="Scope & expected outcome"
                   required
                   className="md:col-span-2"
                 >
                   <textarea
-                    rows={5}
+                    rows={6}
                     value={form.description}
                     onChange={(event) =>
                       updateField('description', event.target.value)
                     }
-                    placeholder="Describe the work that must be completed and the expected outcome..."
-                    className={`${inputClassName} h-auto resize-none py-3`}
+                    placeholder="Describe exactly what must be completed, the expected outcome and any important acceptance conditions..."
+                    className={`${inputClassName} h-auto resize-none py-3.5`}
                   />
+
+                  <p className="mt-2 text-[11px] leading-5 text-ink/35">
+                    Keep the description specific enough for an independent
+                    reviewer to determine whether the milestone is complete.
+                  </p>
                 </FormField>
               </div>
             </CardBody>
           </Card>
 
-          {/* Evidence requirements */}
+          {/* Evidence */}
           <Card>
             <CardHeader
               title="Evidence requirements"
-              subtitle="Select the evidence required before the milestone can move to approval."
+              subtitle="Specify the proof required before the milestone can enter approval."
             />
 
             <CardBody>
@@ -408,29 +531,40 @@ export function CreateMilestone() {
                     <button
                       key={option.value}
                       type="button"
+                      aria-pressed={selected}
                       onClick={() => toggleEvidence(option.value)}
-                      className={`flex items-start gap-3 rounded-xl border p-4 text-left transition-colors ${
+                      className={`group flex items-start gap-3 rounded-2xl border p-4 text-left transition-all ${
                         selected
-                          ? 'border-ink/20 bg-ink/[0.03]'
-                          : 'border-line bg-white hover:bg-paper-2'
+                          ? 'border-[#1657FF]/20 bg-[#1657FF]/[0.04] shadow-sm'
+                          : 'border-line bg-white hover:-translate-y-0.5 hover:border-ink/10 hover:shadow-sm'
                       }`}
                     >
                       <div
-                        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${
-                          selected ? 'bg-ink text-white' : 'bg-ink/5'
+                        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-colors ${
+                          selected
+                            ? 'bg-[#1657FF] text-white'
+                            : 'bg-ink/[0.04] text-ink/40 group-hover:bg-ink/[0.06]'
                         }`}
                       >
                         {selected ? (
-                          <CheckCircle2 className="h-4 w-4" />
+                          <Check className="h-4 w-4" />
                         ) : (
-                          <Icon className="h-4 w-4 text-ink/45" />
+                          <Icon className="h-4 w-4" />
                         )}
                       </div>
 
                       <div className="min-w-0">
-                        <p className="text-xs font-semibold text-ink">
-                          {option.label}
-                        </p>
+                        <div className="flex items-center gap-2">
+                          <p className="text-xs font-semibold text-ink">
+                            {option.label}
+                          </p>
+
+                          {selected && (
+                            <span className="font-mono text-[8px] font-semibold uppercase tracking-wider text-[#1657FF]">
+                              Selected
+                            </span>
+                          )}
+                        </div>
 
                         <p className="mt-1 text-[11px] leading-5 text-ink/45">
                           {option.description}
@@ -441,29 +575,38 @@ export function CreateMilestone() {
                 })}
               </div>
 
-              <div className="mt-5 flex items-start gap-3 rounded-xl bg-paper-2 p-4">
-                <Info className="mt-0.5 h-4 w-4 shrink-0 text-ink/40" />
+              <div className="mt-5 flex items-start gap-3 rounded-2xl border border-[#1657FF]/10 bg-[#1657FF]/[0.035] p-4">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#1657FF]/10 text-[#1657FF]">
+                  <Info className="h-4 w-4" />
+                </div>
 
-                <p className="text-xs leading-5 text-ink/50">
-                  Evidence should be sufficient for independent verification.
-                  Contractor evidence alone does not authorize payment release.
-                </p>
+                <div>
+                  <p className="text-xs font-semibold text-ink">
+                    Evidence does not equal approval
+                  </p>
+
+                  <p className="mt-1 text-[11px] leading-5 text-ink/45">
+                    Uploaded evidence supports verification. Payment remains
+                    protected until the configured approval conditions are
+                    satisfied.
+                  </p>
+                </div>
               </div>
             </CardBody>
           </Card>
 
-          {/* Approval chain */}
+          {/* Approval controls */}
           <Card>
             <CardHeader
               title="Approval controls"
-              subtitle="Define the verification and approval chain for this milestone."
+              subtitle="Configure who must verify and approve the milestone."
             />
 
             <CardBody>
               <div className="space-y-3">
                 <ApprovalControl
                   title="Project Manager verification"
-                  description="PM reviews milestone evidence and confirms that the work has been completed."
+                  description="The PM verifies evidence and confirms that the contracted work has been completed."
                   checked={form.requiresPmVerification}
                   onChange={(checked) =>
                     updateField('requiresPmVerification', checked)
@@ -473,7 +616,7 @@ export function CreateMilestone() {
 
                 <ApprovalControl
                   title="Client approval"
-                  description="Client approves the milestone before the associated payment can be released."
+                  description="The client confirms acceptance before the associated payment can be released."
                   checked={form.requiresClientApproval}
                   onChange={(checked) =>
                     updateField('requiresClientApproval', checked)
@@ -483,7 +626,7 @@ export function CreateMilestone() {
 
                 <ApprovalControl
                   title="Professional sign-off"
-                  description="Require an architect, engineer or other professional to approve the milestone where technically necessary."
+                  description="Require an architect, engineer or other qualified professional where the milestone has technical approval requirements."
                   checked={form.requiresProfessionalSignOff}
                   onChange={(checked) =>
                     updateField(
@@ -497,14 +640,28 @@ export function CreateMilestone() {
           </Card>
         </div>
 
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Summary */}
-          <Card>
-            <CardHeader
-              title="Milestone summary"
-              subtitle="Review the payment and verification structure."
-            />
+        {/* ---------------------------------------------------------------- */}
+        {/* Sidebar                                                           */}
+        {/* ---------------------------------------------------------------- */}
+
+        <aside className="space-y-6 xl:sticky xl:top-6 xl:self-start">
+          {/* Live summary */}
+          <Card className="overflow-hidden">
+            <div className="border-b border-line bg-paper-2 px-5 py-4">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-ink/35">
+                    Live configuration
+                  </p>
+
+                  <h2 className="mt-1 font-display text-base font-semibold text-ink">
+                    Milestone summary
+                  </h2>
+                </div>
+
+                <Sparkles className="h-4 w-4 text-[#1657FF]" />
+              </div>
+            </div>
 
             <CardBody>
               <div className="space-y-4">
@@ -520,9 +677,15 @@ export function CreateMilestone() {
 
                 <SummaryRow
                   label="Payment"
+                  value={formattedAmount}
+                  emphasized
+                />
+
+                <SummaryRow
+                  label="Allocation"
                   value={
-                    form.amount
-                      ? `₦${Number(form.amount).toLocaleString()}`
+                    form.paymentPercentage
+                      ? `${form.paymentPercentage}%`
                       : 'Not set'
                   }
                 />
@@ -534,12 +697,20 @@ export function CreateMilestone() {
 
                 <SummaryRow
                   label="PM verification"
-                  value={form.requiresPmVerification ? 'Required' : 'Not required'}
+                  value={
+                    form.requiresPmVerification
+                      ? 'Required'
+                      : 'Not required'
+                  }
                 />
 
                 <SummaryRow
                   label="Client approval"
-                  value={form.requiresClientApproval ? 'Required' : 'Not required'}
+                  value={
+                    form.requiresClientApproval
+                      ? 'Required'
+                      : 'Not required'
+                  }
                 />
 
                 <SummaryRow
@@ -554,82 +725,135 @@ export function CreateMilestone() {
             </CardBody>
           </Card>
 
-          {/* Escrow rule */}
+          {/* Workflow */}
           <Card>
             <CardHeader
-              title="Escrow payment rule"
-              subtitle="Build OS payment protection"
+              title="Release workflow"
+              subtitle="How this milestone reaches payment release."
             />
 
             <CardBody>
-              <div className="rounded-xl border border-line bg-paper-2 p-4">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-ink text-white">
-                    <Wallet className="h-4 w-4" />
-                  </div>
+              <div className="space-y-0">
+                <WorkflowStep
+                  number="01"
+                  title="Complete"
+                  description="Contractor completes the defined milestone."
+                  active
+                />
 
-                  <div>
-                    <p className="text-xs font-semibold text-ink">
-                      Payment remains protected
-                    </p>
+                <WorkflowStep
+                  number="02"
+                  title="Submit evidence"
+                  description="Required evidence is uploaded to Build OS."
+                  active
+                />
 
-                    <p className="mt-1 text-[11px] text-ink/45">
-                      Release follows verification and approval.
-                    </p>
-                  </div>
-                </div>
+                <WorkflowStep
+                  number="03"
+                  title="Verify"
+                  description="PM and professional reviewers validate the work."
+                  active
+                />
 
-                <div className="mt-4 space-y-3">
-                  <RuleItem text="Required evidence uploaded" />
-                  <RuleItem text="PM / professional verification" />
-                  <RuleItem text="Client approval" />
-                  <RuleItem text="No active dispute on payment line" />
-                </div>
+                <WorkflowStep
+                  number="04"
+                  title="Approve"
+                  description="Client confirms milestone acceptance."
+                  active
+                />
+
+                <WorkflowStep
+                  number="05"
+                  title="Release"
+                  description="Eligible escrow payment is released."
+                  active={false}
+                  last
+                />
               </div>
             </CardBody>
           </Card>
 
-          {/* Audit */}
+          {/* Escrow */}
           <Card>
-            <CardHeader
-              title="Governance"
-              subtitle="Milestone activity is auditable."
-            />
+            <div className="relative overflow-hidden bg-[#0B1220] p-5 text-white">
+              <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-[#1657FF]/20 blur-2xl" />
 
+              <div className="relative">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10">
+                    <Wallet className="h-4 w-4 text-[#34A6FF]" />
+                  </div>
+
+                  <div>
+                    <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-white/35">
+                      Payment protection
+                    </p>
+
+                    <p className="mt-1 text-sm font-semibold">
+                      Escrow protected
+                    </p>
+                  </div>
+                </div>
+
+                <p className="mt-4 text-xs leading-5 text-white/45">
+                  Funds remain protected until the milestone satisfies its
+                  evidence, verification and approval requirements.
+                </p>
+
+                <div className="mt-5 space-y-3">
+                  <DarkRule text="Required evidence uploaded" />
+                  <DarkRule text="Verification completed" />
+                  <DarkRule text="Client approval recorded" />
+                  <DarkRule text="No active payment dispute" />
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          {/* Governance */}
+          <Card>
             <CardBody>
               <div className="flex items-start gap-3">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-ink/5">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-ink/[0.04]">
                   <ShieldCheck className="h-4 w-4 text-ink/50" />
                 </div>
 
                 <div>
                   <p className="text-xs font-semibold text-ink">
-                    Audit trail enabled
+                    Governance protected
                   </p>
 
-                  <p className="mt-1 text-xs leading-5 text-ink/45">
-                    Creation, edits, approvals, rejections, evidence,
-                    payment decisions and status changes should be recorded.
+                  <p className="mt-1 text-[11px] leading-5 text-ink/45">
+                    Creation, edits, evidence, verification, approval,
+                    rejection and payment decisions should remain part of the
+                    project audit trail.
                   </p>
                 </div>
               </div>
             </CardBody>
           </Card>
-        </div>
+        </aside>
       </div>
 
-      {/* Actions */}
-      <Card>
-        <CardBody>
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-xs font-semibold text-ink">
-                Ready to continue?
-              </p>
+      {/* ------------------------------------------------------------------ */}
+      {/* Footer actions                                                      */}
+      {/* ------------------------------------------------------------------ */}
 
-              <p className="mt-1 text-xs text-ink/40">
-                Save this milestone as a draft or submit it for the configured
-                approval workflow.
+      <Card className="overflow-hidden">
+        <CardBody>
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <div className="flex items-center gap-2">
+                <div className="h-1.5 w-1.5 rounded-full bg-[#1657FF]" />
+
+                <p className="text-xs font-semibold text-ink">
+                  Ready to continue?
+                </p>
+              </div>
+
+              <p className="mt-1.5 max-w-xl text-xs leading-5 text-ink/40">
+                Save your configuration as a draft or submit the milestone
+                into the configured approval workflow.
               </p>
             </div>
 
@@ -637,7 +861,7 @@ export function CreateMilestone() {
               <button
                 type="button"
                 onClick={handleSaveDraft}
-                className="inline-flex items-center justify-center gap-2 rounded-xl border border-line bg-white px-4 py-2.5 text-xs font-semibold text-ink/60 transition-colors hover:bg-paper-2 hover:text-ink"
+                className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-line bg-white px-5 text-xs font-semibold text-ink/60 transition-all hover:border-ink/10 hover:bg-paper-2 hover:text-ink"
               >
                 <FileText className="h-4 w-4" />
                 Save draft
@@ -646,10 +870,10 @@ export function CreateMilestone() {
               <button
                 type="button"
                 onClick={handleSubmit}
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-ink px-4 py-2.5 text-xs font-semibold text-white transition-opacity hover:opacity-90"
+                className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-[#0B1220] px-5 text-xs font-semibold text-white shadow-sm transition-all hover:bg-[#1657FF] hover:shadow-md"
               >
                 <CheckCircle2 className="h-4 w-4" />
-                Create milestone
+                Submit for approval
               </button>
             </div>
           </div>
@@ -659,6 +883,10 @@ export function CreateMilestone() {
   )
 }
 
+/* -------------------------------------------------------------------------- */
+/* Components                                                                 */
+/* -------------------------------------------------------------------------- */
+
 function FormField({
   label,
   required,
@@ -667,14 +895,17 @@ function FormField({
 }: {
   label: string
   required?: boolean
-  children: React.ReactNode
+  children: ReactNode
   className?: string
 }) {
   return (
     <label className={`block ${className}`}>
-      <span className="mb-2 block text-[10px] font-semibold uppercase tracking-wide text-ink/40">
+      <span className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.12em] text-ink/40">
         {label}
-        {required && <span className="ml-1 text-rose-500">*</span>}
+
+        {required && (
+          <span className="ml-1 text-rose-500">*</span>
+        )}
       </span>
 
       {children}
@@ -696,63 +927,172 @@ function ApprovalControl({
   required?: boolean
 }) {
   return (
-    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-line bg-white p-4 transition-colors hover:bg-paper-2">
-      <input
-        type="checkbox"
-        checked={checked}
-        onChange={(event) => onChange(event.target.checked)}
+    <div
+      className={`flex items-start gap-4 rounded-2xl border p-4 ${
+        checked
+          ? 'border-[#1657FF]/15 bg-[#1657FF]/[0.025]'
+          : 'border-line bg-white'
+      }`}
+    >
+      <button
+        type="button"
+        role="switch"
+        aria-checked={checked}
         disabled={required}
-        className="mt-1 h-4 w-4 rounded border-line accent-ink"
-      />
+        onClick={() => !required && onChange(!checked)}
+        className={`relative mt-0.5 flex h-5 w-9 shrink-0 items-center rounded-full p-0.5 transition-colors ${
+          checked ? 'bg-[#1657FF]' : 'bg-ink/15'
+        } ${required ? 'cursor-not-allowed opacity-80' : 'cursor-pointer'}`}
+      >
+        <span
+          className={`h-4 w-4 rounded-full bg-white shadow-sm transition-transform ${
+            checked ? 'translate-x-4' : 'translate-x-0'
+          }`}
+        />
+      </button>
 
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2">
-          <p className="text-xs font-semibold text-ink">{title}</p>
+          <p className="text-xs font-semibold text-ink">
+            {title}
+          </p>
 
           {required && (
-            <span className="rounded-full bg-ink/5 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-ink/40">
+            <span className="rounded-full bg-ink/[0.04] px-2 py-0.5 font-mono text-[8px] font-semibold uppercase tracking-wider text-ink/40">
               Required
             </span>
           )}
         </div>
 
-        <p className="mt-1 text-xs leading-5 text-ink/45">
+        <p className="mt-1 text-[11px] leading-5 text-ink/45">
           {description}
         </p>
       </div>
-    </label>
+    </div>
   )
 }
 
 function SummaryRow({
   label,
   value,
+  emphasized = false,
 }: {
   label: string
   value: string
+  emphasized?: boolean
 }) {
   return (
     <div className="flex items-start justify-between gap-4 border-b border-line pb-3 last:border-0 last:pb-0">
-      <span className="text-xs text-ink/40">{label}</span>
+      <span className="text-[11px] text-ink/40">
+        {label}
+      </span>
 
-      <span className="max-w-[60%] text-right text-xs font-semibold text-ink">
+      <span
+        className={`max-w-[62%] text-right ${
+          emphasized
+            ? 'font-display text-sm font-semibold text-ink'
+            : 'text-xs font-semibold text-ink'
+        }`}
+      >
         {value}
       </span>
     </div>
   )
 }
 
-function RuleItem({ text }: { text: string }) {
+function WorkflowStep({
+  number,
+  title,
+  description,
+  active,
+  last = false,
+}: {
+  number: string
+  title: string
+  description: string
+  active: boolean
+  last?: boolean
+}) {
   return (
-    <div className="flex items-center gap-2">
-      <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-600" />
+    <div className="relative flex gap-3 pb-5">
+      {!last && (
+        <span className="absolute left-[15px] top-8 h-[calc(100%-16px)] w-px bg-line" />
+      )}
 
-      <span className="text-[11px] text-ink/50">{text}</span>
+      <div
+        className={`relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[9px] font-bold ${
+          active
+            ? 'bg-[#1657FF] text-white'
+            : 'border border-line bg-white text-ink/30'
+        }`}
+      >
+        {active ? <Check className="h-3.5 w-3.5" /> : number}
+      </div>
+
+      <div className="pt-0.5">
+        <p className="text-xs font-semibold text-ink">
+          {title}
+        </p>
+
+        <p className="mt-1 text-[11px] leading-5 text-ink/40">
+          {description}
+        </p>
+      </div>
     </div>
   )
 }
 
-function HeaderMetric({
+function DarkRule({ text }: { text: string }) {
+  return (
+    <div className="flex items-center gap-2.5">
+      <div className="flex h-4 w-4 items-center justify-center rounded-full bg-emerald-400/10">
+        <Check className="h-2.5 w-2.5 text-emerald-400" />
+      </div>
+
+      <span className="text-[10px] text-white/45">
+        {text}
+      </span>
+    </div>
+  )
+}
+
+function StatusBadge({
+  status,
+}: {
+  status: MilestoneStatus
+}) {
+  const pending = status === 'Pending Approval'
+
+  return (
+    <div
+      className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-2 ${
+        pending
+          ? 'border-amber-300/20 bg-amber-400/10 text-amber-200'
+          : 'border-white/10 bg-white/[0.06] text-white/60'
+      }`}
+    >
+      <span className="relative flex h-1.5 w-1.5">
+        <span
+          className={`absolute inline-flex h-full w-full rounded-full opacity-50 ${
+            pending ? 'bg-amber-300' : 'bg-white/50'
+          }`}
+        />
+
+        <span
+          className={`relative inline-flex h-1.5 w-1.5 rounded-full ${
+            pending ? 'bg-amber-300' : 'bg-white/50'
+          }`}
+        />
+      </span>
+
+      <span className="text-[10px] font-semibold uppercase tracking-[0.12em]">
+        {status}
+      </span>
+    </div>
+  )
+}
+
+function HeroMetric({
   label,
   value,
   description,
@@ -762,19 +1102,25 @@ function HeaderMetric({
   description: string
 }) {
   return (
-    <div className="px-6 py-4 sm:px-7">
-      <p className="text-[10px] font-semibold uppercase tracking-wide text-ink/35">
+    <div className="rounded-2xl border border-white/10 bg-white/[0.045] px-4 py-4">
+      <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-white/30">
         {label}
       </p>
 
-      <p className="mt-1 font-display text-lg font-semibold text-ink">
+      <p className="mt-2 font-display text-lg font-semibold tracking-tight text-white">
         {value}
       </p>
 
-      <p className="mt-1 text-xs text-ink/40">{description}</p>
+      <p className="mt-1 text-[10px] text-white/35">
+        {description}
+      </p>
     </div>
   )
 }
 
+/* -------------------------------------------------------------------------- */
+/* Shared styles                                                              */
+/* -------------------------------------------------------------------------- */
+
 const inputClassName =
-  'h-11 w-full rounded-xl border border-line bg-white px-3.5 text-sm text-ink outline-none transition-colors placeholder:text-ink/30 focus:border-ink/25'
+  'h-11 w-full rounded-xl border border-line bg-white px-3.5 text-sm text-ink outline-none transition-all placeholder:text-ink/25 focus:border-[#1657FF]/30 focus:ring-4 focus:ring-[#1657FF]/[0.06]'

@@ -1,14 +1,24 @@
 // Monitoring module — shared domain types
 // BRD references: Sec. 20.3 / 43
 //
-// Keep Monitoring-specific domain models in this file.
-// Cross-cutting application models (User, UserRole, ProjectSummary, etc.)
-// should remain in the root `src/types` directory.
+// Monitoring-specific domain models live here.
+// Cross-cutting application models such as User, UserRole,
+// ProjectSummary, Project, Evidence, etc. belong in src/types.
+//
+// This module is intentionally transport-agnostic. API request/response
+// concerns belong in monitoringService.ts.
+
+/* -------------------------------------------------------------------------- */
+/* Report                                                                     */
+/* -------------------------------------------------------------------------- */
 
 /**
  * Supported monitoring report periods.
  */
-export type MonitoringReportType = 'daily' | 'weekly' | 'monthly'
+export type MonitoringReportType =
+  | 'daily'
+  | 'weekly'
+  | 'monthly'
 
 /**
  * Lifecycle state of a monitoring report.
@@ -20,6 +30,10 @@ export type MonitoringReportStatus =
   | 'approved'
   | 'rejected'
 
+/* -------------------------------------------------------------------------- */
+/* Inspection                                                                 */
+/* -------------------------------------------------------------------------- */
+
 /**
  * Site inspection lifecycle.
  */
@@ -30,13 +44,17 @@ export type InspectionStatus =
   | 'cancelled'
 
 /**
- * Final or current inspection outcome.
+ * Current or final inspection outcome.
  */
 export type InspectionOutcome =
   | 'pending'
   | 'passed'
   | 'attention_required'
   | 'failed'
+
+/* -------------------------------------------------------------------------- */
+/* Risk                                                                       */
+/* -------------------------------------------------------------------------- */
 
 /**
  * Risk categories monitored across a project.
@@ -51,9 +69,13 @@ export type RiskCategory =
   | 'other'
 
 /**
- * Risk severity used for alert prioritisation.
+ * Severity used for risk prioritisation.
  */
-export type RiskSeverity = 'low' | 'medium' | 'high' | 'critical'
+export type RiskSeverity =
+  | 'low'
+  | 'medium'
+  | 'high'
+  | 'critical'
 
 /**
  * Current lifecycle state of a risk alert.
@@ -64,8 +86,12 @@ export type RiskStatus =
   | 'mitigating'
   | 'resolved'
 
+/* -------------------------------------------------------------------------- */
+/* Project health & progress                                                  */
+/* -------------------------------------------------------------------------- */
+
 /**
- * High-level project health state.
+ * High-level health state of a monitored project.
  */
 export type ProjectHealth =
   | 'healthy'
@@ -74,7 +100,7 @@ export type ProjectHealth =
   | 'critical'
 
 /**
- * Progress classification based on planned vs actual progress.
+ * Delivery classification derived from planned vs actual progress.
  */
 export type ProgressStatus =
   | 'ahead'
@@ -84,7 +110,20 @@ export type ProgressStatus =
   | 'critical'
 
 /**
- * A single metric displayed on the monitoring dashboard.
+ * Generic state used by dashboard metrics.
+ */
+export type MonitoringMetricStatus =
+  | 'positive'
+  | 'neutral'
+  | 'warning'
+  | 'negative'
+
+/* -------------------------------------------------------------------------- */
+/* Dashboard                                                                  */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * A single metric displayed in the monitoring dashboard.
  */
 export interface MonitoringMetric {
   id: string
@@ -97,11 +136,14 @@ export interface MonitoringMetric {
 
   unit?: string
 
-  status?: 'positive' | 'neutral' | 'warning' | 'negative'
+  status?: MonitoringMetricStatus
 }
 
 /**
  * High-level monitoring overview for a project.
+ *
+ * This is intentionally an aggregate read model. It should not be treated
+ * as the source of truth for individual reports, inspections, or risks.
  */
 export interface MonitoringDashboard {
   projectId: string
@@ -129,8 +171,12 @@ export interface MonitoringDashboard {
   lastUpdated: string
 }
 
+/* -------------------------------------------------------------------------- */
+/* Progress                                                                   */
+/* -------------------------------------------------------------------------- */
+
 /**
- * A point in the historical project progress timeline.
+ * Historical planned-vs-actual progress point.
  */
 export interface ProgressTimelinePoint {
   date: string
@@ -146,10 +192,16 @@ export interface ProjectProgress {
   projectId: string
 
   overallProgress: number
+
   plannedProgress: number
   actualProgress: number
 
+  /**
+   * Positive = ahead of plan.
+   * Negative = behind plan.
+   */
   variance: number
+
   status: ProgressStatus
 
   startDate: string
@@ -163,6 +215,18 @@ export interface ProjectProgress {
   updatedAt: string
 }
 
+/* -------------------------------------------------------------------------- */
+/* Work activities                                                            */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Lifecycle state of a work activity.
+ */
+export type WorkActivityStatus =
+  | 'completed'
+  | 'in_progress'
+  | 'pending'
+
 /**
  * Work activity recorded in a monitoring report.
  */
@@ -171,13 +235,25 @@ export interface WorkActivity {
 
   description: string
 
-  status: 'completed' | 'in_progress' | 'pending'
+  status: WorkActivityStatus
 
   notes?: string
 }
 
+/* -------------------------------------------------------------------------- */
+/* Issues                                                                     */
+/* -------------------------------------------------------------------------- */
+
 /**
- * A project issue identified during monitoring.
+ * Lifecycle state of a monitoring issue.
+ */
+export type MonitoringIssueStatus =
+  | 'open'
+  | 'in_progress'
+  | 'resolved'
+
+/**
+ * Project issue identified through monitoring.
  */
 export interface MonitoringIssue {
   id: string
@@ -187,29 +263,53 @@ export interface MonitoringIssue {
 
   severity: RiskSeverity
 
-  status: 'open' | 'in_progress' | 'resolved'
+  status: MonitoringIssueStatus
 
   createdAt: string
   resolvedAt?: string
 }
 
+/* -------------------------------------------------------------------------- */
+/* Recommendations                                                            */
+/* -------------------------------------------------------------------------- */
+
 /**
- * A recommendation attached to a monitoring report or inspection.
+ * Priority assigned to a monitoring recommendation.
+ */
+export type MonitoringRecommendationPriority =
+  | 'low'
+  | 'medium'
+  | 'high'
+
+/**
+ * Lifecycle state of a recommendation.
+ */
+export type MonitoringRecommendationStatus =
+  | 'open'
+  | 'in_progress'
+  | 'implemented'
+
+/**
+ * Recommendation attached to a monitoring report or inspection.
  */
 export interface MonitoringRecommendation {
   id: string
 
   description: string
 
-  priority: 'low' | 'medium' | 'high'
+  priority: MonitoringRecommendationPriority
 
-  status: 'open' | 'in_progress' | 'implemented'
+  status: MonitoringRecommendationStatus
 
   createdAt: string
 }
 
+/* -------------------------------------------------------------------------- */
+/* Monitoring reports                                                         */
+/* -------------------------------------------------------------------------- */
+
 /**
- * A daily, weekly, or monthly project monitoring report.
+ * Daily, weekly, or monthly project monitoring report.
  */
 export interface MonitoringReport {
   id: string
@@ -240,8 +340,12 @@ export interface MonitoringReport {
   updatedAt: string
 }
 
+/* -------------------------------------------------------------------------- */
+/* Inspection findings                                                        */
+/* -------------------------------------------------------------------------- */
+
 /**
- * A finding identified during an inspection.
+ * Finding identified during a site inspection.
  */
 export interface InspectionFinding {
   id: string
@@ -254,11 +358,18 @@ export interface InspectionFinding {
   resolved: boolean
   resolvedAt?: string
 
+  /**
+   * References to evidence records stored by the Evidence module.
+   */
   evidenceIds?: string[]
 }
 
+/* -------------------------------------------------------------------------- */
+/* Inspections                                                                */
+/* -------------------------------------------------------------------------- */
+
 /**
- * A scheduled or completed project site inspection.
+ * Scheduled or completed project site inspection.
  */
 export interface Inspection {
   id: string
@@ -285,8 +396,12 @@ export interface Inspection {
   updatedAt: string
 }
 
+/* -------------------------------------------------------------------------- */
+/* Risk alerts                                                                */
+/* -------------------------------------------------------------------------- */
+
 /**
- * A risk alert detected through project monitoring or AI analysis.
+ * Risk alert generated through project monitoring, rules, or AI analysis.
  */
 export interface RiskAlert {
   id: string
@@ -302,8 +417,22 @@ export interface RiskAlert {
 
   impact?: string
 
+  /**
+   * Optional probability estimate represented as a percentage.
+   *
+   * Example:
+   *   75 = 75% likelihood.
+   */
   likelihood?: number
+
+  /**
+   * Optional impact score used by the risk engine.
+   */
   impactScore?: number
+
+  /**
+   * Optional calculated risk score.
+   */
   riskScore?: number
 
   mitigation?: string
@@ -317,8 +446,12 @@ export interface RiskAlert {
   updatedAt: string
 }
 
+/* -------------------------------------------------------------------------- */
+/* Filters                                                                    */
+/* -------------------------------------------------------------------------- */
+
 /**
- * Filter parameters shared by report list screens.
+ * Filter parameters for monitoring reports.
  */
 export interface MonitoringReportFilters {
   projectId?: string
@@ -331,7 +464,7 @@ export interface MonitoringReportFilters {
 }
 
 /**
- * Filter parameters for inspection screens.
+ * Filter parameters for inspections.
  */
 export interface InspectionFilters {
   projectId?: string
@@ -344,7 +477,7 @@ export interface InspectionFilters {
 }
 
 /**
- * Filter parameters for risk alert screens.
+ * Filter parameters for risk alerts.
  */
 export interface RiskAlertFilters {
   projectId?: string
@@ -353,6 +486,10 @@ export interface RiskAlertFilters {
   severity?: RiskSeverity
   status?: RiskStatus
 }
+
+/* -------------------------------------------------------------------------- */
+/* Report write payloads                                                      */
+/* -------------------------------------------------------------------------- */
 
 /**
  * Payload used when creating a monitoring report.
@@ -382,8 +519,12 @@ export interface CreateMonitoringReportPayload {
 export type UpdateMonitoringReportPayload =
   Partial<CreateMonitoringReportPayload>
 
+/* -------------------------------------------------------------------------- */
+/* Inspection write payloads                                                  */
+/* -------------------------------------------------------------------------- */
+
 /**
- * Payload used when creating a new inspection.
+ * Payload used when creating an inspection.
  */
 export interface CreateInspectionPayload {
   projectId: string
@@ -409,6 +550,10 @@ export type UpdateInspectionPayload =
     findings?: InspectionFinding[]
     recommendations?: MonitoringRecommendation[]
   }
+
+/* -------------------------------------------------------------------------- */
+/* Risk write payloads                                                        */
+/* -------------------------------------------------------------------------- */
 
 /**
  * Payload used when creating a risk alert.

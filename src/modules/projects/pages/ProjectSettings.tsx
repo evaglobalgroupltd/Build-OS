@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import {
+  ArrowUpRight,
   Bell,
+  Check,
   ChevronRight,
   Clock3,
   FileCheck2,
@@ -9,6 +11,7 @@ import {
   ShieldCheck,
   Users,
 } from 'lucide-react'
+
 import { Badge } from '@/components/ui/Badge'
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 
@@ -48,58 +51,100 @@ export function ProjectSettings({
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-        <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-ink/35">
-            Project configuration
-          </p>
+    <div className="space-y-7">
+      {/* ------------------------------------------------------------------ */}
+      {/* Header                                                             */}
+      {/* ------------------------------------------------------------------ */}
 
-          <h1 className="mt-1 font-display text-2xl font-semibold tracking-tight text-ink">
-            Project Settings
-          </h1>
+      <section
+        aria-label="Project settings header"
+        className="
+          relative overflow-hidden rounded-[24px]
+          bg-[#18271F]
+          shadow-[0_18px_50px_rgba(20,40,30,0.10)]
+        "
+      >
+        <div className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-white/[0.04] blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-28 left-1/3 h-48 w-48 rounded-full bg-[#B8D9C4]/[0.04] blur-3xl" />
 
-          <p className="mt-1 max-w-2xl text-sm leading-6 text-ink/45">
-            Manage project notifications, evidence requirements, approval
-            controls and project-level access.
-          </p>
+        <div className="relative flex flex-col gap-7 p-6 sm:p-7 lg:flex-row lg:items-end lg:justify-between lg:p-8">
+          <div className="min-w-0">
+            <div className="mb-4 flex flex-wrap items-center gap-2">
+              <span className="rounded-full bg-white/[0.09] px-3 py-1.5 text-[9px] font-bold uppercase tracking-[0.14em] text-white/65">
+                Project governance
+              </span>
+
+              <span className="h-1 w-1 rounded-full bg-white/20" />
+
+              <span className="font-mono text-[9px] text-white/35">
+                {projectId || 'Current project'}
+              </span>
+            </div>
+
+            <h1 className="font-display text-[29px] font-semibold leading-tight tracking-[-0.035em] text-white sm:text-[34px]">
+              Project Settings
+            </h1>
+
+            <p className="mt-3 max-w-2xl text-[11px] leading-5 text-white/45 sm:text-xs">
+              Configure the controls, notifications and access rules that
+              govern how this project operates.
+            </p>
+          </div>
+
+          <div className="flex shrink-0 items-center gap-3">
+            {saved && (
+              <div className="flex items-center gap-2 rounded-full bg-white/[0.08] px-3.5 py-2.5 text-[10px] font-semibold text-white/70">
+                <span className="flex h-4 w-4 items-center justify-center rounded-full bg-[#B8D9C4] text-[#18271F]">
+                  <Check size={10} strokeWidth={3} />
+                </span>
+                Changes saved
+              </div>
+            )}
+
+            <button
+              type="button"
+              onClick={handleSave}
+              className="
+                group inline-flex items-center justify-center gap-2
+                rounded-full bg-white px-5 py-2.5
+                text-[10px] font-bold text-ink
+                transition duration-300
+                hover:-translate-y-0.5 hover:bg-white/90
+              "
+            >
+              <Save
+                size={13}
+                className="transition-transform duration-300 group-hover:scale-105"
+              />
+              Save changes
+            </button>
+          </div>
         </div>
+      </section>
 
-        <div className="flex items-center gap-3">
-          {saved && (
-            <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-teal">
-              <FileCheck2 className="h-3.5 w-3.5" />
-              Changes saved
-            </span>
-          )}
+      {/* ------------------------------------------------------------------ */}
+      {/* Settings layout                                                    */}
+      {/* ------------------------------------------------------------------ */}
 
-          <button
-            type="button"
-            onClick={handleSave}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-ink px-4 py-2.5 text-xs font-semibold text-white"
-          >
-            <Save className="h-4 w-4" />
-            Save changes
-          </button>
-        </div>
-      </div>
+      <div className="grid gap-5 xl:grid-cols-[minmax(0,1.45fr)_minmax(300px,0.75fr)]">
+        <div className="space-y-5">
+          {/* -------------------------------------------------------------- */}
+          {/* Workflow controls                                              */}
+          {/* -------------------------------------------------------------- */}
 
-      {/* Settings */}
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.5fr)_minmax(280px,1fr)]">
-        <div className="space-y-6">
-          {/* Workflow controls */}
-          <Card>
+          <Card className="overflow-hidden">
             <CardHeader
               title="Project workflow"
-              subtitle="Controls that protect the project's evidence and approval process."
+              subtitle="Controls that protect evidence, approvals and project delivery."
             />
 
-            <CardBody className="divide-y divide-line">
+            <CardBody className="divide-y divide-ink/[0.06]">
               <SettingRow
                 icon={ShieldCheck}
+                eyebrow="Verification"
                 title="Require milestone evidence"
-                description="Milestones should have supporting evidence before they can proceed to verification."
+                description="Milestones must include supporting evidence before they can proceed to verification."
+                enabled={requireEvidence}
                 control={
                   <Toggle
                     checked={requireEvidence}
@@ -110,8 +155,10 @@ export function ProjectSettings({
 
               <SettingRow
                 icon={FileCheck2}
+                eyebrow="Approval"
                 title="Require client approval"
-                description="Require client approval for milestone decisions before associated payment actions."
+                description="Client approval is required for milestone decisions before associated payment actions."
+                enabled={requireApproval}
                 control={
                   <Toggle
                     checked={requireApproval}
@@ -122,8 +169,10 @@ export function ProjectSettings({
 
               <SettingRow
                 icon={Clock3}
+                eyebrow="Reporting"
                 title="Weekly progress reports"
-                description="Receive a weekly project progress report from the project team."
+                description="Receive a consolidated progress report from the project team each week."
+                enabled={weeklyReports}
                 control={
                   <Toggle
                     checked={weeklyReports}
@@ -134,18 +183,23 @@ export function ProjectSettings({
             </CardBody>
           </Card>
 
-          {/* Notifications */}
-          <Card>
+          {/* -------------------------------------------------------------- */}
+          {/* Notifications                                                   */}
+          {/* -------------------------------------------------------------- */}
+
+          <Card className="overflow-hidden">
             <CardHeader
               title="Notifications"
-              subtitle="Choose which project events should generate notifications."
+              subtitle="Control which project events should generate alerts."
             />
 
-            <CardBody className="divide-y divide-line">
+            <CardBody className="divide-y divide-ink/[0.06]">
               <SettingRow
                 icon={Bell}
+                eyebrow="Master control"
                 title="Project notifications"
-                description="Enable notifications for important project events."
+                description="Enable notifications for important project activity and events."
+                enabled={notifications}
                 control={
                   <Toggle
                     checked={notifications}
@@ -156,8 +210,11 @@ export function ProjectSettings({
 
               <SettingRow
                 icon={FileCheck2}
+                eyebrow="Milestones"
                 title="Milestone alerts"
                 description="Notify you when milestones are submitted, verified or require approval."
+                enabled={milestoneAlerts}
+                disabled={!notifications}
                 control={
                   <Toggle
                     checked={milestoneAlerts}
@@ -169,8 +226,11 @@ export function ProjectSettings({
 
               <SettingRow
                 icon={Clock3}
+                eyebrow="Financial"
                 title="Payment alerts"
-                description="Notify you when project payment or escrow actions require attention."
+                description="Notify you when payment or escrow actions require attention."
+                enabled={paymentAlerts}
+                disabled={!notifications}
                 control={
                   <Toggle
                     checked={paymentAlerts}
@@ -182,8 +242,11 @@ export function ProjectSettings({
 
               <SettingRow
                 icon={FileCheck2}
+                eyebrow="Documents"
                 title="Document alerts"
                 description="Notify you when project documents are uploaded or require review."
+                enabled={documentAlerts}
+                disabled={!notifications}
                 control={
                   <Toggle
                     checked={documentAlerts}
@@ -195,16 +258,20 @@ export function ProjectSettings({
             </CardBody>
           </Card>
 
-          {/* Project access */}
-          <Card>
+          {/* -------------------------------------------------------------- */}
+          {/* Project access                                                  */}
+          {/* -------------------------------------------------------------- */}
+
+          <Card className="overflow-hidden">
             <CardHeader
               title="Project access"
-              subtitle="Manage the professionals and project participants who can access this project."
+              subtitle="Manage participants and the permissions connected to this project."
             />
 
-            <CardBody className="space-y-3">
+            <CardBody className="space-y-2.5">
               <AccessRow
                 icon={Users}
+                eyebrow="Participants"
                 title="Project team"
                 description="Contractors, professionals and other assigned project participants."
                 value="Manage team"
@@ -212,30 +279,36 @@ export function ProjectSettings({
 
               <AccessRow
                 icon={ShieldCheck}
+                eyebrow="Client permissions"
                 title="Client access"
-                description="Client visibility and approval permissions for this project."
+                description="Client visibility, review and approval permissions."
                 value="Manage access"
               />
 
               <AccessRow
                 icon={Lock}
+                eyebrow="Protection"
                 title="Security & audit"
-                description="Project actions remain subject to role permissions and audit logging."
+                description="Role permissions, audit logging and project-level security controls."
                 value="View controls"
               />
             </CardBody>
           </Card>
         </div>
 
-        {/* Side panel */}
-        <div className="space-y-6">
-          <Card>
+        {/* ---------------------------------------------------------------- */}
+        {/* Side panel                                                        */}
+        {/* ---------------------------------------------------------------- */}
+
+        <div className="space-y-5">
+          {/* Project controls */}
+          <Card className="overflow-hidden">
             <CardHeader
               title="Project controls"
-              subtitle="Important project-level safeguards."
+              subtitle="Live safeguards currently protecting this workspace."
             />
 
-            <CardBody className="space-y-4">
+            <CardBody className="space-y-2">
               <ControlStatus
                 label="Evidence before payment"
                 enabled={requireEvidence}
@@ -253,119 +326,224 @@ export function ProjectSettings({
             </CardBody>
           </Card>
 
-          <Card>
+          {/* Governance summary */}
+          <div className="overflow-hidden rounded-[20px] bg-[#F7F8F6]">
+            <div className="border-b border-ink/[0.06] px-5 py-4">
+              <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-ink/35">
+                Governance status
+              </p>
+
+              <div className="mt-2 flex items-center gap-2">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#EAF4EE] text-[#12613E]">
+                  <ShieldCheck size={12} />
+                </span>
+
+                <p className="font-display text-sm font-semibold text-ink">
+                  Protected workflow
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-3 p-5">
+              <GovernanceItem
+                label="Evidence verification"
+                enabled={requireEvidence}
+              />
+
+              <GovernanceItem
+                label="Client approval"
+                enabled={requireApproval}
+              />
+
+              <GovernanceItem
+                label="Audit controls"
+                enabled
+              />
+
+              <GovernanceItem
+                label="Role permissions"
+                enabled
+              />
+            </div>
+          </div>
+
+          {/* Change control */}
+          <Card className="overflow-hidden">
             <CardHeader
               title="Change control"
               subtitle="Scope, cost and timeline changes."
             />
 
             <CardBody>
-              <div className="rounded-xl border border-line bg-paper-2 p-4">
+              <div className="rounded-[18px] border border-[#B85C12]/10 bg-[#FBF7F3] p-4">
                 <div className="flex items-start gap-3">
-                  <Lock className="mt-0.5 h-4 w-4 shrink-0 text-ink/40" />
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#F8EEE6] text-[#B85C12]">
+                    <Lock size={14} />
+                  </div>
 
-                  <div>
-                    <p className="text-xs font-semibold text-ink">
-                      Protected workflow
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-semibold text-ink">
+                      Formal change workflow protected
                     </p>
 
-                    <p className="mt-1 text-xs leading-5 text-ink/45">
-                      Project settings cannot bypass the formal Change Request
+                    <p className="mt-1.5 text-[10px] leading-5 text-ink/45">
+                      Settings cannot bypass the formal Change Request
                       process. Changes affecting scope, cost, timeline or
-                      payment should be handled through that workflow.
+                      payment must follow the appropriate approval workflow.
                     </p>
                   </div>
                 </div>
 
                 <button
                   type="button"
-                  className="mt-4 inline-flex items-center gap-1.5 text-[11px] font-semibold text-ink"
+                  className="
+                    group mt-4 inline-flex items-center gap-1.5
+                    text-[10px] font-bold text-ink/55
+                    transition hover:text-[#B85C12]
+                  "
                 >
                   Open change requests
-                  <ChevronRight className="h-3.5 w-3.5" />
+                  <ArrowUpRight
+                    size={12}
+                    className="transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                  />
                 </button>
               </div>
             </CardBody>
           </Card>
 
-          <Card>
+          {/* Project ID */}
+          <Card className="overflow-hidden">
             <CardHeader
-              title="Project ID"
-              subtitle="Reference used by project services and audit records."
+              title="Project reference"
+              subtitle="Used by project services and audit records."
             />
 
             <CardBody>
-              <span className="rounded-lg bg-ink/5 px-3 py-2 font-mono text-[10px] text-ink/50">
-                {projectId || 'Current project'}
-              </span>
+              <div className="flex items-center justify-between gap-3 rounded-[16px] border border-ink/[0.06] bg-[#FAFBFA] px-4 py-3.5">
+                <div>
+                  <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-ink/30">
+                    Project ID
+                  </p>
+
+                  <p className="mt-1 font-mono text-[10px] font-medium text-ink/55">
+                    {projectId || 'Current project'}
+                  </p>
+                </div>
+
+                <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-white text-ink/25 shadow-[0_3px_12px_rgba(20,40,30,0.04)]">
+                  <FileCheck2 size={13} />
+                </span>
+              </div>
             </CardBody>
           </Card>
         </div>
       </div>
 
-      {/* Safety notice */}
-      <div className="rounded-xl border border-line bg-paper-2 p-4">
-        <div className="flex items-start gap-3">
-          <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-ink/35" />
+      {/* ------------------------------------------------------------------ */}
+      {/* Governance notice                                                  */}
+      {/* ------------------------------------------------------------------ */}
 
-          <div>
-            <p className="text-xs font-semibold text-ink">
-              Project governance
-            </p>
+      <section
+        aria-label="Project governance notice"
+        className="overflow-hidden rounded-[20px] border border-ink/[0.07] bg-white"
+      >
+        <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-start sm:p-6">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#EAF4EE] text-[#12613E]">
+            <ShieldCheck size={15} />
+          </div>
 
-            <p className="mt-1 text-xs leading-5 text-ink/45">
-              Settings control how the project workspace behaves. They do not
-              override role permissions, evidence verification, payment
-              controls, dispute handling or formal change approval.
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="text-[11px] font-bold text-ink">
+                Project governance
+              </p>
+
+              <span className="rounded-full bg-[#EAF4EE] px-2 py-1 text-[8px] font-bold uppercase tracking-[0.10em] text-[#12613E]">
+                Protected
+              </span>
+            </div>
+
+            <p className="mt-1.5 max-w-4xl text-[10.5px] leading-5 text-ink/40">
+              These settings control how the project workspace behaves. They
+              do not override role permissions, evidence verification,
+              payment controls, dispute handling or formal change approval.
             </p>
           </div>
         </div>
-      </div>
+      </section>
     </div>
   )
 }
 
 /* -------------------------------------------------------------------------- */
-/* Shared components                                                           */
+/* Shared components                                                          */
 /* -------------------------------------------------------------------------- */
 
 function SettingRow({
   icon: Icon,
+  eyebrow,
   title,
   description,
+  enabled,
+  disabled = false,
   control,
 }: {
   icon: React.ElementType
+  eyebrow: string
   title: string
   description: string
+  enabled: boolean
+  disabled?: boolean
   control: React.ReactNode
 }) {
   return (
-    <div className="flex items-start gap-4 py-4 first:pt-0 last:pb-0">
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-ink/5">
-        <Icon className="h-4 w-4 text-ink/40" />
+    <div
+      className={[
+        'group flex items-start gap-4 py-5 transition',
+        disabled ? 'opacity-45' : '',
+      ].join(' ')}
+    >
+      <div
+        className={[
+          'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition duration-300',
+          enabled
+            ? 'bg-[#EAF4EE] text-[#12613E]'
+            : 'bg-ink/[0.05] text-ink/35',
+          !disabled && 'group-hover:scale-[1.03]',
+        ].join(' ')}
+      >
+        <Icon size={16} />
       </div>
 
       <div className="min-w-0 flex-1">
-        <p className="text-xs font-semibold text-ink">{title}</p>
+        <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-ink/30">
+          {eyebrow}
+        </p>
 
-        <p className="mt-1 max-w-xl text-[11px] leading-5 text-ink/40">
+        <p className="mt-1 text-[11px] font-semibold text-ink sm:text-xs">
+          {title}
+        </p>
+
+        <p className="mt-1 max-w-xl text-[10.5px] leading-5 text-ink/40">
           {description}
         </p>
       </div>
 
-      <div className="shrink-0">{control}</div>
+      <div className="shrink-0 pt-1">{control}</div>
     </div>
   )
 }
 
 function AccessRow({
   icon: Icon,
+  eyebrow,
   title,
   description,
   value,
 }: {
   icon: React.ElementType
+  eyebrow: string
   title: string
   description: string
   value: string
@@ -373,21 +551,53 @@ function AccessRow({
   return (
     <button
       type="button"
-      className="flex w-full items-center gap-3 rounded-xl border border-line p-3 text-left hover:bg-ink/[0.02]"
+      className="
+        group flex w-full items-center gap-3
+        rounded-[17px] border border-ink/[0.06]
+        bg-[#FCFDFC] p-3.5 text-left
+        transition duration-300
+        hover:-translate-y-0.5
+        hover:border-ink/[0.11]
+        hover:bg-white
+        hover:shadow-[0_10px_28px_rgba(20,40,30,0.05)]
+      "
     >
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-ink/5">
-        <Icon className="h-4 w-4 text-ink/40" />
+      <div
+        className="
+          flex h-10 w-10 shrink-0 items-center justify-center
+          rounded-xl bg-ink/[0.05] text-ink/40
+          transition duration-300
+          group-hover:bg-[#EAF4EE]
+          group-hover:text-[#12613E]
+        "
+      >
+        <Icon size={15} />
       </div>
 
       <div className="min-w-0 flex-1">
-        <p className="text-xs font-semibold text-ink">{title}</p>
+        <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-ink/30">
+          {eyebrow}
+        </p>
+
+        <p className="mt-1 text-[11px] font-semibold text-ink">
+          {title}
+        </p>
 
         <p className="mt-1 text-[10px] leading-4 text-ink/35">
           {description}
         </p>
       </div>
 
-      <ChevronRight className="h-4 w-4 shrink-0 text-ink/25" />
+      <div className="flex shrink-0 items-center gap-1.5 text-ink/25 transition group-hover:text-ink/55">
+        <span className="hidden text-[9px] font-bold sm:block">
+          {value}
+        </span>
+
+        <ChevronRight
+          size={14}
+          className="transition-transform duration-200 group-hover:translate-x-0.5"
+        />
+      </div>
     </button>
   )
 }
@@ -400,12 +610,50 @@ function ControlStatus({
   enabled: boolean
 }) {
   return (
-    <div className="flex items-center justify-between gap-3">
-      <span className="text-xs text-ink/50">{label}</span>
+    <div className="flex items-center justify-between gap-4 rounded-[14px] px-3 py-3 transition hover:bg-ink/[0.02]">
+      <div className="flex min-w-0 items-center gap-2.5">
+        <span
+          className={[
+            'h-1.5 w-1.5 shrink-0 rounded-full',
+            enabled ? 'bg-[#12613E]' : 'bg-ink/20',
+          ].join(' ')}
+        />
+
+        <span className="truncate text-[10.5px] font-medium text-ink/55">
+          {label}
+        </span>
+      </div>
 
       <Badge tone={enabled ? 'teal' : 'neutral'}>
         {enabled ? 'Enabled' : 'Off'}
       </Badge>
+    </div>
+  )
+}
+
+function GovernanceItem({
+  label,
+  enabled,
+}: {
+  label: string
+  enabled: boolean
+}) {
+  return (
+    <div className="flex items-center gap-2.5">
+      <span
+        className={[
+          'flex h-5 w-5 shrink-0 items-center justify-center rounded-full',
+          enabled
+            ? 'bg-[#EAF4EE] text-[#12613E]'
+            : 'bg-ink/[0.05] text-ink/25',
+        ].join(' ')}
+      >
+        {enabled ? <Check size={10} strokeWidth={3} /> : null}
+      </span>
+
+      <span className="text-[10px] font-medium text-ink/50">
+        {label}
+      </span>
     </div>
   )
 }
@@ -423,14 +671,18 @@ function Toggle({
       disabled={disabled}
       onClick={() => onChange(!checked)}
       className={[
-        'relative h-6 w-11 rounded-full transition-colors',
-        checked ? 'bg-ink' : 'bg-ink/10',
-        disabled ? 'cursor-not-allowed opacity-40' : 'cursor-pointer',
+        'relative h-7 w-12 rounded-full transition-all duration-300',
+        checked
+          ? 'bg-[#12613E] shadow-[0_4px_14px_rgba(18,97,62,0.18)]'
+          : 'bg-ink/[0.10]',
+        disabled
+          ? 'cursor-not-allowed opacity-35'
+          : 'cursor-pointer hover:opacity-90',
       ].join(' ')}
     >
       <span
         className={[
-          'absolute top-1 h-4 w-4 rounded-full bg-white shadow-sm transition-transform',
+          'absolute top-1 h-5 w-5 rounded-full bg-white shadow-[0_2px_7px_rgba(0,0,0,0.14)] transition-all duration-300',
           checked ? 'left-6' : 'left-1',
         ].join(' ')}
       />

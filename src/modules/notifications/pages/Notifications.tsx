@@ -98,38 +98,45 @@ const notificationMeta: Record<
   {
     label: string
     icon: typeof Bell
-    className: string
+    iconClassName: string
+    accentClassName: string
   }
 > = {
   project: {
     label: 'Project',
     icon: Clock3,
-    className: 'bg-teal/10 text-teal',
+    iconClassName: 'bg-[#12613E]/[0.08] text-[#12613E]',
+    accentClassName: 'bg-[#12613E]',
   },
   payment: {
     label: 'Payment',
     icon: Wallet,
-    className: 'bg-amber/10 text-amber',
+    iconClassName: 'bg-[#B85C12]/[0.10] text-[#B85C12]',
+    accentClassName: 'bg-[#B85C12]',
   },
   milestone: {
     label: 'Milestone',
     icon: Check,
-    className: 'bg-teal/10 text-teal',
+    iconClassName: 'bg-[#12613E]/[0.08] text-[#12613E]',
+    accentClassName: 'bg-[#12613E]',
   },
   risk: {
     label: 'Risk alert',
     icon: ShieldAlert,
-    className: 'bg-laterite/10 text-laterite',
+    iconClassName: 'bg-rose-50 text-rose-700',
+    accentClassName: 'bg-rose-600',
   },
   evidence: {
     label: 'Evidence',
     icon: FileCheck2,
-    className: 'bg-ink/5 text-ink',
+    iconClassName: 'bg-slate-100 text-slate-600',
+    accentClassName: 'bg-slate-500',
   },
   system: {
     label: 'System',
     icon: Bell,
-    className: 'bg-ink/5 text-ink/70',
+    iconClassName: 'bg-slate-100 text-slate-500',
+    accentClassName: 'bg-slate-400',
   },
 }
 
@@ -141,6 +148,23 @@ export function Notifications() {
 
   const unreadCount = useMemo(
     () => notifications.filter((notification) => !notification.read).length,
+    [notifications],
+  )
+
+  const riskCount = useMemo(
+    () =>
+      notifications.filter(
+        (notification) => notification.type === 'risk',
+      ).length,
+    [notifications],
+  )
+
+  const actionCount = useMemo(
+    () =>
+      notifications.filter(
+        (notification) =>
+          !notification.read && Boolean(notification.actionLabel),
+      ).length,
     [notifications],
   )
 
@@ -172,246 +196,414 @@ export function Notifications() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Page header */}
-      <div className="flex flex-col gap-4 border-b border-ink/10 pb-5 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <div className="flex items-center gap-2">
-            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-ink/40">
-              Notifications
-            </p>
+    <div className="space-y-8">
+      {/* ------------------------------------------------------------------ */}
+      {/* Hero                                                               */}
+      {/* ------------------------------------------------------------------ */}
 
-            {unreadCount > 0 && (
-              <span className="rounded-full bg-laterite px-2 py-0.5 font-mono text-[9px] font-semibold text-white">
-                {unreadCount} new
+      <section className="relative overflow-hidden rounded-[24px] border border-ink/[0.07] bg-white px-6 py-7 shadow-[0_18px_50px_rgba(20,40,30,0.07)] sm:px-8 sm:py-8">
+        <div className="pointer-events-none absolute -right-20 -top-28 h-64 w-64 rounded-full bg-[#12613E]/[0.07] blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-28 left-1/3 h-52 w-52 rounded-full bg-[#B85C12]/[0.045] blur-3xl" />
+
+        <div className="relative flex flex-col gap-7 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-3xl">
+            <div className="flex flex-wrap items-center gap-2.5">
+              <span className="inline-flex items-center gap-2 rounded-full border border-[#12613E]/10 bg-[#12613E]/[0.045] px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[#12613E]">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#12613E]" />
+                Notifications
               </span>
-            )}
+
+              {unreadCount > 0 && (
+                <span className="rounded-full bg-[#B85C12] px-2.5 py-1 font-mono text-[9px] font-semibold uppercase tracking-[0.12em] text-white">
+                  {unreadCount} new
+                </span>
+              )}
+            </div>
+
+            <h1 className="mt-5 font-display text-3xl font-semibold tracking-[-0.04em] text-[#18271F] sm:text-4xl">
+              Notification centre
+            </h1>
+
+            <p className="mt-3 max-w-2xl text-sm leading-7 text-ink/50 sm:text-[15px]">
+              A central view of project activity, approvals, financial
+              actions, verification events, monitoring signals and other
+              updates requiring your attention.
+            </p>
+
+            <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-ink/40">
+              <HeroMeta label="Unread" value={`${unreadCount} updates`} />
+              <HeroMeta label="Attention" value={`${actionCount} actions`} />
+              <HeroMeta label="Risk" value={`${riskCount} alerts`} />
+            </div>
           </div>
 
-          <h1 className="mt-2 text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
-            Notification centre
-          </h1>
-
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-ink/55">
-            Stay informed about project activity, milestone verification,
-            payments, monitoring updates, evidence and risk alerts.
-          </p>
+          <button
+            type="button"
+            onClick={markAllAsRead}
+            disabled={unreadCount === 0}
+            className="group inline-flex h-11 shrink-0 items-center justify-center gap-2.5 rounded-xl bg-[#18271F] px-5 text-xs font-semibold text-white shadow-[0_12px_28px_rgba(24,39,31,0.14)] transition duration-200 hover:-translate-y-0.5 hover:bg-[#12613E] disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:translate-y-0"
+          >
+            <CheckCheck className="h-4 w-4" />
+            Mark all as read
+            <ChevronRight className="h-3.5 w-3.5 opacity-50 transition-transform group-hover:translate-x-0.5" />
+          </button>
         </div>
+      </section>
 
-        <button
-          type="button"
-          onClick={markAllAsRead}
-          disabled={unreadCount === 0}
-          className="inline-flex items-center justify-center gap-2 rounded-lg border border-ink/10 bg-white px-4 py-2.5 text-xs font-medium text-ink transition hover:border-ink/20 hover:bg-ink/[0.02] disabled:cursor-not-allowed disabled:opacity-40"
-        >
-          <CheckCheck className="h-4 w-4" />
-          Mark all as read
-        </button>
-      </div>
+      {/* ------------------------------------------------------------------ */}
+      {/* Executive summary                                                  */}
+      {/* ------------------------------------------------------------------ */}
 
-      {/* Summary cards */}
-      <div className="grid gap-3 sm:grid-cols-3">
-        <Card className="p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink/40">
-                Unread
-              </p>
+      <section className="grid gap-4 sm:grid-cols-3">
+        <SummaryCard
+          eyebrow="Attention"
+          label="Unread notifications"
+          value={unreadCount}
+          description={
+            unreadCount > 0
+              ? 'Updates awaiting your review.'
+              : 'Everything has been reviewed.'
+          }
+          icon={Bell}
+          tone="green"
+        />
 
-              <p className="mt-2 text-2xl font-semibold text-ink">
-                {unreadCount}
-              </p>
-            </div>
+        <SummaryCard
+          eyebrow="Exceptions"
+          label="Risk alerts"
+          value={riskCount}
+          description={
+            riskCount > 0
+              ? 'Risk signals within the current feed.'
+              : 'No risk alerts in this feed.'
+          }
+          icon={CircleAlert}
+          tone="rose"
+        />
 
-            <div className="rounded-xl bg-laterite/10 p-2.5 text-laterite">
-              <Bell className="h-5 w-5" />
-            </div>
-          </div>
-        </Card>
+        <SummaryCard
+          eyebrow="Activity"
+          label="Total updates"
+          value={notifications.length}
+          description="Recent project and platform activity."
+          icon={CheckCheck}
+          tone="bronze"
+        />
+      </section>
 
-        <Card className="p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink/40">
-                Risk alerts
-              </p>
+      {/* ------------------------------------------------------------------ */}
+      {/* Notification register                                               */}
+      {/* ------------------------------------------------------------------ */}
 
-              <p className="mt-2 text-2xl font-semibold text-ink">
-                {
-                  notifications.filter(
-                    (notification) => notification.type === 'risk',
-                  ).length
-                }
-              </p>
-            </div>
-
-            <div className="rounded-xl bg-laterite/10 p-2.5 text-laterite">
-              <CircleAlert className="h-5 w-5" />
-            </div>
-          </div>
-        </Card>
-
-        <Card className="p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink/40">
-                Total
-              </p>
-
-              <p className="mt-2 text-2xl font-semibold text-ink">
-                {notifications.length}
-              </p>
-            </div>
-
-            <div className="rounded-xl bg-teal/10 p-2.5 text-teal">
-              <CheckCheck className="h-5 w-5" />
-            </div>
-          </div>
-        </Card>
-      </div>
-
-      {/* Notifications */}
-      <Card className="overflow-hidden">
-        <div className="flex flex-col gap-4 border-b border-ink/10 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+      <Card className="overflow-hidden border-ink/[0.07] shadow-[0_18px_50px_rgba(20,40,30,0.06)]">
+        <div className="flex flex-col gap-5 border-b border-ink/[0.07] px-5 py-5 sm:px-6 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h2 className="text-sm font-semibold text-ink">
-              Recent activity
-            </h2>
+            <div className="flex items-center gap-2">
+              <h2 className="font-display text-lg font-semibold tracking-[-0.02em] text-[#18271F]">
+                Recent activity
+              </h2>
 
-            <p className="mt-1 text-xs text-ink/45">
-              Updates requiring your attention and project activity.
+              {unreadCount > 0 && (
+                <span className="rounded-full bg-[#12613E]/[0.08] px-2 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-[0.12em] text-[#12613E]">
+                  {unreadCount} unread
+                </span>
+              )}
+            </div>
+
+            <p className="mt-1.5 text-xs leading-5 text-ink/45">
+              Updates requiring attention and recent activity across your
+              Build OS workspace.
             </p>
           </div>
 
-          <div className="flex rounded-lg bg-ink/[0.04] p-1">
-            <button
-              type="button"
+          <div className="inline-flex w-fit rounded-xl border border-ink/[0.06] bg-ink/[0.025] p-1">
+            <FilterButton
+              active={filter === 'all'}
               onClick={() => setFilter('all')}
-              className={`rounded-md px-3 py-1.5 text-xs font-medium transition ${
-                filter === 'all'
-                  ? 'bg-white text-ink shadow-sm'
-                  : 'text-ink/45 hover:text-ink'
-              }`}
             >
               All
-            </button>
+              <span className="ml-1.5 font-mono text-[9px] opacity-50">
+                {notifications.length}
+              </span>
+            </FilterButton>
 
-            <button
-              type="button"
+            <FilterButton
+              active={filter === 'unread'}
               onClick={() => setFilter('unread')}
-              className={`rounded-md px-3 py-1.5 text-xs font-medium transition ${
-                filter === 'unread'
-                  ? 'bg-white text-ink shadow-sm'
-                  : 'text-ink/45 hover:text-ink'
-              }`}
             >
               Unread
               {unreadCount > 0 && (
-                <span className="ml-1.5 font-mono text-[10px]">
+                <span className="ml-1.5 rounded-full bg-[#B85C12] px-1.5 py-0.5 font-mono text-[9px] text-white">
                   {unreadCount}
                 </span>
               )}
-            </button>
+            </FilterButton>
           </div>
         </div>
 
         {visibleNotifications.length > 0 ? (
-          <div className="divide-y divide-ink/[0.08]">
+          <div className="divide-y divide-ink/[0.07]">
             {visibleNotifications.map((notification) => {
               const meta = notificationMeta[notification.type]
               const Icon = meta.icon
 
               return (
-                <div
+                <article
                   key={notification.id}
-                  className={`group flex gap-4 px-5 py-4 transition hover:bg-ink/[0.015] ${
-                    !notification.read ? 'bg-teal/[0.025]' : ''
+                  className={`group relative px-5 py-5 transition duration-200 sm:px-6 ${
+                    !notification.read
+                      ? 'bg-[#12613E]/[0.018]'
+                      : 'bg-white hover:bg-ink/[0.012]'
                   }`}
                 >
-                  <div
-                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${meta.className}`}
-                  >
-                    <Icon className="h-4 w-4" />
-                  </div>
+                  {!notification.read && (
+                    <span
+                      className={`absolute inset-y-0 left-0 w-[3px] ${meta.accentClassName}`}
+                    />
+                  )}
 
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                      <div className="flex items-center gap-2">
-                        {!notification.read && (
-                          <span className="h-1.5 w-1.5 rounded-full bg-laterite" />
-                        )}
+                  <div className="flex gap-4 sm:gap-5">
+                    <div
+                      className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] ${meta.iconClassName}`}
+                    >
+                      <Icon className="h-[18px] w-[18px]" />
+                    </div>
 
-                        <h3
-                          className={`text-sm ${
-                            notification.read
-                              ? 'font-medium text-ink/75'
-                              : 'font-semibold text-ink'
-                          }`}
-                        >
-                          {notification.title}
-                        </h3>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-col gap-2 lg:flex-row lg:items-start lg:justify-between lg:gap-6">
+                        <div className="min-w-0">
+                          <div className="flex flex-wrap items-center gap-2">
+                            {!notification.read && (
+                              <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#B85C12]" />
+                            )}
+
+                            <h3
+                              className={`text-sm tracking-[-0.01em] ${
+                                notification.read
+                                  ? 'font-medium text-ink/75'
+                                  : 'font-semibold text-[#18271F]'
+                              }`}
+                            >
+                              {notification.title}
+                            </h3>
+
+                            <span className="rounded-full bg-ink/[0.035] px-2 py-0.5 font-mono text-[8px] font-semibold uppercase tracking-[0.12em] text-ink/40">
+                              {meta.label}
+                            </span>
+                          </div>
+
+                          <p className="mt-2 max-w-3xl text-sm leading-6 text-ink/50">
+                            {notification.description}
+                          </p>
+                        </div>
+
+                        <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.08em] text-ink/30">
+                          {notification.time}
+                        </span>
                       </div>
 
-                      <span className="font-mono text-[10px] text-ink/35">
-                        {notification.time}
-                      </span>
-                    </div>
+                      <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2">
+                        {notification.actionLabel && (
+                          <button
+                            type="button"
+                            onClick={() => markAsRead(notification.id)}
+                            className="group/action inline-flex items-center gap-1.5 text-xs font-semibold text-[#12613E] transition hover:text-[#0E4D32]"
+                          >
+                            {notification.actionLabel}
+                            <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover/action:translate-x-0.5" />
+                          </button>
+                        )}
 
-                    <p className="mt-1.5 max-w-3xl text-sm leading-6 text-ink/50">
-                      {notification.description}
-                    </p>
+                        {!notification.read && (
+                          <button
+                            type="button"
+                            onClick={() => markAsRead(notification.id)}
+                            className="inline-flex items-center gap-1.5 text-xs font-medium text-ink/40 transition hover:text-ink/70"
+                          >
+                            <Check className="h-3.5 w-3.5" />
+                            Mark as read
+                          </button>
+                        )}
 
-                    <div className="mt-3 flex items-center gap-4">
-                      {notification.actionLabel && (
-                        <button
-                          type="button"
-                          onClick={() => markAsRead(notification.id)}
-                          className="inline-flex items-center gap-1 text-xs font-semibold text-teal transition hover:text-teal/70"
-                        >
-                          {notification.actionLabel}
-
-                          <ChevronRight className="h-3.5 w-3.5" />
-                        </button>
-                      )}
-
-                      {!notification.read && (
-                        <button
-                          type="button"
-                          onClick={() => markAsRead(notification.id)}
-                          className="text-xs text-ink/40 transition hover:text-ink"
-                        >
-                          Mark as read
-                        </button>
-                      )}
+                        {notification.read && (
+                          <span className="inline-flex items-center gap-1.5 text-[11px] text-ink/30">
+                            <CheckCheck className="h-3.5 w-3.5" />
+                            Read
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
+                </article>
               )
             })}
           </div>
         ) : (
-          <div className="flex min-h-[280px] flex-col items-center justify-center px-6 text-center">
-            <div className="rounded-full bg-teal/10 p-4 text-teal">
-              <CheckCheck className="h-6 w-6" />
-            </div>
-
-            <h3 className="mt-4 text-sm font-semibold text-ink">
-              You&apos;re all caught up
-            </h3>
-
-            <p className="mt-2 max-w-sm text-sm leading-6 text-ink/45">
-              There are no unread notifications requiring your attention.
-            </p>
-          </div>
+          <EmptyNotifications />
         )}
+
+        <div className="flex flex-col gap-2 border-t border-ink/[0.07] bg-[#F8FAF8] px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+          <p className="text-[11px] text-ink/35">
+            {visibleNotifications.length} of {notifications.length} notifications
+            displayed
+          </p>
+
+          <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-ink/30">
+            Live workspace activity
+          </span>
+        </div>
       </Card>
 
-      {/* BRD reference */}
-      <div className="flex justify-end">
-        <span className="rounded-full bg-ink/5 px-3 py-1 font-mono text-[10px] text-ink/40">
+      {/* ------------------------------------------------------------------ */}
+      {/* Footer metadata                                                    */}
+      {/* ------------------------------------------------------------------ */}
+
+      <div className="flex flex-col gap-3 border-t border-ink/[0.06] pt-5 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-xs text-ink/35">
+          Notification preferences and delivery controls can be managed from
+          your workspace settings.
+        </p>
+
+        <span className="w-fit rounded-full bg-ink/[0.04] px-3 py-1.5 font-mono text-[9px] uppercase tracking-[0.12em] text-ink/35">
           BRD ref: Sec. 20.2
         </span>
       </div>
+    </div>
+  )
+}
+
+/* -------------------------------------------------------------------------- */
+/* Supporting UI                                                             */
+/* -------------------------------------------------------------------------- */
+
+function HeroMeta({
+  label,
+  value,
+}: {
+  label: string
+  value: string
+}) {
+  return (
+    <div className="flex items-center gap-2">
+      <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-ink/30">
+        {label}
+      </span>
+
+      <span className="font-medium text-ink/60">{value}</span>
+    </div>
+  )
+}
+
+function SummaryCard({
+  eyebrow,
+  label,
+  value,
+  description,
+  icon: Icon,
+  tone,
+}: {
+  eyebrow: string
+  label: string
+  value: number
+  description: string
+  icon: typeof Bell
+  tone: 'green' | 'bronze' | 'rose'
+}) {
+  const styles = {
+    green: {
+      icon: 'bg-[#12613E]/[0.08] text-[#12613E]',
+      value: 'text-[#12613E]',
+    },
+    bronze: {
+      icon: 'bg-[#B85C12]/[0.09] text-[#B85C12]',
+      value: 'text-[#B85C12]',
+    },
+    rose: {
+      icon: 'bg-rose-50 text-rose-700',
+      value: 'text-rose-700',
+    },
+  }[tone]
+
+  return (
+    <Card className="group border-ink/[0.07] p-5 shadow-[0_12px_35px_rgba(20,40,30,0.045)] transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_18px_45px_rgba(20,40,30,0.08)]">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-ink/35">
+            {eyebrow}
+          </p>
+
+          <p className="mt-2 text-sm font-medium text-ink/65">
+            {label}
+          </p>
+
+          <p
+            className={`mt-2 font-display text-3xl font-semibold tracking-[-0.04em] ${styles.value}`}
+          >
+            {value}
+          </p>
+
+          <p className="mt-2 text-xs leading-5 text-ink/40">
+            {description}
+          </p>
+        </div>
+
+        <div
+          className={`rounded-[14px] p-3 transition-transform duration-200 group-hover:scale-105 ${styles.icon}`}
+        >
+          <Icon className="h-[18px] w-[18px]" />
+        </div>
+      </div>
+    </Card>
+  )
+}
+
+function FilterButton({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean
+  onClick: () => void
+  children: React.ReactNode
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`inline-flex items-center rounded-lg px-3.5 py-2 text-xs font-semibold transition ${
+        active
+          ? 'bg-white text-[#18271F] shadow-[0_3px_10px_rgba(20,40,30,0.07)]'
+          : 'text-ink/40 hover:text-ink/70'
+      }`}
+    >
+      {children}
+    </button>
+  )
+}
+
+function EmptyNotifications() {
+  return (
+    <div className="flex min-h-[340px] flex-col items-center justify-center px-6 py-16 text-center">
+      <div className="relative">
+        <div className="absolute inset-0 rounded-full bg-[#12613E]/[0.08] blur-xl" />
+
+        <div className="relative flex h-16 w-16 items-center justify-center rounded-full border border-[#12613E]/10 bg-[#12613E]/[0.055] text-[#12613E]">
+          <CheckCheck className="h-7 w-7" />
+        </div>
+      </div>
+
+      <p className="mt-6 font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-[#12613E]/60">
+        All clear
+      </p>
+
+      <h3 className="mt-2 font-display text-xl font-semibold tracking-[-0.025em] text-[#18271F]">
+        You&apos;re all caught up
+      </h3>
+
+      <p className="mt-2 max-w-sm text-sm leading-6 text-ink/45">
+        There are no unread notifications requiring your attention right now.
+        New project activity will appear here as it occurs.
+      </p>
     </div>
   )
 }

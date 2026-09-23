@@ -189,46 +189,70 @@ export function ServiceInvitations() {
   ).length
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-ink/40">
-            Professional workspace
-          </p>
+    <div className="space-y-7">
+      {/* ─────────────────────────────────────────────
+          PAGE HEADER
+      ───────────────────────────────────────────── */}
+      <header className="relative overflow-hidden rounded-[28px] border border-ink/[0.07] bg-white shadow-[0_14px_45px_rgba(11,18,32,0.045)]">
+        {/* Decorative glow */}
+        <div className="absolute right-0 top-0 h-48 w-48 translate-x-16 -translate-y-20 rounded-full bg-[#1657FF]/[0.09] blur-3xl" />
 
-          <h1 className="mt-1 font-display text-2xl font-semibold tracking-tight text-ink">
-            Service Invitations
-          </h1>
+        <div className="absolute bottom-0 right-24 h-20 w-20 translate-y-12 rounded-full bg-[#34A6FF]/[0.06] blur-2xl" />
 
-          <p className="mt-1 max-w-2xl text-sm leading-6 text-ink/50">
-            Review invitations from clients and decide which professional
-            service opportunities you want to pursue.
-          </p>
-        </div>
+        <div className="relative flex flex-col gap-6 p-6 sm:p-7 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-2xl">
+            <div className="flex items-center gap-2">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#1657FF]" />
 
-        <div className="flex items-center gap-2 rounded-xl border border-line bg-white px-3.5 py-2.5">
-          <BadgeCheck className="h-4 w-4 text-emerald-600" />
+              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#1657FF]">
+                Professional workspace
+              </p>
+            </div>
 
-          <div>
-            <p className="text-[10px] font-semibold text-ink">
-              Verified opportunities
-            </p>
+            <h1 className="mt-2 font-display text-3xl font-semibold tracking-[-0.04em] text-[#0B1220] sm:text-[34px]">
+              Service Invitations
+            </h1>
 
-            <p className="text-[9px] text-ink/40">
-              Invitations from verified project clients
+            <p className="mt-2 max-w-xl text-sm leading-6 text-ink/45">
+              Review verified project opportunities, assess requirements and
+              decide which assignments you want to pursue.
             </p>
           </div>
-        </div>
-      </div>
 
-      {/* Summary */}
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {/* Verification signal */}
+          <div className="group flex items-center gap-3 rounded-2xl border border-ink/[0.07] bg-[#F6F8FC] px-4 py-3.5 transition-all duration-200 hover:border-[#1657FF]/15 hover:bg-[#1657FF]/[0.025]">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-500/[0.08]">
+              <BadgeCheck className="h-4 w-4 text-emerald-600" />
+            </div>
+
+            <div>
+              <p className="text-[10px] font-bold text-[#0B1220]">
+                Verified opportunities
+              </p>
+
+              <p className="mt-0.5 text-[9px] text-ink/40">
+                Invitations from verified project clients
+              </p>
+            </div>
+
+            <ChevronRight className="ml-2 h-3.5 w-3.5 text-ink/20 transition-transform group-hover:translate-x-0.5" />
+          </div>
+        </div>
+      </header>
+
+      {/* ─────────────────────────────────────────────
+          SUMMARY
+      ───────────────────────────────────────────── */}
+      <section
+        aria-label="Invitation summary"
+        className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
+      >
         <SummaryCard
           icon={Send}
           label="New invitations"
           value={newCount}
           description="Awaiting your response"
+          accent="blue"
         />
 
         <SummaryCard
@@ -236,6 +260,7 @@ export function ServiceInvitations() {
           label="Under review"
           value={reviewingCount}
           description="Opportunities you're considering"
+          accent="amber"
         />
 
         <SummaryCard
@@ -243,6 +268,7 @@ export function ServiceInvitations() {
           label="Proposals submitted"
           value={submittedCount}
           description="Awaiting client decision"
+          accent="violet"
         />
 
         <SummaryCard
@@ -250,71 +276,109 @@ export function ServiceInvitations() {
           label="Total invitations"
           value={invitations.length}
           description="Invitation history"
+          accent="navy"
         />
-      </div>
+      </section>
 
-      {/* Invitation list */}
-      <Card className="overflow-hidden">
+      {/* ─────────────────────────────────────────────
+          OPPORTUNITY WORKSPACE
+      ───────────────────────────────────────────── */}
+      <Card className="overflow-hidden rounded-[26px] border-ink/[0.07] shadow-[0_14px_45px_rgba(11,18,32,0.045)]">
         <CardHeader
           title="Service opportunities"
           subtitle="Review project requirements before submitting a proposal"
         />
 
-        <div className="border-y border-line bg-paper-2 px-6 py-4">
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        {/* Toolbar */}
+        <div className="border-y border-ink/[0.06] bg-[#F6F8FC] px-5 py-4 sm:px-6">
+          <div className="flex flex-col gap-4">
             {/* Search */}
-            <div className="relative min-w-0 flex-1 lg:max-w-md">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/30" />
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+              <div className="relative min-w-0 flex-1 lg:max-w-md">
+                <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/25" />
 
-              <input
-                type="search"
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search invitations, projects or services..."
-                className="h-10 w-full rounded-xl border border-line bg-white pl-9 pr-3 text-xs text-ink outline-none placeholder:text-ink/30 focus:border-ink/30"
-              />
+                <input
+                  type="search"
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
+                  placeholder="Search invitations, projects or services..."
+                  className="h-11 w-full rounded-xl border border-ink/[0.07] bg-white pl-10 pr-4 text-xs font-medium text-ink outline-none shadow-[0_2px_8px_rgba(11,18,32,0.025)] transition-all placeholder:text-ink/25 focus:border-[#1657FF]/30 focus:ring-4 focus:ring-[#1657FF]/[0.06]"
+                />
+              </div>
+
+              <div className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-[0.14em] text-ink/30">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#1657FF]" />
+
+                {filteredInvitations.length} opportunity
+                {filteredInvitations.length === 1 ? '' : 'ies'}
+              </div>
             </div>
 
             {/* Filters */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-1 lg:pb-0">
-              <Filter className="mr-1 h-3.5 w-3.5 shrink-0 text-ink/35" />
+            <div className="flex items-center gap-2 overflow-x-auto pb-0.5">
+              <div className="mr-1 flex h-8 shrink-0 items-center gap-1.5 rounded-lg bg-white px-2.5 text-[10px] font-semibold text-ink/40 shadow-[0_2px_8px_rgba(11,18,32,0.025)]">
+                <Filter className="h-3 w-3" />
+                Filter
+              </div>
 
-              {filters.map((filter) => (
-                <button
-                  key={filter}
-                  type="button"
-                  onClick={() => setActiveFilter(filter)}
-                  className={[
-                    'whitespace-nowrap rounded-full px-3 py-1.5 text-[10px] font-semibold transition-colors',
-                    activeFilter === filter
-                      ? 'bg-ink text-white'
-                      : 'bg-white text-ink/50 hover:bg-ink/5 hover:text-ink',
-                  ].join(' ')}
-                >
-                  {filter}
-                </button>
-              ))}
+              {filters.map((filter) => {
+                const count =
+                  filter === 'All'
+                    ? invitations.length
+                    : invitations.filter(
+                        (item) => item.status === filter,
+                      ).length
+
+                return (
+                  <button
+                    key={filter}
+                    type="button"
+                    onClick={() => setActiveFilter(filter)}
+                    className={[
+                      'group inline-flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-2 text-[10px] font-semibold transition-all duration-200',
+                      activeFilter === filter
+                        ? 'bg-[#0B1220] text-white shadow-[0_5px_14px_rgba(11,18,32,0.13)]'
+                        : 'bg-white text-ink/45 hover:bg-ink/[0.035] hover:text-ink',
+                    ].join(' ')}
+                  >
+                    {filter}
+
+                    <span
+                      className={[
+                        'text-[9px]',
+                        activeFilter === filter
+                          ? 'text-white/45'
+                          : 'text-ink/25 group-hover:text-ink/40',
+                      ].join(' ')}
+                    >
+                      {String(count).padStart(2, '0')}
+                    </span>
+                  </button>
+                )
+              })}
             </div>
           </div>
         </div>
 
+        {/* Results */}
         {filteredInvitations.length > 0 ? (
-          <div className="divide-y divide-line">
-            {filteredInvitations.map((invitation) => (
+          <div className="divide-y divide-ink/[0.06]">
+            {filteredInvitations.map((invitation, index) => (
               <InvitationRow
                 key={invitation.id}
                 invitation={invitation}
+                index={index}
               />
             ))}
           </div>
         ) : (
           <CardBody>
-            <div className="flex min-h-52 flex-col items-center justify-center text-center">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-ink/5">
-                <Search className="h-5 w-5 text-ink/35" />
+            <div className="flex min-h-64 flex-col items-center justify-center text-center">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-ink/[0.06] bg-[#F6F8FC]">
+                <Search className="h-5 w-5 text-ink/25" />
               </div>
 
-              <h3 className="mt-4 text-sm font-semibold text-ink">
+              <h3 className="mt-4 font-display text-base font-semibold text-ink">
                 No invitations found
               </h3>
 
@@ -322,6 +386,19 @@ export function ServiceInvitations() {
                 Try another search term or change the invitation status
                 filter.
               </p>
+
+              {(search || activeFilter !== 'All') && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearch('')
+                    setActiveFilter('All')
+                  }}
+                  className="mt-4 rounded-full bg-[#0B1220] px-4 py-2 text-[10px] font-semibold text-white transition-all hover:bg-[#1657FF]"
+                >
+                  Clear filters
+                </button>
+              )}
             </div>
           </CardBody>
         )}
@@ -332,50 +409,84 @@ export function ServiceInvitations() {
 
 function InvitationRow({
   invitation,
+  index,
 }: {
   invitation: ServiceInvitation
+  index: number
 }) {
   const canRespond =
     invitation.status === 'New' ||
     invitation.status === 'Reviewing'
 
   return (
-    <div className="px-6 py-5 transition-colors hover:bg-ink/[0.015]">
-      <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
-        {/* Identity */}
-        <div className="flex min-w-0 flex-1 items-start gap-4">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-ink/5">
-            <BriefcaseBusiness className="h-4 w-4 text-ink/45" />
-          </div>
+    <article className="group relative px-5 py-5 transition-all duration-200 hover:bg-[#F6F8FC]/60 sm:px-6 sm:py-6">
+      {/* Hover accent */}
+      <div className="absolute bottom-5 left-0 top-5 w-0.5 rounded-r-full bg-[#1657FF] opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
 
-          <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-2">
-              <h3 className="text-sm font-semibold text-ink">
-                {invitation.title}
-              </h3>
+      <div className="flex flex-col gap-6">
+        {/* Identity + actions */}
+        <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
+          <div className="flex min-w-0 flex-1 gap-4">
+            {/* Opportunity icon */}
+            <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-ink/[0.06] bg-[#F6F8FC] transition-all duration-200 group-hover:border-[#1657FF]/15 group-hover:bg-[#1657FF]/[0.06]">
+              <BriefcaseBusiness className="h-[17px] w-[17px] text-ink/40 transition-colors group-hover:text-[#1657FF]" />
 
-              <StatusBadge status={invitation.status} />
-            </div>
-
-            <p className="mt-1 text-xs font-medium text-ink/50">
-              {invitation.project}
-            </p>
-
-            <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[10px] text-ink/35">
-              <span>{invitation.id}</span>
-
-              <span>{invitation.service}</span>
-
-              <span className="inline-flex items-center gap-1">
-                <MapPin className="h-3 w-3" />
-                {invitation.location}
+              <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full border-2 border-white bg-[#0B1220] px-1 text-[7px] font-bold text-white">
+                {String(index + 1).padStart(2, '0')}
               </span>
             </div>
+
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <h3 className="text-sm font-semibold tracking-[-0.01em] text-ink">
+                  {invitation.title}
+                </h3>
+
+                <StatusBadge status={invitation.status} />
+              </div>
+
+              <p className="mt-1.5 text-xs font-medium text-ink/45">
+                {invitation.project}
+              </p>
+
+              <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+                <MetaPill>{invitation.id}</MetaPill>
+
+                <MetaPill>{invitation.service}</MetaPill>
+
+                <span className="inline-flex items-center gap-1.5 text-[9px] font-semibold text-ink/35">
+                  <MapPin className="h-3 w-3 text-ink/25" />
+                  {invitation.location}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex shrink-0 gap-2">
+            <button
+              type="button"
+              className="group/button inline-flex items-center justify-center gap-1.5 rounded-xl border border-ink/[0.07] bg-white px-4 py-2.5 text-[11px] font-semibold text-ink shadow-[0_2px_8px_rgba(11,18,32,0.025)] transition-all duration-200 hover:-translate-y-0.5 hover:border-[#1657FF]/20 hover:bg-[#1657FF] hover:text-white hover:shadow-[0_8px_20px_rgba(22,87,255,0.14)]"
+            >
+              View details
+
+              <ChevronRight className="h-3.5 w-3.5 text-ink/25 transition-all group-hover/button:translate-x-0.5 group-hover/button:text-white" />
+            </button>
+
+            {canRespond && (
+              <button
+                type="button"
+                className="group/button inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#0B1220] px-4 py-2.5 text-[11px] font-semibold text-white shadow-[0_5px_15px_rgba(11,18,32,0.12)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#1657FF] hover:shadow-[0_8px_20px_rgba(22,87,255,0.18)]"
+              >
+                <Send className="h-3.5 w-3.5 transition-transform group-hover/button:-translate-y-0.5 group-hover/button:translate-x-0.5" />
+                Submit proposal
+              </button>
+            )}
           </div>
         </div>
 
-        {/* Opportunity metadata */}
-        <div className="grid grid-cols-2 gap-x-8 gap-y-3 sm:grid-cols-4 xl:min-w-[560px]">
+        {/* Opportunity metrics */}
+        <div className="grid grid-cols-2 overflow-hidden rounded-2xl border border-ink/[0.055] bg-[#F6F8FC] sm:grid-cols-4">
           <MetaItem
             icon={CalendarDays}
             label="Received"
@@ -391,6 +502,7 @@ function InvitationRow({
           <MetaItem
             label="Budget"
             value={invitation.budget}
+            emphasis
           />
 
           <MetaItem
@@ -399,80 +511,100 @@ function InvitationRow({
           />
         </div>
 
-        {/* Action */}
-        <div className="flex shrink-0 gap-2">
-          <button
-            type="button"
-            className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-line bg-white px-3.5 py-2.5 text-xs font-semibold text-ink transition-colors hover:bg-ink/[0.03]"
-          >
-            View details
-            <ChevronRight className="h-3.5 w-3.5 text-ink/35" />
-          </button>
-
-          {canRespond && (
-            <button
-              type="button"
-              className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-ink px-3.5 py-2.5 text-xs font-semibold text-white transition-opacity hover:opacity-90"
-            >
-              <Send className="h-3.5 w-3.5" />
-              Submit proposal
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Opportunity detail */}
-      <div className="mt-5 grid gap-4 border-t border-line pt-5 lg:grid-cols-[1.3fr_1fr]">
-        <div>
-          <p className="text-[9px] font-semibold uppercase tracking-wide text-ink/30">
-            Project brief
-          </p>
-
-          <p className="mt-1.5 text-xs leading-5 text-ink/50">
-            {invitation.description}
-          </p>
-        </div>
-
-        <div>
-          <p className="text-[9px] font-semibold uppercase tracking-wide text-ink/30">
-            Key requirements
-          </p>
-
-          <div className="mt-2 space-y-1.5">
-            {invitation.requirements.map((requirement) => (
-              <div
-                key={requirement}
-                className="flex items-start gap-2 text-[10px] text-ink/45"
-              >
-                <CheckCircle2 className="mt-0.5 h-3 w-3 shrink-0 text-ink/30" />
-                <span>{requirement}</span>
+        {/* Brief + requirements */}
+        <div className="grid gap-4 lg:grid-cols-[1.25fr_1fr]">
+          {/* Brief */}
+          <div className="rounded-2xl border border-ink/[0.055] bg-white px-4 py-4 sm:px-5">
+            <div className="flex gap-3">
+              <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#1657FF]/[0.07]">
+                <FileText className="h-3.5 w-3.5 text-[#1657FF]" />
               </div>
-            ))}
+
+              <div className="min-w-0">
+                <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-ink/30">
+                  Project brief
+                </p>
+
+                <p className="mt-1.5 text-xs leading-5 text-ink/50">
+                  {invitation.description}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Requirements */}
+          <div className="rounded-2xl border border-ink/[0.055] bg-white px-4 py-4 sm:px-5">
+            <div className="flex items-center justify-between">
+              <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-ink/30">
+                Key requirements
+              </p>
+
+              <span className="rounded-full bg-ink/[0.035] px-2 py-1 text-[8px] font-bold text-ink/30">
+                {String(invitation.requirements.length).padStart(2, '0')}
+              </span>
+            </div>
+
+            <div className="mt-2.5 space-y-2">
+              {invitation.requirements.map((requirement) => (
+                <div
+                  key={requirement}
+                  className="flex items-start gap-2 text-[10px] text-ink/45"
+                >
+                  <CheckCircle2 className="mt-0.5 h-3 w-3 shrink-0 text-[#1657FF]/50" />
+
+                  <span>{requirement}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Expired / declined notice */}
-      {(invitation.status === 'Expired' ||
-        invitation.status === 'Declined') && (
-        <div
-          className={[
-            'mt-4 flex items-center gap-2 rounded-xl px-4 py-3 text-[10px]',
-            invitation.status === 'Expired'
-              ? 'border border-amber-500/15 bg-amber-500/[0.04] text-amber-700'
-              : 'border border-rose-500/15 bg-rose-500/[0.04] text-rose-700',
-          ].join(' ')}
-        >
-          <XCircle className="h-3.5 w-3.5" />
+        {/* Client signal */}
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-ink/[0.055] pt-4">
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500/[0.08]">
+              <BadgeCheck className="h-3.5 w-3.5 text-emerald-600" />
+            </div>
 
-          <span>
-            {invitation.status === 'Expired'
-              ? 'This invitation is no longer accepting proposals.'
-              : 'This invitation was declined and is no longer active.'}
-          </span>
+            <div>
+              <p className="text-[9px] font-bold text-ink/50">
+                {invitation.client}
+              </p>
+
+              <p className="text-[8px] text-ink/30">
+                Client identity verified
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-1.5 text-[9px] font-semibold text-ink/30">
+            <Clock3 className="h-3 w-3" />
+            Response deadline: {invitation.deadline}
+          </div>
         </div>
-      )}
-    </div>
+
+        {/* Expired / declined notice */}
+        {(invitation.status === 'Expired' ||
+          invitation.status === 'Declined') && (
+          <div
+            className={[
+              'flex items-center gap-2 rounded-2xl border px-4 py-3 text-[10px]',
+              invitation.status === 'Expired'
+                ? 'border-amber-500/[0.12] bg-amber-500/[0.035] text-amber-700'
+                : 'border-rose-500/[0.12] bg-rose-500/[0.035] text-rose-700',
+            ].join(' ')}
+          >
+            <XCircle className="h-3.5 w-3.5 shrink-0" />
+
+            <span>
+              {invitation.status === 'Expired'
+                ? 'This invitation is no longer accepting proposals.'
+                : 'This invitation was declined and is no longer active.'}
+            </span>
+          </div>
+        )}
+      </div>
+    </article>
   )
 }
 
@@ -481,34 +613,95 @@ function SummaryCard({
   label,
   value,
   description,
+  accent,
 }: {
   icon: React.ComponentType<{ className?: string }>
   label: string
   value: number
   description: string
+  accent: 'blue' | 'amber' | 'violet' | 'navy'
 }) {
+  const styles = {
+    blue: {
+      icon: 'bg-[#1657FF]/[0.08] text-[#1657FF]',
+      dot: 'bg-[#1657FF]',
+    },
+    amber: {
+      icon: 'bg-amber-500/[0.08] text-amber-600',
+      dot: 'bg-amber-500',
+    },
+    violet: {
+      icon: 'bg-violet-500/[0.08] text-violet-600',
+      dot: 'bg-violet-500',
+    },
+    navy: {
+      icon: 'bg-[#0B1220]/[0.06] text-[#0B1220]',
+      dot: 'bg-[#0B1220]',
+    },
+  }
+
+  const style = styles[accent]
+
   return (
-    <Card>
+    <Card className="group relative overflow-hidden rounded-[22px] border-ink/[0.07] shadow-[0_10px_35px_rgba(11,18,32,0.035)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(11,18,32,0.07)]">
       <CardBody>
         <div className="flex items-start justify-between">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-ink/5">
-            <Icon className="h-4 w-4 text-ink/45" />
+          <div
+            className={[
+              'flex h-10 w-10 items-center justify-center rounded-xl transition-transform duration-200 group-hover:scale-105',
+              style.icon,
+            ].join(' ')}
+          >
+            <Icon className="h-[17px] w-[17px]" />
           </div>
 
-          <span className="font-display text-2xl font-semibold tracking-tight text-ink">
-            {value}
+          <div className="flex items-center gap-1.5">
+            <span className={`h-1.5 w-1.5 rounded-full ${style.dot}`} />
+
+            <span className="text-[8px] font-bold uppercase tracking-[0.14em] text-ink/25">
+              Live
+            </span>
+          </div>
+        </div>
+
+        <div className="mt-5 flex items-end justify-between gap-3">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-ink/35">
+              {label}
+            </p>
+
+            <p className="mt-1 text-xs text-ink/40">
+              {description}
+            </p>
+          </div>
+
+          <span className="font-display text-3xl font-semibold tracking-[-0.04em] text-[#0B1220]">
+            {String(value).padStart(2, '0')}
           </span>
         </div>
 
-        <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-ink/40">
-          {label}
-        </p>
-
-        <p className="mt-1 text-xs text-ink/40">
-          {description}
-        </p>
+        <div className="mt-5 h-1 overflow-hidden rounded-full bg-ink/[0.045]">
+          <div
+            className={[
+              'h-full w-1/3 rounded-full opacity-80 transition-all duration-500 group-hover:w-1/2',
+              style.dot,
+            ].join(' ')}
+          />
+        </div>
       </CardBody>
     </Card>
+  )
+}
+
+function MetaPill({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <span className="inline-flex items-center rounded-full bg-ink/[0.035] px-2.5 py-1 text-[9px] font-semibold text-ink/35">
+      {children}
+    </span>
   )
 }
 
@@ -516,19 +709,28 @@ function MetaItem({
   icon: Icon,
   label,
   value,
+  emphasis = false,
 }: {
   icon?: React.ComponentType<{ className?: string }>
   label: string
   value: string
+  emphasis?: boolean
 }) {
   return (
-    <div className="min-w-0">
-      <p className="flex items-center gap-1 text-[9px] font-semibold uppercase tracking-wide text-ink/30">
+    <div className="min-w-0 border-b border-r border-ink/[0.055] px-4 py-3.5 last:border-r-0 sm:border-b-0 sm:px-5">
+      <p className="flex items-center gap-1.5 text-[8px] font-bold uppercase tracking-[0.14em] text-ink/25">
         {Icon && <Icon className="h-2.5 w-2.5" />}
         {label}
       </p>
 
-      <p className="mt-1 truncate text-[11px] font-medium text-ink/65">
+      <p
+        className={[
+          'mt-1.5 truncate text-[11px]',
+          emphasis
+            ? 'font-bold text-[#0B1220]'
+            : 'font-semibold text-ink/60',
+        ].join(' ')}
+      >
         {value}
       </p>
     </div>
@@ -548,23 +750,23 @@ function StatusBadge({
     }
   > = {
     New: {
-      className: 'bg-sky-500/10 text-sky-700',
+      className: 'bg-[#1657FF]/[0.08] text-[#1657FF]',
       icon: Send,
     },
     Reviewing: {
-      className: 'bg-amber-500/10 text-amber-700',
+      className: 'bg-amber-500/[0.09] text-amber-700',
       icon: Clock3,
     },
     'Proposal Submitted': {
-      className: 'bg-violet-500/10 text-violet-700',
+      className: 'bg-violet-500/[0.09] text-violet-700',
       icon: FileText,
     },
     Expired: {
-      className: 'bg-ink/5 text-ink/40',
+      className: 'bg-ink/[0.05] text-ink/40',
       icon: Clock3,
     },
     Declined: {
-      className: 'bg-rose-500/10 text-rose-700',
+      className: 'bg-rose-500/[0.09] text-rose-700',
       icon: XCircle,
     },
   }
@@ -573,7 +775,10 @@ function StatusBadge({
 
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-[9px] font-semibold ${className}`}
+      className={[
+        'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[9px] font-bold',
+        className,
+      ].join(' ')}
     >
       <Icon className="h-3 w-3" />
       {status}

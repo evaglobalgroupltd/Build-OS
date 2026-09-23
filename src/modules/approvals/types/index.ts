@@ -1,12 +1,27 @@
+
 // Approvals module — shared domain types
-// BRD references: Sec. 43.3, 43.4
 //
-// Keep approval-specific types in this file.
-// Cross-cutting entities such as User, Role, Company and Project-level
-// primitives should remain in the root src/types directory.
+// BRD references:
+// - Sec. 43.3 — Approval workflow
+// - Sec. 43.4 — Approval history / controls
+//
+// Architectural rule:
+// Approval-specific domain models belong here.
+//
+// Cross-cutting entities such as:
+// - User
+// - Role
+// - Company
+// - Project
+// - Contractor
+//
+// should remain in the root `src/types` directory.
+//
+// This file is intentionally UI-agnostic and API-friendly.
+// Presentation-specific formatting should remain inside the UI layer.
 
 /* -------------------------------------------------------------------------- */
-/* Enums / unions                                                             */
+/* Approval enums / unions                                                     */
 /* -------------------------------------------------------------------------- */
 
 export type ApprovalOutcome =
@@ -41,9 +56,15 @@ export type ApprovalEvidenceType =
   | 'OTHER'
 
 /* -------------------------------------------------------------------------- */
-/* Evidence                                                                   */
+/* Evidence                                                                    */
 /* -------------------------------------------------------------------------- */
 
+/**
+ * Evidence submitted in support of a milestone approval.
+ *
+ * Evidence may be uploaded by contractors, project managers,
+ * inspectors or other authorized project participants.
+ */
 export interface ApprovalEvidence {
   id: string
 
@@ -51,6 +72,11 @@ export interface ApprovalEvidence {
 
   name: string
 
+  /**
+   * Secure or temporary resource URL.
+   *
+   * The UI should not assume this URL is permanent.
+   */
   url?: string
 
   verified: boolean
@@ -61,9 +87,15 @@ export interface ApprovalEvidence {
 }
 
 /* -------------------------------------------------------------------------- */
-/* Inspection                                                                 */
+/* Inspection                                                                  */
 /* -------------------------------------------------------------------------- */
 
+/**
+ * Inspection state associated with an approval.
+ *
+ * An approval should not be considered payment-ready solely because
+ * evidence has been uploaded. Inspection state is independently tracked.
+ */
 export interface ApprovalInspection {
   id: string
 
@@ -79,9 +111,15 @@ export interface ApprovalInspection {
 }
 
 /* -------------------------------------------------------------------------- */
-/* Decision                                                                   */
+/* Decision                                                                    */
 /* -------------------------------------------------------------------------- */
 
+/**
+ * Immutable decision record associated with an approval.
+ *
+ * `approvalId` is optional to preserve flexibility for embedded decision
+ * responses, while API responses can populate it when available.
+ */
 export interface ApprovalDecision {
   id: string
 
@@ -103,16 +141,18 @@ export interface ApprovalDecision {
 }
 
 /* -------------------------------------------------------------------------- */
-/* Approval                                                                   */
+/* Core approval                                                               */
 /* -------------------------------------------------------------------------- */
 
 /**
- * Core approval record used by:
+ * Core approval record.
  *
+ * Used by:
  * - Approval Inbox
  * - Approval Details
- * - Approval History
+ * - Approval History references
  * - Approval dashboard metrics
+ * - Payment-control workflows
  */
 export interface Approval {
   id: string
@@ -129,10 +169,24 @@ export interface Approval {
 
   contractorName: string
 
+  /**
+   * Monetary values are stored as numbers.
+   *
+   * Formatting such as:
+   * `₦8.4M`
+   * `$8,400,000`
+   *
+   * belongs in the presentation layer.
+   */
   amount: number
 
   currency: string
 
+  /**
+   * Completion percentage.
+   *
+   * Expected range: 0–100.
+   */
   progress: number
 
   evidenceCount: number
@@ -157,13 +211,14 @@ export interface Approval {
 }
 
 /* -------------------------------------------------------------------------- */
-/* Approval details                                                           */
+/* Approval details                                                            */
 /* -------------------------------------------------------------------------- */
 
 /**
- * Extended approval context.
+ * Complete approval context.
  *
- * Used by ApprovalDetails when the user needs the complete decision record.
+ * Used by ApprovalDetails when the user needs the full decision,
+ * evidence and project context before taking action.
  */
 export interface ApprovalDetail extends Approval {
   evidence: ApprovalEvidence[]
@@ -188,15 +243,20 @@ export interface ApprovalDetail extends Approval {
 
   projectManagerName?: string
 
+  /**
+   * Historical decisions associated with this approval.
+   *
+   * Ordered from newest to oldest by the API contract.
+   */
   previousDecisions: ApprovalDecision[]
 }
 
 /* -------------------------------------------------------------------------- */
-/* Approval history                                                           */
+/* Approval history                                                            */
 /* -------------------------------------------------------------------------- */
 
 /**
- * Historical decision record.
+ * Historical approval decision.
  *
  * Pending approvals should not normally appear in this collection.
  */
@@ -239,9 +299,12 @@ export interface ApprovalHistoryItem {
 }
 
 /* -------------------------------------------------------------------------- */
-/* Filters                                                                    */
+/* Filters                                                                     */
 /* -------------------------------------------------------------------------- */
 
+/**
+ * Shared query contract for approval lists and history.
+ */
 export interface ApprovalFilters {
   projectId?: string
 
@@ -265,9 +328,12 @@ export interface ApprovalFilters {
 }
 
 /* -------------------------------------------------------------------------- */
-/* Pagination                                                                 */
+/* Pagination                                                                  */
 /* -------------------------------------------------------------------------- */
 
+/**
+ * Standard paginated approval response.
+ */
 export interface ApprovalListResponse {
   data: Approval[]
 
@@ -280,6 +346,9 @@ export interface ApprovalListResponse {
   totalPages: number
 }
 
+/**
+ * Standard paginated approval-history response.
+ */
 export interface ApprovalHistoryResponse {
   data: ApprovalHistoryItem[]
 
@@ -293,9 +362,15 @@ export interface ApprovalHistoryResponse {
 }
 
 /* -------------------------------------------------------------------------- */
-/* Dashboard summary                                                          */
+/* Dashboard summary                                                           */
 /* -------------------------------------------------------------------------- */
 
+/**
+ * Aggregated approval metrics.
+ *
+ * Values should be calculated by the backend so dashboard figures,
+ * financial totals and approval queues remain consistent across clients.
+ */
 export interface ApprovalSummary {
   pending: number
 
@@ -313,17 +388,33 @@ export interface ApprovalSummary {
 }
 
 /* -------------------------------------------------------------------------- */
-/* Approval actions                                                           */
+/* Approval actions                                                            */
 /* -------------------------------------------------------------------------- */
 
+/**
+ * Approval action payload.
+ *
+ * Used when approving a milestone.
+ */
 export interface ApprovalDecisionPayload {
   comment?: string
 }
 
+/**
+ * Rejection payload.
+ *
+ * A reason is mandatory for governance and auditability.
+ */
 export interface ApprovalRejectionPayload {
   reason: string
 }
 
+/**
+ * Correction request payload.
+ *
+ * Required actions should be explicit enough for the contractor
+ * to understand what must be corrected before resubmission.
+ */
 export interface ApprovalCorrectionPayload {
   reason: string
 

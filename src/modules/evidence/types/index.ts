@@ -7,7 +7,49 @@
 // - Procurement delivery verification
 // - Dispute evidence
 // - Digital Property Passport
+//
+// Design principle:
+// Evidence is a first-class, auditable Build OS object.
+// It records:
+//   1. what was submitted,
+//   2. what the submission is attached to,
+//   3. who submitted it,
+//   4. what verification state it is in,
+//   5. what reviewers decided,
+//   6. and what workflow action comes next.
+//
+// Important:
+// Evidence verification does NOT automatically authorize payment release.
+// Payment release remains governed by the Escrow / Payment Approval domain.
 
+/* -------------------------------------------------------------------------- */
+/* Statuses                                                                   */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Lifecycle state of an evidence package.
+ *
+ * `draft`
+ *   Evidence is being prepared and has not entered review.
+ *
+ * `submitted`
+ *   Evidence has been submitted and is awaiting review.
+ *
+ * `under_review`
+ *   A reviewer is actively assessing the evidence.
+ *
+ * `verified`
+ *   Evidence has passed the applicable verification process.
+ *
+ * `needs_information`
+ *   Additional evidence, clarification, or documentation is required.
+ *
+ * `blocked`
+ *   A dispute, compliance issue, or other control prevents progression.
+ *
+ * `rejected`
+ *   The submission has been formally rejected.
+ */
 export type EvidenceStatus =
   | 'draft'
   | 'submitted'
@@ -17,16 +59,27 @@ export type EvidenceStatus =
   | 'blocked'
   | 'rejected'
 
+/**
+ * Supported evidence file formats at the domain level.
+ *
+ * The actual MIME type belongs to the upload/infrastructure layer.
+ */
 export type EvidenceFileType =
   | 'image'
   | 'video'
   | 'document'
 
+/**
+ * Status of an individual step in the verification trail.
+ */
 export type EvidenceStepStatus =
   | 'complete'
   | 'pending'
   | 'blocked'
 
+/**
+ * Business context in which evidence is being used.
+ */
 export type EvidenceCategory =
   | 'milestone'
   | 'procurement'
@@ -36,41 +89,92 @@ export type EvidenceCategory =
   | 'handover'
 
 /**
+ * Reviewer decision applied to an evidence submission.
+ *
+ * This is intentionally separate from EvidenceStatus because
+ * a decision represents an action taken by a reviewer, while
+ * status represents the resulting lifecycle state.
+ */
+export type EvidenceReviewDecision =
+  | 'verified'
+  | 'needs_information'
+  | 'rejected'
+  | 'blocked'
+
+/* -------------------------------------------------------------------------- */
+/* File                                                                       */
+/* -------------------------------------------------------------------------- */
+
+/**
  * Individual uploaded evidence file.
+ *
+ * This is domain-level metadata. Upload transport details,
+ * storage provider identifiers, and signed URLs should remain
+ * in the infrastructure/API layer where possible.
  */
 export interface EvidenceFile {
   id: string
+
+  /**
+   * Original or display filename.
+   */
   name: string
+
   type: EvidenceFileType
+
+  /**
+   * Human-readable file size.
+   *
+   * Example: "4.8 MB"
+   */
   size: string
 
   /**
-   * Human-readable timestamp for current mock data.
-   * This can later become an ISO timestamp from the API.
+   * Timestamp representing when the file was uploaded.
+   *
+   * Mock data may use a human-readable value.
+   * Production APIs should normally return an ISO timestamp.
    */
   uploadedAt: string
 
   /**
-   * Optional URL for real uploaded evidence.
+   * URL to the original file when available.
    */
   url?: string
 
   /**
-   * Optional thumbnail URL for image/video previews.
+   * Lightweight preview URL for images/videos.
    */
   thumbnailUrl?: string
 }
 
+/* -------------------------------------------------------------------------- */
+/* Workflow                                                                   */
+/* -------------------------------------------------------------------------- */
+
 /**
- * Evidence workflow activity.
+ * Individual activity within the evidence verification workflow.
+ *
+ * EvidenceTrail uses these steps to communicate not only
+ * the current state, but how the record arrived there.
  */
 export interface EvidenceStep {
   id: string
+
+  /**
+   * Human-readable workflow step.
+   *
+   * Example:
+   * "Submitted"
+   * "Project Manager Review"
+   * "Independent Verification"
+   */
   label: string
+
   status: EvidenceStepStatus
 
   /**
-   * Who performed this step.
+   * Person or organisation responsible for this step.
    *
    * Example:
    * "Segun Adeyemi (Contractor)"
@@ -78,28 +182,35 @@ export interface EvidenceStep {
   actor?: string
 
   /**
-   * ISO date or human-readable timestamp.
+   * ISO timestamp or presentation-ready timestamp.
    */
   timestamp?: string
 
   /**
-   * Optional explanation for blocked,
-   * rejected or information-request states.
+   * Context explaining a blocked,
+   * rejected, or information-request state.
    */
   note?: string
 }
 
 /**
- * Evidence verification trail.
+ * Verification and workflow history attached to an evidence record.
  */
 export interface EvidenceTrailData {
+  /**
+   * Workflow completion percentage.
+   *
+   * This represents verification/workflow progress,
+   * not necessarily the percentage completion of the
+   * underlying construction milestone.
+   */
   percentComplete: number
 
   steps: EvidenceStep[]
 
   /**
-   * The single next thing that has to happen
-   * for this evidence workflow to move forward.
+   * The single next action required for the workflow
+   * to progress.
    */
   nextAction?: {
     label: string
@@ -107,8 +218,12 @@ export interface EvidenceTrailData {
   }
 }
 
+/* -------------------------------------------------------------------------- */
+/* References                                                                 */
+/* -------------------------------------------------------------------------- */
+
 /**
- * Project reference connected to evidence.
+ * Project reference connected to the evidence.
  */
 export interface EvidenceProject {
   id: string
@@ -117,7 +232,7 @@ export interface EvidenceProject {
 }
 
 /**
- * Milestone reference connected to evidence.
+ * Optional milestone reference connected to the evidence.
  */
 export interface EvidenceMilestone {
   id: string
@@ -125,7 +240,7 @@ export interface EvidenceMilestone {
 }
 
 /**
- * Person or organisation that submitted evidence.
+ * Person or organisation that submitted the evidence.
  */
 export interface EvidenceSubmitter {
   id?: string
@@ -134,7 +249,7 @@ export interface EvidenceSubmitter {
 }
 
 /**
- * Reviewer information.
+ * Person responsible for reviewing the evidence.
  */
 export interface EvidenceReviewer {
   id?: string
@@ -142,13 +257,48 @@ export interface EvidenceReviewer {
   role: string
 }
 
+/* -------------------------------------------------------------------------- */
+/* Review                                                                     */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Immutable record of a review decision.
+ *
+ * Keeping review information together makes the audit trail
+ * easier to extend later without repeatedly modifying the
+ * top-level Evidence interface.
+ */
+export interface EvidenceReview {
+  decision: EvidenceReviewDecision
+
+  reviewer: EvidenceReviewer
+
+  reviewedAt: string
+
+  note?: string
+}
+
+/* -------------------------------------------------------------------------- */
+/* Evidence                                                                   */
+/* -------------------------------------------------------------------------- */
+
 /**
  * Main Evidence domain object.
  *
- * Evidence is a first-class Build OS object.
- * It can be attached to milestones, procurement,
- * monitoring reports, inspections, disputes and
- * handover records.
+ * Evidence is a first-class Build OS object and may support:
+ *
+ * - milestone approval
+ * - payment verification
+ * - procurement delivery
+ * - site monitoring
+ * - inspections
+ * - disputes
+ * - handover
+ * - Digital Property Passport records
+ *
+ * IMPORTANT:
+ * `verified` means the evidence package has passed its applicable
+ * verification workflow. It does not itself authorize escrow release.
  */
 export interface Evidence {
   id: string
@@ -161,38 +311,91 @@ export interface Evidence {
 
   status: EvidenceStatus
 
+  /**
+   * Project to which this evidence belongs.
+   */
   project: EvidenceProject
 
+  /**
+   * Milestone associated with the evidence, when applicable.
+   */
   milestone?: EvidenceMilestone
 
+  /**
+   * Party responsible for submitting the evidence.
+   */
   submittedBy: EvidenceSubmitter
 
+  /**
+   * Submission timestamp.
+   *
+   * Production APIs should normally provide this as ISO 8601.
+   */
   submittedAt: string
 
+  /**
+   * Files forming the evidence package.
+   */
   files: EvidenceFile[]
 
+  /**
+   * Human-readable verification workflow.
+   */
   trail?: EvidenceTrailData
 
+  /**
+   * Latest reviewer.
+   *
+   * Kept at the top level for convenient UI access.
+   */
   reviewer?: EvidenceReviewer
 
+  /**
+   * Latest review timestamp.
+   */
   reviewedAt?: string
 
+  /**
+   * Latest reviewer note.
+   */
   reviewNote?: string
 
   /**
-   * True when an active dispute or compliance issue
-   * prevents the evidence from progressing.
+   * Structured representation of the latest review decision.
+   *
+   * This can coexist with the convenience fields above while
+   * the API evolves toward a more explicit audit model.
+   */
+  review?: EvidenceReview
+
+  /**
+   * Indicates that an active dispute, compliance issue,
+   * or other control currently prevents progression.
    */
   isBlocked?: boolean
 
   /**
-   * Optional trust or verification quality indicator.
+   * Optional quality / verification indicator.
+   *
+   * Expected range when supplied: 0–100.
+   *
+   * This is a quality indicator, not a payment authorization
+   * or trust-score replacement.
    */
   verificationScore?: number
 }
 
+/* -------------------------------------------------------------------------- */
+/* Creation                                                                   */
+/* -------------------------------------------------------------------------- */
+
 /**
  * Data required to submit new evidence.
+ *
+ * `files` intentionally remains browser-native here because this
+ * payload represents the UI/application boundary. The API service
+ * may transform it into multipart/form-data or another transport
+ * representation.
  */
 export interface CreateEvidencePayload {
   title: string
@@ -208,17 +411,12 @@ export interface CreateEvidencePayload {
   files: File[]
 }
 
-/**
- * Reviewer decision.
- */
-export type EvidenceReviewDecision =
-  | 'verified'
-  | 'needs_information'
-  | 'rejected'
-  | 'blocked'
+/* -------------------------------------------------------------------------- */
+/* Review                                                                     */
+/* -------------------------------------------------------------------------- */
 
 /**
- * Data submitted during evidence review.
+ * Data submitted when a reviewer evaluates evidence.
  */
 export interface ReviewEvidencePayload {
   decision: EvidenceReviewDecision
@@ -226,8 +424,15 @@ export interface ReviewEvidencePayload {
   note?: string
 }
 
+/* -------------------------------------------------------------------------- */
+/* Filtering                                                                  */
+/* -------------------------------------------------------------------------- */
+
 /**
- * Filters used by the Evidence Library.
+ * Filters supported by the Evidence Library.
+ *
+ * `all` is a UI convenience value and should normally be
+ * normalized away before reaching the API.
  */
 export interface EvidenceFilters {
   search?: string

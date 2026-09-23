@@ -1,3 +1,4 @@
+
 import {
   Award,
   BadgeCheck,
@@ -165,46 +166,73 @@ export function ProfessionalList() {
   }, [activeCategory, search])
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-ink/40">
-            Professional marketplace
-          </p>
+    <div className="space-y-7 pb-8">
 
-          <h1 className="mt-1 font-display text-2xl font-semibold tracking-tight text-ink">
-            Find a professional
+      {/* ===================================================== */}
+      {/* Page Header */}
+      {/* ===================================================== */}
+
+      <header className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+
+        <div className="max-w-2xl">
+
+          <div className="mb-3 flex items-center gap-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#B85C12]" />
+
+            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-ink/35">
+              Professional marketplace
+            </p>
+          </div>
+
+          <h1 className="font-display text-[30px] font-semibold leading-[1.05] tracking-[-0.04em] text-ink sm:text-[36px]">
+            Find the right expertise
+            <span className="text-ink/35"> for your project.</span>
           </h1>
 
-          <p className="mt-1 max-w-2xl text-sm leading-6 text-ink/50">
-            Browse verified architects, engineers, surveyors and other
-            technical professionals for your project.
+          <p className="mt-3 max-w-xl text-[13px] leading-6 text-ink/48">
+            Connect with verified architects, engineers, surveyors, valuers
+            and technical specialists across your project lifecycle.
           </p>
+
         </div>
 
-        <div className="flex items-center gap-2 rounded-xl border border-line bg-white px-3.5 py-2.5">
-          <ShieldCheck className="h-4 w-4 text-emerald-600" />
+        {/* Trust signal */}
+
+        <div className="flex shrink-0 items-center gap-3 rounded-[18px] border border-ink/[0.07] bg-white px-4 py-3.5 shadow-[0_8px_30px_rgba(20,30,25,0.035)]">
+
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#EAF4EE] text-[#12613E]">
+            <ShieldCheck size={17} />
+          </div>
 
           <div>
-            <p className="text-[10px] font-semibold text-ink">
-              Verified professionals
+            <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-ink/55">
+              Verified network
             </p>
 
-            <p className="text-[9px] text-ink/40">
+            <p className="mt-0.5 text-[9px] leading-4 text-ink/35">
               Credentials checked before paid participation
             </p>
           </div>
-        </div>
-      </div>
 
-      {/* Marketplace stats */}
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        </div>
+
+      </header>
+
+      {/* ===================================================== */}
+      {/* Marketplace Overview */}
+      {/* ===================================================== */}
+
+      <section
+        aria-label="Marketplace overview"
+        className="grid grid-cols-2 gap-3 xl:grid-cols-4"
+      >
+
         <SummaryCard
           icon={BadgeCheck}
           label="Verified professionals"
           value={professionals.length}
-          description="Available in marketplace"
+          description="Currently listed"
+          accent="teal"
         />
 
         <SummaryCard
@@ -212,97 +240,211 @@ export function ProfessionalList() {
           label="Average rating"
           value="4.8"
           description="Client feedback"
+          accent="amber"
         />
 
         <SummaryCard
           icon={Award}
           label="Average trust score"
           value="91"
-          description="Platform trust score"
+          description="Platform trust"
+          accent="ink"
         />
 
         <SummaryCard
           icon={BriefcaseBusiness}
           label="Projects completed"
           value="384"
-          description="Across listed professionals"
-        />
-      </div>
-
-      {/* Search and filters */}
-      <Card className="overflow-hidden">
-        <CardHeader
-          title="Verified professionals"
-          subtitle="Select a professional based on expertise, experience and trust"
+          description="Across the network"
+          accent="blue"
         />
 
-        <div className="border-y border-line bg-paper-2 px-6 py-4">
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-            <div className="relative min-w-0 flex-1 lg:max-w-md">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/30" />
+      </section>
 
-              <input
-                type="search"
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search by name, service or location..."
-                className="h-10 w-full rounded-xl border border-line bg-white pl-9 pr-3 text-xs text-ink outline-none placeholder:text-ink/30 focus:border-ink/30"
-              />
-            </div>
+      {/* ===================================================== */}
+      {/* Marketplace */}
+      {/* ===================================================== */}
 
-            <div className="flex items-center gap-2 overflow-x-auto pb-1 lg:pb-0">
-              <Filter className="mr-1 h-3.5 w-3.5 shrink-0 text-ink/35" />
+      <section aria-label="Professional directory">
 
-              {categories.map((category) => (
-                <button
-                  key={category}
-                  type="button"
-                  onClick={() => setActiveCategory(category)}
-                  className={[
-                    'whitespace-nowrap rounded-full px-3 py-1.5 text-[10px] font-semibold transition-colors',
-                    activeCategory === category
-                      ? 'bg-ink text-white'
-                      : 'bg-white text-ink/50 hover:bg-ink/5 hover:text-ink',
-                  ].join(' ')}
-                >
-                  {category}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
+        <Card className="overflow-hidden">
 
-        {/* Professional cards */}
-        {filteredProfessionals.length > 0 ? (
-          <div className="grid gap-4 p-6 md:grid-cols-2 xl:grid-cols-3">
-            {filteredProfessionals.map((professional) => (
-              <ProfessionalCard
-                key={professional.id}
-                professional={professional}
-              />
-            ))}
-          </div>
-        ) : (
-          <CardBody>
-            <div className="flex min-h-52 flex-col items-center justify-center text-center">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-ink/5">
-                <Search className="h-5 w-5 text-ink/35" />
+          {/* Directory header */}
+
+          <CardHeader
+            title="Professional directory"
+            subtitle="Explore verified expertise based on specialty, experience and platform trust"
+          />
+
+          {/* Search / filter toolbar */}
+
+          <div className="border-y border-ink/[0.07] bg-[#FAFBFA] px-4 py-4 sm:px-6">
+
+            <div className="flex flex-col gap-4">
+
+              <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+
+                {/* Search */}
+
+                <div className="relative w-full lg:max-w-[420px]">
+
+                  <Search
+                    className="
+                      pointer-events-none
+                      absolute
+                      left-3.5
+                      top-1/2
+                      h-4
+                      w-4
+                      -translate-y-1/2
+                      text-ink/25
+                    "
+                  />
+
+                  <input
+                    type="search"
+                    value={search}
+                    onChange={(event) => setSearch(event.target.value)}
+                    placeholder="Search professionals, services or locations..."
+                    aria-label="Search professionals"
+                    className="
+                      h-11
+                      w-full
+                      rounded-[14px]
+                      border
+                      border-ink/[0.08]
+                      bg-white
+                      pl-10
+                      pr-4
+                      text-[11px]
+                      font-medium
+                      text-ink
+                      outline-none
+                      shadow-[0_2px_10px_rgba(20,30,25,0.02)]
+                      placeholder:text-ink/25
+                      transition
+                      focus:border-ink/20
+                      focus:ring-4
+                      focus:ring-ink/[0.025]
+                    "
+                  />
+
+                </div>
+
+                {/* Result count */}
+
+                <div className="flex items-center justify-between gap-3">
+
+                  <span className="text-[10px] font-medium text-ink/35">
+                    Showing{' '}
+                    <span className="font-bold text-ink/55">
+                      {filteredProfessionals.length}
+                    </span>{' '}
+                    professionals
+                  </span>
+
+                </div>
+
               </div>
 
-              <h3 className="mt-4 text-sm font-semibold text-ink">
-                No professionals found
-              </h3>
+              {/* Category filter */}
 
-              <p className="mt-1 max-w-sm text-xs leading-5 text-ink/40">
-                Try a different name, service, location or category.
-              </p>
+              <div className="flex items-center gap-2 overflow-x-auto pb-0.5">
+
+                <div className="mr-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-ink/[0.045]">
+                  <Filter className="h-3.5 w-3.5 text-ink/40" />
+                </div>
+
+                {categories.map((category) => {
+                  const active = activeCategory === category
+
+                  return (
+                    <button
+                      key={category}
+                      type="button"
+                      onClick={() => setActiveCategory(category)}
+                      className={[
+                        'whitespace-nowrap rounded-full px-3.5 py-2 text-[10px] font-semibold transition-all',
+                        active
+                          ? 'bg-ink text-white shadow-[0_4px_12px_rgba(20,25,22,0.12)]'
+                          : 'bg-white text-ink/45 ring-1 ring-inset ring-ink/[0.06] hover:bg-ink/[0.025] hover:text-ink/75',
+                      ].join(' ')}
+                    >
+                      {category}
+                    </button>
+                  )
+                })}
+
+              </div>
+
             </div>
-          </CardBody>
-        )}
-      </Card>
+
+          </div>
+
+          {/* Professional results */}
+
+          {filteredProfessionals.length > 0 ? (
+
+            <div className="grid gap-4 p-4 sm:p-6 md:grid-cols-2 xl:grid-cols-3">
+
+              {filteredProfessionals.map((professional) => (
+                <ProfessionalCard
+                  key={professional.id}
+                  professional={professional}
+                />
+              ))}
+
+            </div>
+
+          ) : (
+
+            <CardBody>
+
+              <div className="flex min-h-[280px] flex-col items-center justify-center text-center">
+
+                <div className="flex h-14 w-14 items-center justify-center rounded-[18px] bg-ink/[0.045]">
+                  <Search className="h-5 w-5 text-ink/25" />
+                </div>
+
+                <h3 className="mt-5 font-display text-base font-semibold tracking-[-0.015em] text-ink">
+                  No professionals found
+                </h3>
+
+                <p className="mt-1.5 max-w-sm text-[11px] leading-5 text-ink/40">
+                  Try adjusting your search or selecting a different
+                  professional category.
+                </p>
+
+                {(search || activeCategory !== 'All') && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSearch('')
+                      setActiveCategory('All')
+                    }}
+                    className="mt-5 rounded-full bg-ink px-4 py-2 text-[10px] font-bold text-white transition hover:opacity-90"
+                  >
+                    Clear filters
+                  </button>
+                )}
+
+              </div>
+
+            </CardBody>
+
+          )}
+
+        </Card>
+
+      </section>
+
     </div>
   )
 }
+
+/* ============================================================= */
+/* Professional Card                                              */
+/* ============================================================= */
 
 function ProfessionalCard({
   professional,
@@ -310,74 +452,148 @@ function ProfessionalCard({
   professional: Professional
 }) {
   return (
-    <div className="group rounded-2xl border border-line bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-ink/15 hover:shadow-sm">
-      {/* Profile */}
-      <div className="flex items-start justify-between gap-4">
+    <article
+      className="
+        group
+        relative
+        overflow-hidden
+        rounded-[20px]
+        border
+        border-ink/[0.07]
+        bg-white
+        p-5
+        transition-all
+        duration-300
+        hover:-translate-y-1
+        hover:border-ink/[0.13]
+        hover:shadow-[0_18px_45px_rgba(20,30,25,0.075)]
+      "
+    >
+
+      {/* Subtle top accent */}
+
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-ink/[0.12] to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+
+      {/* ======================================================= */}
+      {/* Identity */}
+      {/* ======================================================= */}
+
+      <div className="flex items-start justify-between gap-3">
+
         <div className="flex min-w-0 items-center gap-3">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-ink/5 font-display text-sm font-semibold text-ink">
+
+          <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-[15px] bg-[#F2F4F2] font-display text-sm font-semibold tracking-[-0.02em] text-ink transition-transform duration-300 group-hover:scale-[1.03]">
             {getInitials(professional.name)}
+
+            <span className="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full border-2 border-white bg-[#12613E]">
+              <BadgeCheck className="h-2.5 w-2.5 text-white" />
+            </span>
           </div>
 
           <div className="min-w-0">
-            <div className="flex items-center gap-1.5">
-              <h3 className="truncate text-sm font-semibold text-ink">
+
+            <div className="flex min-w-0 items-center gap-1.5">
+
+              <h3 className="truncate text-[13px] font-bold tracking-[-0.01em] text-ink">
                 {professional.name}
               </h3>
 
-              <BadgeCheck className="h-3.5 w-3.5 shrink-0 text-emerald-600" />
             </div>
 
-            <p className="mt-0.5 text-[10px] font-medium text-ink/45">
+            <p className="mt-1 text-[10px] font-medium text-ink/40">
               {professional.category}
             </p>
+
           </div>
+
         </div>
 
         <AvailabilityBadge
           availability={professional.availability}
         />
+
       </div>
 
+      {/* ======================================================= */}
       {/* Specialty */}
-      <div className="mt-5">
-        <p className="text-[9px] font-semibold uppercase tracking-wide text-ink/30">
-          Specialty
+      {/* ======================================================= */}
+
+      <div className="mt-6">
+
+        <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-ink/25">
+          Primary specialty
         </p>
 
-        <p className="mt-1 text-xs font-semibold text-ink/70">
+        <p className="mt-1.5 text-[13px] font-semibold tracking-[-0.01em] text-ink/75">
           {professional.specialty}
         </p>
+
+        <div className="mt-2 flex items-center gap-1.5 text-[10px] text-ink/35">
+          <MapPin className="h-3 w-3" />
+          {professional.location}
+        </div>
+
       </div>
 
-      {/* Location */}
-      <div className="mt-3 flex items-center gap-1.5 text-[10px] text-ink/40">
-        <MapPin className="h-3 w-3" />
-        {professional.location}
-      </div>
+      {/* ======================================================= */}
+      {/* Trust panel */}
+      {/* ======================================================= */}
 
-      {/* Trust */}
-      <div className="mt-5 rounded-xl bg-paper-2 p-3.5">
-        <div className="flex items-center justify-between">
+      <div className="mt-5 rounded-[15px] border border-ink/[0.05] bg-[#F8F9F8] p-3.5">
+
+        <div className="flex items-center justify-between gap-3">
+
           <div>
-            <p className="text-[9px] font-semibold uppercase tracking-wide text-ink/30">
-              Trust score
-            </p>
 
-            <div className="mt-1 flex items-center gap-1.5">
-              <span className="font-display text-lg font-semibold text-ink">
+            <div className="flex items-center gap-1.5">
+
+              <ShieldCheck className="h-3.5 w-3.5 text-[#12613E]" />
+
+              <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-ink/35">
+                Trust score
+              </p>
+
+            </div>
+
+            <div className="mt-1 flex items-baseline gap-1">
+
+              <span className="font-display text-[21px] font-semibold tracking-[-0.04em] text-ink">
                 {professional.trustScore}
               </span>
 
-              <span className="text-[9px] text-ink/35">/ 100</span>
+              <span className="text-[9px] font-medium text-ink/25">
+                / 100
+              </span>
+
             </div>
+
           </div>
 
           <TrustScore score={professional.trustScore} />
+
         </div>
+
+        {/* Trust progress */}
+
+        <div className="mt-3 h-1 overflow-hidden rounded-full bg-ink/[0.06]">
+
+          <div
+            className="h-full rounded-full bg-[#12613E] transition-all duration-500"
+            style={{
+              width: `${professional.trustScore}%`,
+            }}
+          />
+
+        </div>
+
       </div>
 
+      {/* ======================================================= */}
       {/* Metrics */}
-      <div className="mt-4 grid grid-cols-3 divide-x divide-line">
+      {/* ======================================================= */}
+
+      <div className="mt-5 grid grid-cols-3 divide-x divide-ink/[0.07]">
+
         <Metric
           value={`${professional.experience} yrs`}
           label="Experience"
@@ -393,66 +609,143 @@ function ProfessionalCard({
           value={String(professional.projects)}
           label="Projects"
         />
+
       </div>
 
+      {/* ======================================================= */}
       {/* Description */}
-      <p className="mt-4 line-clamp-2 text-[11px] leading-5 text-ink/45">
+      {/* ======================================================= */}
+
+      <p className="mt-5 line-clamp-2 min-h-[40px] text-[10.5px] leading-5 text-ink/40">
         {professional.bio}
       </p>
 
+      {/* ======================================================= */}
       {/* Verification */}
-      <div className="mt-4 flex items-center gap-1.5 border-t border-line pt-4 text-[9px] text-ink/35">
-        <ShieldCheck className="h-3 w-3 text-emerald-600" />
-        Verified since {professional.verifiedSince}
+      {/* ======================================================= */}
+
+      <div className="mt-4 flex items-center gap-1.5 border-t border-ink/[0.06] pt-4">
+
+        <ShieldCheck className="h-3 w-3 shrink-0 text-[#12613E]" />
+
+        <span className="text-[9px] font-medium text-ink/35">
+          Verified since {professional.verifiedSince}
+        </span>
+
+        <span className="ml-auto text-[9px] font-semibold text-[#12613E]">
+          Credentialed
+        </span>
+
       </div>
 
+      {/* ======================================================= */}
       {/* Action */}
+      {/* ======================================================= */}
+
       <button
         type="button"
-        className="mt-4 flex w-full items-center justify-between rounded-xl border border-line px-3.5 py-2.5 text-xs font-semibold text-ink transition-colors group-hover:border-ink/20 group-hover:bg-ink/[0.02]"
+        className="
+          mt-4
+          flex
+          w-full
+          items-center
+          justify-between
+          rounded-[13px]
+          bg-ink/[0.035]
+          px-3.5
+          py-3
+          text-[10px]
+          font-bold
+          text-ink/65
+          transition-all
+          group-hover:bg-ink
+          group-hover:text-white
+        "
       >
-        <span>View professional</span>
-        <ChevronRight className="h-3.5 w-3.5 text-ink/35" />
+
+        <span>View professional profile</span>
+
+        <ChevronRight
+          className="
+            h-3.5
+            w-3.5
+            text-ink/25
+            transition-all
+            group-hover:translate-x-0.5
+            group-hover:text-white/70
+          "
+        />
+
       </button>
-    </div>
+
+    </article>
   )
 }
+
+/* ============================================================= */
+/* Summary Card                                                    */
+/* ============================================================= */
 
 function SummaryCard({
   icon: Icon,
   label,
   value,
   description,
+  accent,
 }: {
   icon: React.ComponentType<{ className?: string }>
   label: string
   value: string | number
   description: string
+  accent: 'teal' | 'amber' | 'ink' | 'blue'
 }) {
+  const accentStyles = {
+    teal: 'bg-[#EAF4EE] text-[#12613E]',
+    amber: 'bg-[#F7EFE8] text-[#B85C12]',
+    ink: 'bg-ink/[0.055] text-ink/60',
+    blue: 'bg-[#EEF3FF] text-[#315BCB]',
+  }
+
   return (
-    <Card>
-      <CardBody>
-        <div className="flex items-start justify-between">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-ink/5">
-            <Icon className="h-4 w-4 text-ink/45" />
+    <Card className="group overflow-hidden transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_14px_35px_rgba(20,30,25,0.055)]">
+
+      <CardBody className="relative">
+
+        <div className="flex items-start justify-between gap-3">
+
+          <div
+            className={`flex h-9 w-9 items-center justify-center rounded-xl ${accentStyles[accent]}`}
+          >
+            <Icon className="h-4 w-4" />
           </div>
 
-          <span className="font-display text-2xl font-semibold tracking-tight text-ink">
+          <span className="font-display text-[25px] font-semibold tracking-[-0.04em] text-ink">
             {value}
           </span>
+
         </div>
 
-        <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-ink/40">
-          {label}
-        </p>
+        <div className="mt-5">
 
-        <p className="mt-1 text-xs text-ink/40">
-          {description}
-        </p>
+          <p className="text-[9px] font-bold uppercase tracking-[0.13em] text-ink/35">
+            {label}
+          </p>
+
+          <p className="mt-1 text-[10px] text-ink/35">
+            {description}
+          </p>
+
+        </div>
+
       </CardBody>
+
     </Card>
   )
 }
+
+/* ============================================================= */
+/* Metric                                                          */
+/* ============================================================= */
 
 function Metric({
   value,
@@ -465,18 +758,30 @@ function Metric({
 }) {
   return (
     <div className="px-3 first:pl-0 last:pr-0">
-      <div className="flex items-center gap-1">
-        {Icon && <Icon className="h-3 w-3 fill-current text-amber-500" />}
 
-        <p className="text-xs font-semibold text-ink/70">
+      <div className="flex items-center gap-1">
+
+        {Icon && (
+          <Icon className="h-3 w-3 fill-current text-[#B85C12]" />
+        )}
+
+        <p className="text-[11px] font-bold tracking-[-0.01em] text-ink/70">
           {value}
         </p>
+
       </div>
 
-      <p className="mt-0.5 text-[9px] text-ink/30">{label}</p>
+      <p className="mt-1 text-[8.5px] font-medium text-ink/30">
+        {label}
+      </p>
+
     </div>
   )
 }
+
+/* ============================================================= */
+/* Availability                                                    */
+/* ============================================================= */
 
 function AvailabilityBadge({
   availability,
@@ -484,20 +789,33 @@ function AvailabilityBadge({
   availability: Professional['availability']
 }) {
   const styles = {
-    Available: 'bg-emerald-500/10 text-emerald-700',
-    Limited: 'bg-amber-500/10 text-amber-700',
-    Busy: 'bg-rose-500/10 text-rose-700',
+    Available: 'bg-[#EAF4EE] text-[#12613E]',
+    Limited: 'bg-[#F7EFE8] text-[#A75A19]',
+    Busy: 'bg-[#FBECEC] text-[#A33A3A]',
+  }
+
+  const dotStyles = {
+    Available: 'bg-[#12613E]',
+    Limited: 'bg-[#B85C12]',
+    Busy: 'bg-[#A33A3A]',
   }
 
   return (
     <span
-      className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-1 text-[9px] font-semibold ${styles[availability]}`}
+      className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[8.5px] font-bold ${styles[availability]}`}
     >
-      <Clock3 className="h-3 w-3" />
+      <span
+        className={`h-1.5 w-1.5 rounded-full ${dotStyles[availability]}`}
+      />
+
       {availability}
     </span>
   )
 }
+
+/* ============================================================= */
+/* Trust Score                                                     */
+/* ============================================================= */
 
 function TrustScore({ score }: { score: number }) {
   const category =
@@ -513,16 +831,22 @@ function TrustScore({ score }: { score: number }) {
 
   return (
     <div className="text-right">
-      <p className="text-[9px] font-semibold text-ink/50">
+
+      <p className="text-[9px] font-bold text-ink/55">
         {category}
       </p>
 
-      <p className="mt-0.5 text-[9px] text-ink/30">
+      <p className="mt-0.5 text-[8px] text-ink/25">
         Platform rating
       </p>
+
     </div>
   )
 }
+
+/* ============================================================= */
+/* Initials                                                        */
+/* ============================================================= */
 
 function getInitials(name: string) {
   return name

@@ -1,3 +1,5 @@
+
+import type { ComponentType } from 'react'
 import {
   AlertTriangle,
   CalendarDays,
@@ -17,7 +19,12 @@ import {
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 
-type ReportStatus = 'Draft' | 'Submitted' | 'Under Review' | 'Approved' | 'Rejected'
+type ReportStatus =
+  | 'Draft'
+  | 'Submitted'
+  | 'Under Review'
+  | 'Approved'
+  | 'Rejected'
 
 type EvidenceType = 'Photo' | 'Video' | 'Document'
 
@@ -186,61 +193,92 @@ export function DailyReport() {
 
   const hasOpenIssue = report.issues.length > 0
 
+  const evidencePercentage =
+    report.evidence.length > 0
+      ? Math.round((verifiedEvidence / report.evidence.length) * 100)
+      : 0
+
   return (
-    <div className="space-y-6">
-      {/* Header */}
+    <div className="space-y-7 pb-8">
+      {/* =========================================================
+          HERO / REPORT HEADER
+      ========================================================= */}
+
       <Card className="overflow-hidden">
-        <div className="border-b border-line bg-paper-2 px-6 py-7 sm:px-8">
-          <div className="flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
+        <div className="relative overflow-hidden border-b border-ink/[0.07] bg-[#F8F9F7] px-5 py-6 sm:px-7 sm:py-7 lg:px-8">
+          {/* subtle architectural background */}
+          <div className="pointer-events-none absolute right-0 top-0 h-56 w-56 rounded-full bg-[#12613E]/[0.035] blur-3xl" />
+          <div className="pointer-events-none absolute bottom-0 left-1/3 h-40 w-40 rounded-full bg-[#B85C12]/[0.025] blur-3xl" />
+
+          <div className="relative flex flex-col gap-7 xl:flex-row xl:items-start xl:justify-between">
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded-full bg-ink/5 px-2.5 py-1 font-mono text-[10px] font-semibold uppercase tracking-wide text-ink/45">
+                <span className="rounded-full border border-ink/[0.07] bg-white px-3 py-1.5 font-mono text-[9px] font-semibold tracking-[0.08em] text-ink/40 shadow-[0_3px_12px_rgba(20,40,30,0.03)]">
                   {report.id}
                 </span>
 
                 <StatusBadge status={report.status} />
               </div>
 
-              <h1 className="mt-3 font-display text-2xl font-semibold tracking-tight text-ink">
+              <p className="mt-5 text-[10px] font-bold uppercase tracking-[0.18em] text-ink/35">
+                Construction monitoring
+              </p>
+
+              <h1 className="mt-1.5 max-w-2xl font-display text-[29px] font-semibold leading-tight tracking-[-0.035em] text-ink sm:text-[34px]">
                 Daily Site Report
               </h1>
 
-              <p className="mt-1 text-sm text-ink/45">
+              <p className="mt-2 text-[13px] text-ink/50">
                 {report.projectName}
               </p>
 
-              <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-xs text-ink/45">
-                <span className="inline-flex items-center gap-1.5">
-                  <CalendarDays className="h-3.5 w-3.5" />
-                  {report.reportDate}
-                </span>
+              <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2.5 text-[11px] font-medium text-ink/45">
+                <MetaItem
+                  icon={CalendarDays}
+                  value={report.reportDate}
+                />
 
-                <span className="inline-flex items-center gap-1.5">
-                  <MapPin className="h-3.5 w-3.5" />
-                  {report.location}
-                </span>
+                <MetaItem
+                  icon={MapPin}
+                  value={report.location}
+                />
 
-                <span className="inline-flex items-center gap-1.5">
-                  <Clock3 className="h-3.5 w-3.5" />
-                  {report.workingHours}
-                </span>
+                <MetaItem
+                  icon={Clock3}
+                  value={report.workingHours}
+                />
               </div>
             </div>
 
-            <div className="flex flex-wrap gap-2">
+            <div className="flex shrink-0 flex-wrap gap-2">
               <button
                 type="button"
-                className="inline-flex items-center gap-2 rounded-xl border border-line bg-white px-4 py-2.5 text-xs font-semibold text-ink/60 transition-colors hover:bg-paper-2"
+                className="
+                  inline-flex items-center gap-2 rounded-full
+                  border border-ink/[0.09] bg-white px-4 py-2.5
+                  text-[11px] font-semibold text-ink/65
+                  shadow-[0_4px_14px_rgba(20,40,30,0.035)]
+                  transition duration-200
+                  hover:-translate-y-0.5 hover:border-ink/15
+                  hover:shadow-[0_8px_20px_rgba(20,40,30,0.07)]
+                "
               >
-                <FileText className="h-4 w-4" />
+                <FileText className="h-3.5 w-3.5" />
                 Export Report
               </button>
 
               <button
                 type="button"
-                className="inline-flex items-center gap-2 rounded-xl bg-ink px-4 py-2.5 text-xs font-semibold text-white transition-opacity hover:opacity-90"
+                className="
+                  inline-flex items-center gap-2 rounded-full
+                  bg-ink px-4.5 py-2.5
+                  text-[11px] font-semibold text-white
+                  shadow-[0_8px_20px_rgba(20,30,25,0.12)]
+                  transition duration-200
+                  hover:-translate-y-0.5 hover:opacity-95
+                "
               >
-                <CheckCircle2 className="h-4 w-4" />
+                <CheckCircle2 className="h-3.5 w-3.5" />
                 Review Report
               </button>
             </div>
@@ -248,79 +286,102 @@ export function DailyReport() {
         </div>
 
         {/* Summary metrics */}
-        <div className="grid divide-y divide-line sm:grid-cols-2 sm:divide-x sm:divide-y-0 xl:grid-cols-4">
+        <div className="grid divide-y divide-ink/[0.07] sm:grid-cols-2 sm:divide-x sm:divide-y-0 xl:grid-cols-4">
           <ReportMetric
             icon={CheckCircle2}
             label="Daily progress"
             value={`${report.progress}%`}
             description="Reported milestone progress"
+            tone="green"
           />
 
           <ReportMetric
             icon={Users}
             label="Workers on site"
-            value={`${report.workersOnSite}`}
+            value={String(report.workersOnSite)}
             description="Recorded for this shift"
+            tone="ink"
           />
 
           <ReportMetric
             icon={Package}
             label="Materials"
-            value={`${report.materials.length}`}
+            value={String(report.materials.length)}
             description="Material categories recorded"
+            tone="bronze"
           />
 
           <ReportMetric
             icon={ShieldCheck}
             label="Evidence"
             value={`${verifiedEvidence}/${report.evidence.length}`}
-            description="Evidence currently verified"
+            description={`${evidencePercentage}% currently verified`}
+            tone="green"
           />
         </div>
       </Card>
 
-      {/* Review notice */}
+      {/* =========================================================
+          REVIEW NOTICE
+      ========================================================= */}
+
       <div
-        className={`flex items-start gap-3 rounded-xl border px-4 py-3.5 ${
+        className={[
+          'relative overflow-hidden rounded-[20px] border px-5 py-4',
+          'shadow-[0_8px_25px_rgba(20,40,30,0.035)]',
           hasOpenIssue
-            ? 'border-amber-200 bg-amber-50'
-            : 'border-emerald-200 bg-emerald-50'
-        }`}
+            ? 'border-[#B85C12]/15 bg-[#FBF6F1]'
+            : 'border-[#12613E]/15 bg-[#F3F8F5]',
+        ].join(' ')}
       >
-        {hasOpenIssue ? (
-          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
-        ) : (
-          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
-        )}
-
-        <div>
-          <p
-            className={`text-xs font-semibold ${
-              hasOpenIssue ? 'text-amber-900' : 'text-emerald-900'
-            }`}
-          >
-            {hasOpenIssue
-              ? 'Report requires attention'
-              : 'No active report issues'}
-          </p>
-
-          <p
-            className={`mt-1 text-xs leading-5 ${
+        <div className="flex items-start gap-3.5">
+          <div
+            className={[
+              'mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl',
               hasOpenIssue
-                ? 'text-amber-800/75'
-                : 'text-emerald-800/75'
-            }`}
+                ? 'bg-[#B85C12]/10 text-[#B85C12]'
+                : 'bg-[#12613E]/10 text-[#12613E]',
+            ].join(' ')}
           >
-            {hasOpenIssue
-              ? 'One or more site issues have been recorded and should be reviewed before the report is approved.'
-              : 'The submitted daily report contains no unresolved issues.'}
-          </p>
+            {hasOpenIssue ? (
+              <AlertTriangle className="h-4 w-4" />
+            ) : (
+              <CheckCircle2 className="h-4 w-4" />
+            )}
+          </div>
+
+          <div>
+            <p
+              className={[
+                'text-[12px] font-bold',
+                hasOpenIssue ? 'text-[#7A3F0C]' : 'text-[#12613E]',
+              ].join(' ')}
+            >
+              {hasOpenIssue
+                ? 'Report requires attention'
+                : 'No active report issues'}
+            </p>
+
+            <p
+              className={[
+                'mt-1 max-w-3xl text-[11px] leading-5',
+                hasOpenIssue ? 'text-[#7A3F0C]/70' : 'text-[#12613E]/70',
+              ].join(' ')}
+            >
+              {hasOpenIssue
+                ? 'One or more site issues have been recorded and should be reviewed before the report is approved.'
+                : 'The submitted daily report contains no unresolved issues.'}
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* Main content */}
-      <div className="grid gap-6 xl:grid-cols-3">
-        <div className="space-y-6 xl:col-span-2">
+      {/* =========================================================
+          MAIN CONTENT
+      ========================================================= */}
+
+      <div className="grid gap-5 xl:grid-cols-3">
+        <div className="space-y-5 xl:col-span-2">
           {/* Report overview */}
           <Card>
             <CardHeader
@@ -329,7 +390,7 @@ export function DailyReport() {
             />
 
             <CardBody>
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-3 sm:grid-cols-2">
                 <InfoBlock
                   label="Project ID"
                   value={report.projectId}
@@ -338,6 +399,7 @@ export function DailyReport() {
                 <InfoBlock
                   label="Milestone"
                   value={report.milestone}
+                  accent
                 />
 
                 <InfoBlock
@@ -371,22 +433,28 @@ export function DailyReport() {
             />
 
             <CardBody>
-              <div className="space-y-3">
+              <div className="space-y-2.5">
                 {report.workCompleted.map((item, index) => (
                   <div
                     key={item}
-                    className="flex items-start gap-3 rounded-xl border border-line bg-white p-3.5"
+                    className="
+                      group flex items-start gap-3.5 rounded-[16px]
+                      border border-ink/[0.06] bg-white p-4
+                      transition duration-200
+                      hover:border-ink/[0.10]
+                      hover:shadow-[0_8px_22px_rgba(20,40,30,0.045)]
+                    "
                   >
-                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-500/10">
-                      <Check className="h-3.5 w-3.5 text-emerald-700" />
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#EAF4EE] text-[#12613E] transition group-hover:scale-105">
+                      <Check className="h-3.5 w-3.5" />
                     </div>
 
                     <div className="min-w-0">
-                      <p className="text-[10px] font-semibold uppercase tracking-wide text-ink/30">
+                      <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-ink/30">
                         Activity {String(index + 1).padStart(2, '0')}
                       </p>
 
-                      <p className="mt-1 text-sm leading-6 text-ink/60">
+                      <p className="mt-1.5 text-[12px] leading-5 text-ink/65">
                         {item}
                       </p>
                     </div>
@@ -404,28 +472,30 @@ export function DailyReport() {
             />
 
             <CardBody>
-              <div className="overflow-hidden rounded-xl border border-line">
-                <div className="grid grid-cols-[1fr_auto_auto] gap-4 border-b border-line bg-paper-2 px-4 py-3 text-[10px] font-semibold uppercase tracking-wide text-ink/35">
+              <div className="overflow-hidden rounded-[16px] border border-ink/[0.07]">
+                <div className="grid grid-cols-[1fr_auto_auto] gap-4 border-b border-ink/[0.07] bg-[#F7F8F6] px-4 py-3 text-[9px] font-bold uppercase tracking-[0.12em] text-ink/35">
                   <span>Material</span>
                   <span>Quantity</span>
                   <span>Status</span>
                 </div>
 
-                <div className="divide-y divide-line">
+                <div className="divide-y divide-ink/[0.06]">
                   {report.materials.map((material) => (
                     <div
                       key={material.name}
-                      className="grid grid-cols-[1fr_auto_auto] items-center gap-4 px-4 py-3.5"
+                      className="grid grid-cols-[1fr_auto_auto] items-center gap-4 px-4 py-3.5 transition hover:bg-[#FAFBFA]"
                     >
                       <div className="flex min-w-0 items-center gap-2.5">
-                        <Package className="h-4 w-4 shrink-0 text-ink/35" />
+                        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-ink/[0.045]">
+                          <Package className="h-3.5 w-3.5 text-ink/40" />
+                        </div>
 
-                        <span className="truncate text-xs font-semibold text-ink">
+                        <span className="truncate text-[11px] font-semibold text-ink">
                           {material.name}
                         </span>
                       </div>
 
-                      <span className="text-xs font-medium text-ink/55">
+                      <span className="text-[11px] font-medium text-ink/55">
                         {material.quantity} {material.unit}
                       </span>
 
@@ -445,7 +515,7 @@ export function DailyReport() {
             />
 
             <CardBody>
-              <div className="space-y-3">
+              <div className="space-y-2.5">
                 {report.evidence.map((item) => (
                   <EvidenceRow
                     key={item.id}
@@ -464,15 +534,17 @@ export function DailyReport() {
             />
 
             <CardBody>
-              <div className="space-y-3">
+              <div className="space-y-2.5">
                 {report.safetyNotes.map((note) => (
                   <div
                     key={note}
-                    className="flex items-start gap-3 rounded-xl bg-paper-2 p-3.5"
+                    className="flex items-start gap-3 rounded-[15px] bg-[#F7F8F6] p-4"
                   >
-                    <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-ink/45" />
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-white shadow-[0_2px_8px_rgba(20,40,30,0.04)]">
+                      <ShieldCheck className="h-3.5 w-3.5 text-ink/45" />
+                    </div>
 
-                    <p className="text-xs leading-5 text-ink/55">
+                    <p className="pt-0.5 text-[11px] leading-5 text-ink/55">
                       {note}
                     </p>
                   </div>
@@ -482,8 +554,11 @@ export function DailyReport() {
           </Card>
         </div>
 
-        {/* Right rail */}
-        <div className="space-y-6">
+        {/* =======================================================
+            RIGHT RAIL
+        ======================================================= */}
+
+        <div className="space-y-5">
           {/* Workforce */}
           <Card>
             <CardHeader
@@ -492,25 +567,25 @@ export function DailyReport() {
             />
 
             <CardBody>
-              <div className="rounded-xl bg-paper-2 p-4">
+              <div className="rounded-[18px] bg-[#F6F8F5] p-4.5">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-ink/5">
-                    <Users className="h-4 w-4 text-ink/55" />
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white text-[#12613E] shadow-[0_4px_12px_rgba(20,40,30,0.05)]">
+                    <Users className="h-4.5 w-4.5" />
                   </div>
 
                   <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-wide text-ink/35">
+                    <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-ink/35">
                       Workers on site
                     </p>
 
-                    <p className="mt-0.5 font-display text-2xl font-semibold text-ink">
+                    <p className="mt-0.5 font-display text-[27px] font-semibold tracking-[-0.03em] text-ink">
                       {report.workersOnSite}
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div className="mt-5 space-y-3">
+              <div className="mt-5 space-y-3.5">
                 <DetailRow
                   label="Working hours"
                   value={report.workingHours}
@@ -524,6 +599,7 @@ export function DailyReport() {
                 <DetailRow
                   label="Daily progress"
                   value={`${report.progress}%`}
+                  emphasis
                 />
               </div>
             </CardBody>
@@ -541,7 +617,13 @@ export function DailyReport() {
                 {report.equipment.map((equipment) => (
                   <span
                     key={equipment}
-                    className="rounded-full bg-paper-2 px-3 py-1.5 text-xs font-medium text-ink/55"
+                    className="
+                      rounded-full border border-ink/[0.06]
+                      bg-[#F7F8F6] px-3 py-1.5
+                      text-[10px] font-semibold text-ink/55
+                      transition hover:border-ink/[0.10]
+                      hover:bg-white
+                    "
                   >
                     {equipment}
                   </span>
@@ -559,20 +641,22 @@ export function DailyReport() {
 
             <CardBody>
               {report.issues.length === 0 ? (
-                <div className="flex items-center gap-2 rounded-xl bg-emerald-500/10 px-3.5 py-3 text-xs font-medium text-emerald-700">
+                <div className="flex items-center gap-2.5 rounded-[15px] bg-[#EAF4EE] px-4 py-3.5 text-[11px] font-semibold text-[#12613E]">
                   <CheckCircle2 className="h-4 w-4" />
                   No issues reported.
                 </div>
               ) : (
-                <div className="space-y-3">
+                <div className="space-y-2.5">
                   {report.issues.map((issue) => (
                     <div
                       key={issue}
-                      className="flex items-start gap-2.5 rounded-xl bg-amber-500/10 px-3.5 py-3"
+                      className="flex items-start gap-2.5 rounded-[15px] border border-[#B85C12]/10 bg-[#FBF6F1] px-4 py-3.5"
                     >
-                      <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+                      <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-[#B85C12]/10">
+                        <AlertTriangle className="h-3.5 w-3.5 text-[#B85C12]" />
+                      </div>
 
-                      <p className="text-xs leading-5 text-amber-800">
+                      <p className="pt-0.5 text-[11px] leading-5 text-[#7A3F0C]/80">
                         {issue}
                       </p>
                     </div>
@@ -590,17 +674,17 @@ export function DailyReport() {
             />
 
             <CardBody>
-              <div className="space-y-3">
+              <div className="space-y-3.5">
                 {report.nextDayPlan.map((item, index) => (
                   <div
                     key={item}
                     className="flex items-start gap-3"
                   >
-                    <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-ink/5 font-mono text-[9px] font-semibold text-ink/45">
-                      {index + 1}
+                    <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-ink/[0.05] font-mono text-[9px] font-bold text-ink/45">
+                      {String(index + 1).padStart(2, '0')}
                     </div>
 
-                    <p className="pt-0.5 text-xs leading-5 text-ink/55">
+                    <p className="pt-0.5 text-[11px] leading-5 text-ink/55">
                       {item}
                     </p>
                   </div>
@@ -647,44 +731,72 @@ export function DailyReport() {
         </div>
       </div>
 
-      {/* Decision */}
-      <Card>
-        <CardBody>
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <div>
-              <p className="text-sm font-semibold text-ink">
-                Daily report decision
-              </p>
+      {/* =========================================================
+          DECISION PANEL
+      ========================================================= */}
 
-              <p className="mt-1 text-xs leading-5 text-ink/45">
+      <Card className="overflow-hidden">
+        <div className="border-b border-ink/[0.06] bg-[#F8F9F7] px-5 py-4 sm:px-6">
+          <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-ink/35">
+            Governance
+          </p>
+
+          <h3 className="mt-1 font-display text-lg font-semibold tracking-[-0.02em] text-ink">
+            Daily report decision
+          </h3>
+        </div>
+
+        <CardBody>
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+            <div className="max-w-2xl">
+              <p className="text-[12px] leading-5 text-ink/55">
                 Review the submitted activities and evidence before recording
                 the report decision. All actions are added to the project
                 audit trail.
               </p>
             </div>
 
-            <div className="flex flex-wrap gap-2">
+            <div className="flex shrink-0 flex-wrap gap-2">
               <button
                 type="button"
-                className="inline-flex items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-xs font-semibold text-rose-700 transition-colors hover:bg-rose-100"
+                className="
+                  inline-flex items-center gap-2 rounded-full
+                  border border-rose-200 bg-rose-50 px-4 py-2.5
+                  text-[10px] font-bold text-rose-700
+                  transition duration-200
+                  hover:-translate-y-0.5 hover:bg-rose-100
+                "
               >
-                <X className="h-4 w-4" />
+                <X className="h-3.5 w-3.5" />
                 Reject Report
               </button>
 
               <button
                 type="button"
-                className="inline-flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2.5 text-xs font-semibold text-amber-700 transition-colors hover:bg-amber-100"
+                className="
+                  inline-flex items-center gap-2 rounded-full
+                  border border-[#B85C12]/15 bg-[#FBF6F1]
+                  px-4 py-2.5 text-[10px] font-bold text-[#B85C12]
+                  transition duration-200
+                  hover:-translate-y-0.5 hover:bg-[#F7EEE6]
+                "
               >
-                <AlertTriangle className="h-4 w-4" />
+                <AlertTriangle className="h-3.5 w-3.5" />
                 Request Clarification
               </button>
 
               <button
                 type="button"
-                className="inline-flex items-center gap-2 rounded-xl bg-ink px-4 py-2.5 text-xs font-semibold text-white transition-opacity hover:opacity-90"
+                className="
+                  inline-flex items-center gap-2 rounded-full
+                  bg-ink px-4 py-2.5
+                  text-[10px] font-bold text-white
+                  shadow-[0_7px_18px_rgba(20,30,25,0.12)]
+                  transition duration-200
+                  hover:-translate-y-0.5 hover:opacity-95
+                "
               >
-                <Check className="h-4 w-4" />
+                <Check className="h-3.5 w-3.5" />
                 Approve Report
               </button>
             </div>
@@ -692,7 +804,10 @@ export function DailyReport() {
         </CardBody>
       </Card>
 
-      {/* Audit trail */}
+      {/* =========================================================
+          AUDIT TRAIL
+      ========================================================= */}
+
       <Card>
         <CardHeader
           title="Audit trail"
@@ -700,12 +815,13 @@ export function DailyReport() {
         />
 
         <CardBody>
-          <div className="space-y-4">
+          <div className="space-y-0">
             <AuditItem
               title="Daily report submitted"
               description="Contractor submitted the daily construction report with site evidence."
               actor={report.contractor}
               date={report.submittedAt}
+              first
             />
 
             <AuditItem
@@ -727,11 +843,31 @@ export function DailyReport() {
               description="Daily monitoring period opened for the foundation completion phase."
               actor="Build OS"
               date="27 Aug 2026, 08:00"
+              last
             />
           </div>
         </CardBody>
       </Card>
     </div>
+  )
+}
+
+/* ===============================================================
+   PRESENTATIONAL COMPONENTS
+================================================================ */
+
+function MetaItem({
+  icon: Icon,
+  value,
+}: {
+  icon: ComponentType<{ className?: string }>
+  value: string
+}) {
+  return (
+    <span className="inline-flex items-center gap-1.5">
+      <Icon className="h-3.5 w-3.5 text-ink/30" />
+      {value}
+    </span>
   )
 }
 
@@ -741,16 +877,22 @@ function StatusBadge({
   status: ReportStatus
 }) {
   const styles: Record<ReportStatus, string> = {
-    Draft: 'bg-ink/5 text-ink/50',
-    Submitted: 'bg-blue-500/10 text-blue-700',
-    'Under Review': 'bg-amber-500/10 text-amber-700',
-    Approved: 'bg-emerald-500/10 text-emerald-700',
-    Rejected: 'bg-rose-500/10 text-rose-700',
+    Draft: 'border-ink/[0.07] bg-ink/[0.04] text-ink/50',
+    Submitted: 'border-blue-500/10 bg-blue-500/[0.07] text-blue-700',
+    'Under Review':
+      'border-[#B85C12]/10 bg-[#B85C12]/[0.08] text-[#B85C12]',
+    Approved:
+      'border-[#12613E]/10 bg-[#12613E]/[0.08] text-[#12613E]',
+    Rejected: 'border-rose-500/10 bg-rose-500/[0.07] text-rose-700',
   }
 
   return (
     <span
-      className={`rounded-full px-2.5 py-1 text-[10px] font-semibold ${styles[status]}`}
+      className={[
+        'rounded-full border px-3 py-1.5',
+        'text-[9px] font-bold uppercase tracking-[0.08em]',
+        styles[status],
+      ].join(' ')}
     >
       {status}
     </span>
@@ -762,31 +904,44 @@ function ReportMetric({
   label,
   value,
   description,
+  tone = 'ink',
 }: {
-  icon: React.ComponentType<{ className?: string }>
+  icon: ComponentType<{ className?: string }>
   label: string
   value: string
   description: string
+  tone?: 'green' | 'bronze' | 'ink'
 }) {
+  const toneClasses = {
+    green: 'bg-[#EAF4EE] text-[#12613E]',
+    bronze: 'bg-[#FBF0E8] text-[#B85C12]',
+    ink: 'bg-ink/[0.05] text-ink/55',
+  }
+
   return (
-    <div className="px-6 py-5 sm:px-7">
+    <div className="px-5 py-5 sm:px-6">
       <div className="flex items-center gap-3">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-ink/5">
-          <Icon className="h-4 w-4 text-ink/55" />
+        <div
+          className={[
+            'flex h-9 w-9 items-center justify-center rounded-xl',
+            toneClasses[tone],
+          ].join(' ')}
+        >
+          <Icon className="h-4 w-4" />
         </div>
 
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-wide text-ink/35">
+          <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-ink/35">
             {label}
           </p>
 
-          <p className="mt-0.5 font-display text-xl font-semibold text-ink">
+          <p className="mt-0.5 font-display text-[21px] font-semibold tracking-[-0.025em] text-ink">
             {value}
           </p>
         </div>
       </div>
 
-      <p className="mt-3 text-xs text-ink/40">
+      <p className="mt-3 text-[10px] text-ink/40">
         {description}
       </p>
     </div>
@@ -796,17 +951,24 @@ function ReportMetric({
 function InfoBlock({
   label,
   value,
+  accent = false,
 }: {
   label: string
   value: string
+  accent?: boolean
 }) {
   return (
-    <div className="rounded-xl border border-line bg-white p-3.5">
-      <p className="text-[10px] font-semibold uppercase tracking-wide text-ink/35">
+    <div className="rounded-[15px] border border-ink/[0.06] bg-[#FAFBFA] p-4 transition hover:bg-white">
+      <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-ink/35">
         {label}
       </p>
 
-      <p className="mt-1.5 text-sm font-semibold text-ink">
+      <p
+        className={[
+          'mt-1.5 text-[12px] font-semibold',
+          accent ? 'text-[#12613E]' : 'text-ink',
+        ].join(' ')}
+      >
         {value}
       </p>
     </div>
@@ -816,17 +978,24 @@ function InfoBlock({
 function DetailRow({
   label,
   value,
+  emphasis = false,
 }: {
   label: string
   value: string
+  emphasis?: boolean
 }) {
   return (
-    <div className="flex items-center justify-between border-b border-line pb-3 last:border-0 last:pb-0">
-      <span className="text-xs text-ink/45">
+    <div className="flex items-center justify-between gap-4 border-b border-ink/[0.06] pb-3.5 last:border-0 last:pb-0">
+      <span className="text-[11px] text-ink/45">
         {label}
       </span>
 
-      <span className="text-xs font-semibold text-ink">
+      <span
+        className={[
+          'text-[11px] font-semibold text-right',
+          emphasis ? 'text-[#12613E]' : 'text-ink',
+        ].join(' ')}
+      >
         {value}
       </span>
     </div>
@@ -839,14 +1008,19 @@ function MaterialStatus({
   status: MaterialUsage['status']
 }) {
   const styles = {
-    Used: 'bg-emerald-500/10 text-emerald-700',
-    Delivered: 'bg-blue-500/10 text-blue-700',
-    'Low Stock': 'bg-amber-500/10 text-amber-700',
+    Used: 'border-[#12613E]/10 bg-[#12613E]/[0.07] text-[#12613E]',
+    Delivered: 'border-blue-500/10 bg-blue-500/[0.07] text-blue-700',
+    'Low Stock':
+      'border-[#B85C12]/10 bg-[#B85C12]/[0.07] text-[#B85C12]',
   }
 
   return (
     <span
-      className={`rounded-full px-2.5 py-1 text-[10px] font-semibold ${styles[status]}`}
+      className={[
+        'rounded-full border px-2.5 py-1',
+        'text-[9px] font-bold uppercase tracking-[0.06em]',
+        styles[status],
+      ].join(' ')}
     >
       {status}
     </span>
@@ -867,32 +1041,45 @@ function EvidenceRow({
 
   const statusClass =
     evidence.status === 'Verified'
-      ? 'bg-emerald-500/10 text-emerald-700'
+      ? 'border-[#12613E]/10 bg-[#12613E]/[0.07] text-[#12613E]'
       : evidence.status === 'Rejected'
-        ? 'bg-rose-500/10 text-rose-700'
-        : 'bg-amber-500/10 text-amber-700'
+        ? 'border-rose-500/10 bg-rose-500/[0.07] text-rose-700'
+        : 'border-[#B85C12]/10 bg-[#B85C12]/[0.07] text-[#B85C12]'
 
   return (
-    <div className="flex flex-col gap-3 rounded-xl border border-line p-3.5 sm:flex-row sm:items-center sm:justify-between">
+    <div
+      className="
+        group flex flex-col gap-3 rounded-[16px]
+        border border-ink/[0.06] bg-white p-3.5
+        transition duration-200
+        hover:border-ink/[0.10]
+        hover:shadow-[0_8px_22px_rgba(20,40,30,0.045)]
+        sm:flex-row sm:items-center sm:justify-between
+      "
+    >
       <div className="flex min-w-0 items-center gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-ink/5">
-          <Icon className="h-4 w-4 text-ink/50" />
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#F5F6F4] text-ink/45 transition group-hover:bg-[#EAF4EE] group-hover:text-[#12613E]">
+          <Icon className="h-4 w-4" />
         </div>
 
         <div className="min-w-0">
-          <p className="truncate text-xs font-semibold text-ink">
+          <p className="truncate text-[11px] font-semibold text-ink">
             {evidence.name}
           </p>
 
-          <p className="mt-1 text-[10px] text-ink/40">
-            {evidence.type} · {evidence.uploadedBy} ·{' '}
-            {evidence.uploadedAt}
+          <p className="mt-1 text-[9px] text-ink/40">
+            {evidence.type} · {evidence.uploadedBy} · {evidence.uploadedAt}
           </p>
         </div>
       </div>
 
       <span
-        className={`shrink-0 self-start rounded-full px-2.5 py-1 text-[10px] font-semibold sm:self-auto ${statusClass}`}
+        className={[
+          'shrink-0 self-start rounded-full border px-2.5 py-1',
+          'text-[9px] font-bold uppercase tracking-[0.06em]',
+          'sm:self-auto',
+          statusClass,
+        ].join(' ')}
       >
         {evidence.status}
       </span>
@@ -914,13 +1101,14 @@ function VerificationRow({
     <div className="flex items-center justify-between gap-3">
       <div className="flex min-w-0 items-center gap-2.5">
         <div
-          className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${
+          className={[
+            'flex h-7 w-7 shrink-0 items-center justify-center rounded-full',
             verified
-              ? 'bg-emerald-500/10 text-emerald-700'
+              ? 'bg-[#EAF4EE] text-[#12613E]'
               : rejected
                 ? 'bg-rose-500/10 text-rose-700'
-                : 'bg-amber-500/10 text-amber-700'
-          }`}
+                : 'bg-[#FBF0E8] text-[#B85C12]',
+          ].join(' ')}
         >
           {verified ? (
             <Check className="h-3.5 w-3.5" />
@@ -931,19 +1119,20 @@ function VerificationRow({
           )}
         </div>
 
-        <span className="truncate text-xs text-ink/55">
+        <span className="truncate text-[11px] text-ink/55">
           {label}
         </span>
       </div>
 
       <span
-        className={`shrink-0 text-[10px] font-semibold ${
+        className={[
+          'shrink-0 text-[9px] font-bold uppercase tracking-[0.06em]',
           verified
-            ? 'text-emerald-700'
+            ? 'text-[#12613E]'
             : rejected
               ? 'text-rose-700'
-              : 'text-amber-700'
-        }`}
+              : 'text-[#B85C12]',
+        ].join(' ')}
       >
         {status}
       </span>
@@ -956,34 +1145,48 @@ function AuditItem({
   description,
   actor,
   date,
+  first = false,
+  last = false,
 }: {
   title: string
   description: string
   actor: string
   date: string
+  first?: boolean
+  last?: boolean
 }) {
   return (
-    <div className="flex gap-3">
-      <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-ink/5">
-        <UserCheck className="h-3.5 w-3.5 text-ink/50" />
+    <div className="relative flex gap-3.5">
+      {!last && (
+        <div className="absolute left-[15px] top-8 bottom-0 w-px bg-ink/[0.07]" />
+      )}
+
+      <div className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white bg-[#F1F3F0] shadow-[0_2px_8px_rgba(20,40,30,0.04)]">
+        <UserCheck className="h-3.5 w-3.5 text-ink/45" />
       </div>
 
-      <div className="min-w-0 flex-1 border-b border-line pb-4">
+      <div
+        className={[
+          'min-w-0 flex-1 pb-5',
+          !last ? 'border-b border-ink/[0.06]' : '',
+          first ? 'pt-0' : 'pt-0.5',
+        ].join(' ')}
+      >
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className="text-xs font-semibold text-ink">
+          <p className="text-[11px] font-semibold text-ink">
             {title}
           </p>
 
-          <span className="text-[10px] text-ink/35">
+          <span className="text-[9px] font-medium text-ink/35">
             {date}
           </span>
         </div>
 
-        <p className="mt-1 text-xs leading-5 text-ink/45">
+        <p className="mt-1 text-[10px] leading-5 text-ink/45">
           {description}
         </p>
 
-        <p className="mt-1.5 text-[10px] font-medium text-ink/35">
+        <p className="mt-1.5 text-[9px] font-semibold text-ink/35">
           By {actor}
         </p>
       </div>

@@ -1,3 +1,4 @@
+
 import {
   AlertTriangle,
   ArrowRight,
@@ -10,7 +11,7 @@ import {
   Trophy,
 } from 'lucide-react'
 
-import { Card, CardBody, CardHeader } from '@/components/ui/Card'
+import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { bids } from '@/data/mockData'
 
@@ -36,40 +37,117 @@ const bidStatusTone = {
   rejected: 'brick',
 } as const
 
+function getInitials(name: string) {
+  return name
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join('')
+}
+
 export function BidComparison() {
   const sortedBids = [...bids].sort((a, b) => a.amount - b.amount)
 
   const lowestBid = sortedBids[0]?.amount
 
-  return (
-    <div className="space-y-6">
-      {/* Header */}
-      <Card>
-        <CardHeader
-          title="Bid comparison"
-          subtitle="Compare contractors by cost, timeline, verification, experience and trust score before awarding the project."
-        />
+  const verifiedCount = bids.filter((bid) => bid.verified).length
 
-        <CardBody>
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <div className="rounded-xl border border-line bg-paper-2 p-4">
-              <div className="flex items-center gap-2">
-                <FileCheck2 className="h-4 w-4 text-ink/50" />
-                <p className="text-xs text-ink/45">Total bids</p>
+  const shortlistedCount = bids.filter(
+    (bid) =>
+      bid.status === 'shortlisted' || bid.status === 'clarification',
+  ).length
+
+  return (
+    <div className="space-y-7">
+      {/* ------------------------------------------------------------------ */}
+      {/* Executive marketplace header                                       */}
+      {/* ------------------------------------------------------------------ */}
+      <section className="relative overflow-hidden rounded-[24px] bg-[#173629] px-6 py-7 text-white sm:px-8 sm:py-8">
+        <div className="absolute -right-20 -top-24 h-72 w-72 rounded-full bg-white/[0.035]" />
+        <div className="absolute -bottom-28 right-24 h-56 w-56 rounded-full bg-[#B85C12]/10" />
+        <div className="absolute left-[45%] top-1/2 h-36 w-36 -translate-y-1/2 rounded-full bg-white/[0.018]" />
+
+        <div className="relative flex flex-col gap-7 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-3xl">
+            <div className="flex items-center gap-2">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/10">
+                <FileCheck2 className="h-4 w-4 text-white/80" />
               </div>
 
-              <p className="mt-2 font-display text-xl font-semibold text-ink">
+              <span className="text-[9px] font-bold uppercase tracking-[0.18em] text-white/40">
+                Bid intelligence
+              </span>
+            </div>
+
+            <h1 className="mt-5 font-display text-[29px] font-semibold leading-tight tracking-[-0.04em] sm:text-[36px]">
+              Compare before you commit.
+            </h1>
+
+            <p className="mt-3 max-w-2xl text-[12px] leading-5 text-white/50 sm:text-[13px] sm:leading-6">
+              Review commercial terms, contractor credibility, delivery
+              capability and risk indicators before moving to contract award.
+            </p>
+          </div>
+
+          <div className="flex shrink-0 gap-2.5">
+            <div className="rounded-2xl bg-white/[0.08] px-4 py-3">
+              <p className="text-[8px] font-bold uppercase tracking-[0.11em] text-white/35">
+                Submitted
+              </p>
+
+              <p className="mt-1 font-display text-[23px] font-semibold">
                 {bids.length}
               </p>
             </div>
 
-            <div className="rounded-xl border border-line bg-paper-2 p-4">
-              <div className="flex items-center gap-2">
-                <DollarSign className="h-4 w-4 text-ink/50" />
-                <p className="text-xs text-ink/45">Lowest bid</p>
-              </div>
+            <div className="rounded-2xl bg-white/[0.08] px-4 py-3">
+              <p className="text-[8px] font-bold uppercase tracking-[0.11em] text-white/35">
+                Shortlisted
+              </p>
 
-              <p className="mt-2 font-display text-xl font-semibold text-ink">
+              <p className="mt-1 font-display text-[23px] font-semibold">
+                {shortlistedCount}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ------------------------------------------------------------------ */}
+      {/* Summary intelligence                                                */}
+      {/* ------------------------------------------------------------------ */}
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <Card className="group rounded-[20px] border-ink/[0.07] p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_14px_35px_rgba(20,40,30,0.06)]">
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-ink/30">
+                Total bids
+              </p>
+
+              <p className="mt-2 font-display text-[28px] font-semibold tracking-[-0.035em] text-ink">
+                {bids.length}
+              </p>
+            </div>
+
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#F6F8F5]">
+              <FileCheck2 className="h-4 w-4 text-ink/50" />
+            </div>
+          </div>
+
+          <p className="mt-2 text-[10px] text-ink/40">
+            Contractor submissions received
+          </p>
+        </Card>
+
+        <Card className="group rounded-[20px] border-ink/[0.07] p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_14px_35px_rgba(20,40,30,0.06)]">
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-ink/30">
+                Lowest bid
+              </p>
+
+              <p className="mt-2 font-display text-[24px] font-semibold tracking-[-0.03em] text-ink">
                 {sortedBids[0]
                   ? formatAmount(
                       sortedBids[0].amount,
@@ -79,74 +157,156 @@ export function BidComparison() {
               </p>
             </div>
 
-            <div className="rounded-xl border border-line bg-paper-2 p-4">
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="h-4 w-4 text-emerald-600" />
-                <p className="text-xs text-ink/45">Verified bidders</p>
-              </div>
-
-              <p className="mt-2 font-display text-xl font-semibold text-ink">
-                {bids.filter((bid) => bid.verified).length}
-              </p>
-            </div>
-
-            <div className="rounded-xl border border-line bg-paper-2 p-4">
-              <div className="flex items-center gap-2">
-                <Trophy className="h-4 w-4 text-ink/50" />
-                <p className="text-xs text-ink/45">Shortlisted</p>
-              </div>
-
-              <p className="mt-2 font-display text-xl font-semibold text-ink">
-                {bids.filter(
-                  (bid) =>
-                    bid.status === 'shortlisted' ||
-                    bid.status === 'clarification',
-                ).length}
-              </p>
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#F8EEE6]">
+              <DollarSign className="h-4 w-4 text-[#B85C12]" />
             </div>
           </div>
-        </CardBody>
-      </Card>
 
-      {/* Comparison */}
-      <Card className="overflow-hidden">
-        <CardHeader
-          title="Contractor bids"
-          subtitle="Review the commercial and trust indicators for each submitted bid."
-        />
+          <p className="mt-2 text-[10px] text-ink/40">
+            Lowest submitted commercial value
+          </p>
+        </Card>
 
-        <CardBody className="p-0">
-          <div className="divide-y divide-line">
-            {sortedBids.map((bid, index) => {
-              const isLowest = bid.amount === lowestBid
+        <Card className="group rounded-[20px] border-ink/[0.07] p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_14px_35px_rgba(20,40,30,0.06)]">
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-ink/30">
+                Verified bidders
+              </p>
 
-              return (
+              <p className="mt-2 font-display text-[28px] font-semibold tracking-[-0.035em] text-ink">
+                {verifiedCount}
+              </p>
+            </div>
+
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#EAF4EE]">
+              <ShieldCheck className="h-4 w-4 text-[#12613E]" />
+            </div>
+          </div>
+
+          <p className="mt-2 text-[10px] text-ink/40">
+            Contractors with verified credentials
+          </p>
+        </Card>
+
+        <Card className="group rounded-[20px] border-ink/[0.07] p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_14px_35px_rgba(20,40,30,0.06)]">
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-ink/30">
+                Under review
+              </p>
+
+              <p className="mt-2 font-display text-[28px] font-semibold tracking-[-0.035em] text-ink">
+                {shortlistedCount}
+              </p>
+            </div>
+
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#F8EEE6]">
+              <Trophy className="h-4 w-4 text-[#B85C12]" />
+            </div>
+          </div>
+
+          <p className="mt-2 text-[10px] text-ink/40">
+            Shortlisted or awaiting clarification
+          </p>
+        </Card>
+      </div>
+
+      {/* ------------------------------------------------------------------ */}
+      {/* Comparison workspace                                                */}
+      {/* ------------------------------------------------------------------ */}
+      <section>
+        <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-ink/30">
+              Contractor submissions
+            </p>
+
+            <h2 className="mt-1 font-display text-[20px] font-semibold tracking-[-0.025em] text-ink">
+              Commercial & performance comparison
+            </h2>
+
+            <p className="mt-1 text-[11px] leading-5 text-ink/40">
+              Compare the indicators that matter before progressing a bid to award.
+            </p>
+          </div>
+
+          <span className="hidden rounded-full border border-ink/[0.07] bg-white px-3 py-1.5 text-[9px] font-semibold text-ink/40 sm:block">
+            {bids.length} submissions
+          </span>
+        </div>
+
+        <div className="space-y-4">
+          {sortedBids.map((bid, index) => {
+            const isLowest = bid.amount === lowestBid
+            const isAwarded = bid.status === 'awarded'
+            const hasRisks = Boolean(bid.riskFlags?.length)
+
+            return (
+              <Card
+                key={bid.id}
+                className={`
+                  group
+                  relative
+                  overflow-hidden
+                  rounded-[22px]
+                  border
+                  bg-white
+                  transition-all
+                  duration-300
+                  hover:-translate-y-[2px]
+                  hover:shadow-[0_20px_50px_rgba(20,40,30,0.07)]
+                  ${
+                    isAwarded
+                      ? 'border-[#12613E]/15'
+                      : isLowest
+                        ? 'border-[#B85C12]/15'
+                        : 'border-ink/[0.07]'
+                  }
+                `}
+              >
                 <div
-                  key={bid.id}
-                  className="p-5 transition-colors hover:bg-ink/[0.02] sm:p-6"
-                >
-                  {/* Contractor */}
+                  className={`
+                    absolute inset-x-0 top-0 h-0.5
+                    ${
+                      isAwarded
+                        ? 'bg-[#12613E]'
+                        : isLowest
+                          ? 'bg-[#B85C12]'
+                          : 'bg-[#173629]/10'
+                    }
+                  `}
+                />
+
+                <div className="p-5 sm:p-6">
+                  {/* Contractor identity */}
                   <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
                     <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-ink/5">
-                          <span className="font-mono text-xs font-semibold text-ink/60">
-                            {String(index + 1).padStart(2, '0')}
+                      <div className="flex flex-wrap items-center gap-2.5">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#173629] text-white">
+                          <span className="font-display text-[12px] font-semibold">
+                            {getInitials(bid.contractorName)}
                           </span>
                         </div>
 
-                        <h3 className="text-sm font-semibold text-ink">
-                          {bid.contractorName}
-                        </h3>
+                        <div className="min-w-0">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h3 className="text-[14px] font-semibold text-ink">
+                              {bid.contractorName}
+                            </h3>
 
-                        {bid.verified && (
-                          <Badge tone="teal">
-                            <span className="inline-flex items-center gap-1">
-                              <CheckCircle2 className="h-3 w-3" />
-                              Verified
-                            </span>
-                          </Badge>
-                        )}
+                            {bid.verified && (
+                              <span className="inline-flex items-center gap-1 rounded-full bg-[#EAF4EE] px-2 py-1 text-[8px] font-bold uppercase tracking-[0.06em] text-[#12613E]">
+                                <CheckCircle2 className="h-2.5 w-2.5" />
+                                Verified
+                              </span>
+                            )}
+                          </div>
+
+                          <p className="mt-0.5 text-[10px] text-ink/35">
+                            Contractor submission #{String(index + 1).padStart(2, '0')}
+                          </p>
+                        </div>
 
                         {isLowest && (
                           <Badge tone="amber">
@@ -162,82 +322,127 @@ export function BidComparison() {
                         </Badge>
                       </div>
 
-                      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                        {/* Cost */}
-                        <div className="rounded-xl border border-line p-4">
+                      {/* Core comparison metrics */}
+                      <div className="mt-5 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
+                        <div
+                          className={`
+                            rounded-[17px] p-4
+                            ${
+                              isLowest
+                                ? 'bg-[#F8EEE6]'
+                                : 'bg-[#F6F8F5]'
+                            }
+                          `}
+                        >
                           <div className="flex items-center gap-2">
-                            <DollarSign className="h-4 w-4 text-ink/40" />
-                            <p className="text-[10px] font-semibold uppercase tracking-wide text-ink/35">
+                            <DollarSign
+                              className={`h-3.5 w-3.5 ${
+                                isLowest
+                                  ? 'text-[#B85C12]'
+                                  : 'text-ink/40'
+                              }`}
+                            />
+
+                            <p className="text-[8px] font-bold uppercase tracking-[0.10em] text-ink/30">
                               Bid amount
                             </p>
                           </div>
 
-                          <p className="mt-2 font-mono text-base font-semibold text-ink">
+                          <p className="mt-2 font-display text-[18px] font-semibold tracking-[-0.02em] text-ink">
                             {formatAmount(bid.amount, bid.currency)}
                           </p>
+
+                          {isLowest && (
+                            <p className="mt-1 text-[9px] font-medium text-[#B85C12]">
+                              Lowest submitted value
+                            </p>
+                          )}
                         </div>
 
-                        {/* Timeline */}
-                        <div className="rounded-xl border border-line p-4">
+                        <div className="rounded-[17px] bg-[#F6F8F5] p-4">
                           <div className="flex items-center gap-2">
-                            <Clock3 className="h-4 w-4 text-ink/40" />
-                            <p className="text-[10px] font-semibold uppercase tracking-wide text-ink/35">
+                            <Clock3 className="h-3.5 w-3.5 text-ink/40" />
+
+                            <p className="text-[8px] font-bold uppercase tracking-[0.10em] text-ink/30">
                               Timeline
                             </p>
                           </div>
 
-                          <p className="mt-2 font-mono text-base font-semibold text-ink">
-                            {bid.timelineWeeks} weeks
+                          <p className="mt-2 font-display text-[18px] font-semibold tracking-[-0.02em] text-ink">
+                            {bid.timelineWeeks}
+                            <span className="ml-1 text-[10px] font-medium text-ink/40">
+                              weeks
+                            </span>
+                          </p>
+
+                          <p className="mt-1 text-[9px] text-ink/35">
+                            Proposed delivery period
                           </p>
                         </div>
 
-                        {/* Verification */}
-                        <div className="rounded-xl border border-line p-4">
+                        <div className="rounded-[17px] bg-[#F6F8F5] p-4">
                           <div className="flex items-center gap-2">
-                            <ShieldCheck className="h-4 w-4 text-ink/40" />
-                            <p className="text-[10px] font-semibold uppercase tracking-wide text-ink/35">
+                            <ShieldCheck className="h-3.5 w-3.5 text-ink/40" />
+
+                            <p className="text-[8px] font-bold uppercase tracking-[0.10em] text-ink/30">
                               Verification
                             </p>
                           </div>
 
-                          <p className="mt-2 text-sm font-semibold text-ink">
-                            {bid.verified ? 'Verified contractor' : 'Pending'}
+                          <p className="mt-2 text-[12px] font-semibold text-ink">
+                            {bid.verified
+                              ? 'Verified contractor'
+                              : 'Pending verification'}
+                          </p>
+
+                          <p className="mt-1 text-[9px] text-ink/35">
+                            Credential status
                           </p>
                         </div>
 
-                        {/* Trust */}
-                        <div className="rounded-xl border border-line p-4">
+                        <div className="rounded-[17px] bg-[#173629] p-4">
                           <div className="flex items-center gap-2">
-                            <Star className="h-4 w-4 text-ink/40" />
-                            <p className="text-[10px] font-semibold uppercase tracking-wide text-ink/35">
+                            <Star className="h-3.5 w-3.5 text-white/45" />
+
+                            <p className="text-[8px] font-bold uppercase tracking-[0.10em] text-white/35">
                               Trust score
                             </p>
                           </div>
 
-                          <p className="mt-2 text-sm font-semibold text-ink">
+                          <p className="mt-2 font-display text-[18px] font-semibold tracking-[-0.02em] text-white">
                             {bid.trustScore ?? '—'}
-                            {bid.trustScore ? ' / 100' : ''}
+                            {bid.trustScore ? (
+                              <span className="ml-1 text-[9px] font-medium text-white/35">
+                                / 100
+                              </span>
+                            ) : null}
+                          </p>
+
+                          <p className="mt-1 text-[9px] text-white/35">
+                            Platform performance signal
                           </p>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Bottom action area */}
-                  <div className="mt-5 flex flex-col justify-between gap-4 border-t border-line pt-4 sm:flex-row sm:items-center">
-                    <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-ink/45">
+                  {/* Supporting intelligence */}
+                  <div className="mt-5 flex flex-col gap-4 border-t border-ink/[0.06] pt-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
                       {bid.rating !== undefined && (
-                        <span className="inline-flex items-center gap-1">
-                          <Star className="h-3.5 w-3.5 fill-current text-ink/50" />
-                          <span className="font-semibold text-ink/70">
+                        <span className="inline-flex items-center gap-1.5 text-[10px] text-ink/40">
+                          <Star className="h-3.5 w-3.5 fill-current text-[#B85C12]" />
+
+                          <strong className="font-semibold text-ink/70">
                             {bid.rating}
-                          </span>
+                          </strong>
+
                           client rating
                         </span>
                       )}
 
                       {bid.completedProjects !== undefined && (
-                        <span>
+                        <span className="text-[10px] text-ink/40">
                           <strong className="font-semibold text-ink/70">
                             {bid.completedProjects}
                           </strong>{' '}
@@ -245,11 +450,16 @@ export function BidComparison() {
                         </span>
                       )}
 
-                      {bid.riskFlags?.length > 0 && (
-                        <span className="inline-flex items-center gap-1 text-amber-700">
-                          <AlertTriangle className="h-3.5 w-3.5" />
+                      {hasRisks ? (
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F8EEE6] px-2.5 py-1 text-[9px] font-semibold text-[#9A4D0A]">
+                          <AlertTriangle className="h-3 w-3" />
                           {bid.riskFlags.length} risk flag
                           {bid.riskFlags.length > 1 ? 's' : ''}
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-[#EAF4EE] px-2.5 py-1 text-[9px] font-semibold text-[#12613E]">
+                          <CheckCircle2 className="h-3 w-3" />
+                          No flagged risks
                         </span>
                       )}
                     </div>
@@ -257,63 +467,107 @@ export function BidComparison() {
                     <div className="flex items-center gap-2">
                       <button
                         type="button"
-                        className="rounded-lg border border-line px-3 py-2 text-xs font-semibold text-ink/60 transition-colors hover:bg-ink/5"
+                        className="
+                          rounded-full
+                          border
+                          border-ink/[0.08]
+                          bg-white
+                          px-4
+                          py-2.5
+                          text-[10px]
+                          font-bold
+                          text-ink/55
+                          transition-all
+                          duration-200
+                          hover:border-ink/15
+                          hover:bg-[#F6F8F5]
+                          hover:text-ink
+                        "
                       >
                         View bid
                       </button>
 
-                      {bid.status !== 'awarded' &&
-                        bid.status !== 'rejected' && (
-                          <button
-                            type="button"
-                            className="inline-flex items-center gap-1.5 rounded-lg bg-ink px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-ink/90"
-                          >
-                            Review & award
-                            <ArrowRight className="h-3.5 w-3.5" />
-                          </button>
-                        )}
+                      {!isAwarded && bid.status !== 'rejected' && (
+                        <button
+                          type="button"
+                          className="
+                            group/action
+                            inline-flex
+                            items-center
+                            gap-2
+                            rounded-full
+                            bg-ink
+                            px-4
+                            py-2.5
+                            text-[10px]
+                            font-bold
+                            text-white
+                            transition-all
+                            duration-200
+                            hover:bg-[#173629]
+                            hover:shadow-[0_8px_22px_rgba(20,40,30,0.14)]
+                          "
+                        >
+                          Review & award
+                          <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover/action:translate-x-0.5" />
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
-              )
-            })}
+              </Card>
+            )
+          })}
+        </div>
+
+        {bids.length === 0 && (
+          <Card className="rounded-[22px] border-dashed border-ink/[0.10] p-10 text-center">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[#F6F8F5]">
+              <FileCheck2 className="h-5 w-5 text-ink/30" />
+            </div>
+
+            <p className="mt-4 font-display text-[17px] font-semibold text-ink">
+              No bids submitted
+            </p>
+
+            <p className="mx-auto mt-1 max-w-sm text-[10px] leading-5 text-ink/40">
+              Contractor bids will appear here once submissions are received
+              for this project.
+            </p>
+          </Card>
+        )}
+      </section>
+
+      {/* ------------------------------------------------------------------ */}
+      {/* Decision guidance                                                   */}
+      {/* ------------------------------------------------------------------ */}
+      <section className="relative overflow-hidden rounded-[22px] bg-[#F6F8F5] px-5 py-6 sm:px-7 sm:py-7">
+        <div className="absolute -right-16 -top-20 h-44 w-44 rounded-full bg-[#173629]/[0.025]" />
+        <div className="absolute -bottom-20 right-24 h-36 w-36 rounded-full bg-[#B85C12]/[0.04]" />
+
+        <div className="relative flex flex-col gap-5 sm:flex-row sm:items-start">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white shadow-sm">
+            <ShieldCheck className="h-4 w-4 text-[#12613E]" />
           </div>
 
-          {bids.length === 0 && (
-            <div className="p-10 text-center">
-              <FileCheck2 className="mx-auto h-8 w-8 text-ink/25" />
-
-              <p className="mt-3 text-sm font-semibold text-ink">
-                No bids submitted
-              </p>
-
-              <p className="mt-1 text-xs text-ink/40">
-                Contractor bids will appear here once submitted.
-              </p>
-            </div>
-          )}
-        </CardBody>
-      </Card>
-
-      {/* Decision guidance */}
-      <Card className="border-ink/10 bg-paper-2 p-5">
-        <div className="flex gap-3">
-          <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" />
-
-          <div>
-            <p className="text-sm font-semibold text-ink">
+          <div className="max-w-3xl">
+            <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-ink/30">
               Awarding guidance
             </p>
 
-            <p className="mt-1 text-xs leading-5 text-ink/45">
-              The lowest bid should not automatically determine the award.
-              Compare the contractor&apos;s cost breakdown, delivery timeline,
-              verification status, trust score, previous project performance
-              and any identified risk before selecting a contractor.
+            <h2 className="mt-1 font-display text-[18px] font-semibold tracking-[-0.02em] text-ink">
+              Compare the whole bid, not just the price.
+            </h2>
+
+            <p className="mt-2 text-[10px] leading-5 text-ink/45 sm:text-[11px]">
+              The lowest submitted amount is only one commercial indicator.
+              Review the contractor&apos;s cost structure, proposed delivery
+              timeline, verification status, trust score, previous project
+              performance and identified risks before progressing to award.
             </p>
           </div>
         </div>
-      </Card>
+      </section>
     </div>
   )
 }

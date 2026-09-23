@@ -1,21 +1,27 @@
 // Analytics module — API service layer
 //
 // This is the single network boundary for the Analytics module.
-// Pages and components should consume analyticsService rather than calling
-// fetch/axios directly.
+//
+// Pages and components should consume `analyticsService` rather than
+// calling fetch/axios or another HTTP implementation directly.
 //
 // Backend reference: BRD Sec. 28.1
 //
-// Expected API namespace:
+// API namespace:
 //   /api/analytics
 //
-// The service is intentionally written against the analytics domain types.
-// Replace the request implementation with the project's configured API
-// client when the backend becomes available.
+// Design principles:
+// - Keep HTTP concerns isolated from analytics domain logic.
+// - Keep analytics endpoints centralized and discoverable.
+// - Keep all responses strongly typed against ./types.
+// - Allow the application's configured API client to be injected.
+// - Keep this module independent from fetch, Axios, TanStack Query, etc.
+// - Do not place presentation logic in this service layer.
 
 import type {
   AnalyticsDashboardData,
   AnalyticsDateRange,
+  ComplianceAnalytics,
   ContractorAnalyticsSummary,
   ContractorPerformance,
   DisputeAnalytics,
@@ -28,58 +34,102 @@ import type {
   ProjectAnalyticsItem,
   ProjectAnalyticsSummary,
   ProjectLifecycleMetric,
+  ProjectRisk,
   RiskAnalyticsSummary,
   RiskCategory,
-  ProjectRisk,
   RiskTrend,
   VerificationAnalytics,
-  ComplianceAnalytics,
 } from './types'
 
+/**
+ * Supported analytics reporting periods.
+ */
+export type AnalyticsPeriod =
+  | 'today'
+  | '7d'
+  | '30d'
+  | '90d'
+  | '12m'
+  | 'custom'
+
+/**
+ * Common query parameters shared by analytics endpoints.
+ *
+ * `from` and `to` should use the application's canonical date format,
+ * preferably ISO-8601 dates or timestamps.
+ */
 export interface AnalyticsQuery {
   from?: string
   to?: string
-  period?: 'today' | '7d' | '30d' | '90d' | '12m' | 'custom'
+  period?: AnalyticsPeriod
+
   projectId?: string
   contractorId?: string
   marketplaceUserId?: string
 }
 
+/**
+ * Standard analytics API response envelope.
+ *
+ * Domain data lives inside `data`.
+ * Reporting metadata belongs inside `meta`.
+ */
 export interface AnalyticsResponse<T> {
   data: T
+
   meta?: {
     period?: AnalyticsDateRange
     generatedAt?: string
   }
 }
 
+/**
+ * Minimal HTTP contract required by the Analytics module.
+ *
+ * The analytics service intentionally does not know whether the
+ * application uses fetch, Axios, TanStack Query, a custom client,
+ * or another HTTP implementation.
+ */
 export interface AnalyticsApiClient {
   get<T>(
     path: string,
     options?: {
-      params?: Record<string, string | number | boolean | undefined>
+      params?: Record<
+        string,
+        string | number | boolean | undefined
+      >
     },
   ): Promise<T>
 }
 
 /**
- * The application API client should be injected here.
+ * Analytics API client instance.
  *
- * This keeps the analytics service independent from a specific HTTP
- * implementation such as fetch, Axios, TanStack Query, etc.
+ * Configure this once during application startup:
+ *
+ * configureAnalyticsApi(apiClient)
  */
 let apiClient: AnalyticsApiClient | null = null
 
+/**
+ * Inject the application's configured API client.
+ *
+ * Keeping configuration here means every analytics request passes
+ * through one predictable network boundary.
+ */
 export function configureAnalyticsApi(
   client: AnalyticsApiClient,
 ): void {
   apiClient = client
 }
 
-async function get<T>(
-  path: string,
-  params?: AnalyticsQuery,
-): Promise<T> {
+/**
+ * Returns the configured Analytics API client.
+ *
+ * Kept private so consumers interact with the domain service rather
+ * than the underlying HTTP implementation.
+ */
+function getConfiguredClient(): AnalyticsApiClient {
   if (!apiClient) {
     throw new Error(
       'Analytics API client has not been configured. ' +
@@ -87,193 +137,298 @@ async function get<T>(
     )
   }
 
-  return apiClient.get<T>(path, {
+  return apiClient
+}
+
+/**
+ * Execute a typed GET request against the Analytics API.
+ */
+async function get<T>(
+  path: string,
+  params?: AnalyticsQuery,
+): Promise<T> {
+  return getConfiguredClient().get<T>(path, {
     params,
   })
 }
 
+/**
+ * Analytics service.
+ *
+ * This is the public API consumed by Analytics pages, hooks and
+ * application services.
+ */
 export const analyticsService = {
+  // ---------------------------------------------------------------------------
+  // Dashboard
+  // ---------------------------------------------------------------------------
+
   /**
    * Complete analytics dashboard.
    *
-   * Used by the main Analytics Overview screen when the dashboard needs
-   * all major analytics domains in one response.
+   * Used by the main Analytics Overview screen when the dashboard
+   * requires multiple analytics domains in one response.
    */
-  getDashboard: (
+  getDashboard(
     params?: AnalyticsQuery,
-  ) =>
-    get<AnalyticsResponse<AnalyticsDashboardData>>(
+  ) {
+    return get<AnalyticsResponse<AnalyticsDashboardData>>(
       '/api/analytics/dashboard',
       params,
-    ),
+    )
+  },
 
   /**
-   * Platform-wide overview.
+   * Platform-wide analytics overview.
    */
-  getOverview: (
+  getOverview(
     params?: AnalyticsQuery,
-  ) =>
-    get<AnalyticsResponse<PlatformAnalyticsSummary>>(
+  ) {
+    return get<AnalyticsResponse<PlatformAnalyticsSummary>>(
       '/api/analytics/overview',
       params,
-    ),
+    )
+  },
+
+  // ---------------------------------------------------------------------------
+  // Projects
+  // ---------------------------------------------------------------------------
 
   /**
-   * Project delivery analytics.
+   * Project delivery summary.
    */
-  getProjectSummary: (
+  getProjectSummary(
     params?: AnalyticsQuery,
-  ) =>
-    get<AnalyticsResponse<ProjectAnalyticsSummary>>(
+  ) {
+    return get<AnalyticsResponse<ProjectAnalyticsSummary>>(
       '/api/analytics/projects/summary',
       params,
-    ),
-
-  getProjects: (
-    params?: AnalyticsQuery,
-  ) =>
-    get<AnalyticsResponse<ProjectAnalyticsItem[]>>(
-      '/api/analytics/projects',
-      params,
-    ),
-
-  getProjectLifecycle: (
-    params?: AnalyticsQuery,
-  ) =>
-    get<AnalyticsResponse<ProjectLifecycleMetric[]>>(
-      '/api/analytics/projects/lifecycle',
-      params,
-    ),
-
-  getMilestones: (
-    params?: AnalyticsQuery,
-  ) =>
-    get<AnalyticsResponse<MilestoneAnalytics>>(
-      '/api/analytics/projects/milestones',
-      params,
-    ),
+    )
+  },
 
   /**
-   * Financial analytics.
+   * Project-level analytics records.
    */
-  getFinancialSummary: (
+  getProjects(
     params?: AnalyticsQuery,
-  ) =>
-    get<AnalyticsResponse<FinancialAnalyticsSummary>>(
+  ) {
+    return get<AnalyticsResponse<ProjectAnalyticsItem[]>>(
+      '/api/analytics/projects',
+      params,
+    )
+  },
+
+  /**
+   * Project lifecycle distribution.
+   */
+  getProjectLifecycle(
+    params?: AnalyticsQuery,
+  ) {
+    return get<AnalyticsResponse<ProjectLifecycleMetric[]>>(
+      '/api/analytics/projects/lifecycle',
+      params,
+    )
+  },
+
+  /**
+   * Project milestone analytics.
+   */
+  getMilestones(
+    params?: AnalyticsQuery,
+  ) {
+    return get<AnalyticsResponse<MilestoneAnalytics>>(
+      '/api/analytics/projects/milestones',
+      params,
+    )
+  },
+
+  // ---------------------------------------------------------------------------
+  // Financial
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Financial analytics summary.
+   */
+  getFinancialSummary(
+    params?: AnalyticsQuery,
+  ) {
+    return get<AnalyticsResponse<FinancialAnalyticsSummary>>(
       '/api/analytics/financial/summary',
       params,
-    ),
+    )
+  },
 
-  getFinancialTrends: (
+  /**
+   * Financial trend series.
+   */
+  getFinancialTrends(
     params?: AnalyticsQuery,
-  ) =>
-    get<AnalyticsResponse<FinancialTrend[]>>(
+  ) {
+    return get<AnalyticsResponse<FinancialTrend[]>>(
       '/api/analytics/financial/trends',
       params,
-    ),
+    )
+  },
+
+  // ---------------------------------------------------------------------------
+  // Contractors
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Contractor analytics summary.
+   */
+  getContractorSummary(
+    params?: AnalyticsQuery,
+  ) {
+    return get<AnalyticsResponse<ContractorAnalyticsSummary>>(
+      '/api/analytics/contractors/summary',
+      params,
+    )
+  },
 
   /**
    * Contractor performance analytics.
    */
-  getContractorSummary: (
+  getContractorPerformance(
     params?: AnalyticsQuery,
-  ) =>
-    get<AnalyticsResponse<ContractorAnalyticsSummary>>(
-      '/api/analytics/contractors/summary',
-      params,
-    ),
-
-  getContractorPerformance: (
-    params?: AnalyticsQuery,
-  ) =>
-    get<AnalyticsResponse<ContractorPerformance[]>>(
+  ) {
+    return get<AnalyticsResponse<ContractorPerformance[]>>(
       '/api/analytics/contractors/performance',
       params,
-    ),
+    )
+  },
+
+  // ---------------------------------------------------------------------------
+  // Marketplace
+  // ---------------------------------------------------------------------------
 
   /**
-   * Marketplace analytics.
+   * Marketplace analytics summary.
    *
-   * This replaces the previous Supplier Analytics endpoint.
+   * This intentionally replaces the previous Supplier Analytics endpoint.
    */
-  getMarketplaceSummary: (
+  getMarketplaceSummary(
     params?: AnalyticsQuery,
-  ) =>
-    get<AnalyticsResponse<MarketplaceAnalyticsSummary>>(
+  ) {
+    return get<AnalyticsResponse<MarketplaceAnalyticsSummary>>(
       '/api/analytics/marketplace/summary',
       params,
-    ),
-
-  getMarketplacePerformance: (
-    params?: AnalyticsQuery,
-  ) =>
-    get<AnalyticsResponse<MarketplacePerformance[]>>(
-      '/api/analytics/marketplace/performance',
-      params,
-    ),
+    )
+  },
 
   /**
-   * Risk intelligence.
+   * Marketplace performance analytics.
    */
-  getRiskSummary: (
+  getMarketplacePerformance(
     params?: AnalyticsQuery,
-  ) =>
-    get<AnalyticsResponse<RiskAnalyticsSummary>>(
+  ) {
+    return get<AnalyticsResponse<MarketplacePerformance[]>>(
+      '/api/analytics/marketplace/performance',
+      params,
+    )
+  },
+
+  // ---------------------------------------------------------------------------
+  // Risk Intelligence
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Portfolio risk analytics summary.
+   */
+  getRiskSummary(
+    params?: AnalyticsQuery,
+  ) {
+    return get<AnalyticsResponse<RiskAnalyticsSummary>>(
       '/api/analytics/risks/summary',
       params,
-    ),
+    )
+  },
 
-  getRiskCategories: (
+  /**
+   * Risk distribution by category.
+   */
+  getRiskCategories(
     params?: AnalyticsQuery,
-  ) =>
-    get<AnalyticsResponse<RiskCategory[]>>(
+  ) {
+    return get<AnalyticsResponse<RiskCategory[]>>(
       '/api/analytics/risks/categories',
       params,
-    ),
+    )
+  },
 
-  getPriorityRisks: (
+  /**
+   * Highest-priority project risks.
+   */
+  getPriorityRisks(
     params?: AnalyticsQuery,
-  ) =>
-    get<AnalyticsResponse<ProjectRisk[]>>(
+  ) {
+    return get<AnalyticsResponse<ProjectRisk[]>>(
       '/api/analytics/risks/priority',
       params,
-    ),
+    )
+  },
 
-  getRiskTrends: (
+  /**
+   * Risk movement over time.
+   */
+  getRiskTrends(
     params?: AnalyticsQuery,
-  ) =>
-    get<AnalyticsResponse<RiskTrend[]>>(
+  ) {
+    return get<AnalyticsResponse<RiskTrend[]>>(
       '/api/analytics/risks/trends',
       params,
-    ),
+    )
+  },
+
+  // ---------------------------------------------------------------------------
+  // Disputes
+  // ---------------------------------------------------------------------------
 
   /**
    * Dispute analytics.
    */
-  getDisputes: (
+  getDisputes(
     params?: AnalyticsQuery,
-  ) =>
-    get<AnalyticsResponse<DisputeAnalytics>>(
+  ) {
+    return get<AnalyticsResponse<DisputeAnalytics>>(
       '/api/analytics/disputes',
       params,
-    ),
+    )
+  },
+
+  // ---------------------------------------------------------------------------
+  // Verification & Compliance
+  // ---------------------------------------------------------------------------
 
   /**
-   * Verification and compliance analytics.
+   * Verification analytics.
    */
-  getVerification: (
+  getVerification(
     params?: AnalyticsQuery,
-  ) =>
-    get<AnalyticsResponse<VerificationAnalytics>>(
+  ) {
+    return get<AnalyticsResponse<VerificationAnalytics>>(
       '/api/analytics/verification',
       params,
-    ),
+    )
+  },
 
-  getCompliance: (
+  /**
+   * Compliance analytics.
+   */
+  getCompliance(
     params?: AnalyticsQuery,
-  ) =>
-    get<AnalyticsResponse<ComplianceAnalytics>>(
+  ) {
+    return get<AnalyticsResponse<ComplianceAnalytics>>(
       '/api/analytics/compliance',
       params,
-    ),
-}
+    )
+  },
+} as const
+
+/**
+ * Analytics service type.
+ *
+ * Useful when a consumer needs to mock or abstract the service in tests
+ * without depending directly on the concrete implementation.
+ */
+export type AnalyticsService = typeof analyticsService
