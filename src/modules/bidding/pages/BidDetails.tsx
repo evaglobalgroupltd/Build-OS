@@ -11,7 +11,6 @@ import {
   ShieldCheck,
   Star,
   Trophy,
-  UserRound,
 } from 'lucide-react'
 
 import { Card } from '@/components/ui/Card'
@@ -20,6 +19,7 @@ import type { Bid } from '@/modules/bidding/types'
 import { bids } from '@/data/mockData'
 
 const bidStatusTone = {
+  draft: 'neutral',
   submitted: 'neutral',
   shortlisted: 'amber',
   clarification: 'amber',

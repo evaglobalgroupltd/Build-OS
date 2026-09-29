@@ -133,12 +133,12 @@ const teamActivity = [
   },
 ]
 
-const actionToneClasses = {
+const actionToneClasses: Record<string, { chip: string }> = {
   amber: { chip: 'bg-[#F8EEE6] text-[#B85C12]' },
   ink: { chip: 'bg-ink/[0.05] text-ink/60' },
 }
 
-const activityDotClasses = {
+const activityDotClasses: Record<string, string> = {
   complete: 'bg-[#12613E]',
   current: 'bg-[#B85C12]',
   muted: 'bg-ink/25',

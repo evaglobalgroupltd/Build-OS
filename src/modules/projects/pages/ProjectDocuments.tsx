@@ -11,7 +11,6 @@ import {
   ShieldCheck,
   Upload,
   ArrowUpRight,
-  ChevronDown,
 } from 'lucide-react'
 
 import { Card } from '@/components/ui/Card'

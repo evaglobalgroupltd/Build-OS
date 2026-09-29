@@ -117,7 +117,9 @@ export function MFA() {
             {digits.map((digit, index) => (
               <input
                 key={index}
-                ref={(el) => (inputRefs.current[index] = el)}
+                ref={(el) => {
+                  inputRefs.current[index] = el
+                }}
                 type="text"
                 inputMode="numeric"
                 autoComplete={index === 0 ? 'one-time-code' : 'off'}

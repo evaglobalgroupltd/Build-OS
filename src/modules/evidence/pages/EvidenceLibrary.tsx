@@ -704,7 +704,7 @@ function EvidencePrinciple({
   title,
   description,
 }: {
-  icon: typeof ShieldCheck
+  icon: React.ComponentType<{ className?: string }>
   title: string
   description: string
 }) {

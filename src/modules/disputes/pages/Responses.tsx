@@ -10,7 +10,7 @@ import {
 } from 'lucide-react'
 
 import { Badge } from '@/components/ui/Badge'
-import { Card, CardBody, CardHeader } from '@/components/ui/Card'
+import { Card, CardBody } from '@/components/ui/Card'
 
 interface DisputeResponse {
   id: string

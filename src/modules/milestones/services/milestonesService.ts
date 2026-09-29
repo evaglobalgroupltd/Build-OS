@@ -22,7 +22,7 @@ import type {
   MilestoneEvidence,
   MilestoneReviewInput,
   MilestoneStatus,
-} from './types'
+} from '../types'
 
 /**
  * Import the project's configured API client here.

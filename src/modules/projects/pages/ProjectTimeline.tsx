@@ -10,7 +10,6 @@ import {
   History,
   Package,
   Search,
-  ShieldAlert,
   ShieldCheck,
   UserRound,
   Wallet,
@@ -245,9 +244,7 @@ export function ProjectTimeline() {
     (event) => event.type === 'milestone',
   ).length
 
-  const approvalCount = timelineEvents.filter(
-    (event) => event.type === 'approval',
-  ).length
+  
 
   return (
     <div className="space-y-7">

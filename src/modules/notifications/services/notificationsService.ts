@@ -4,7 +4,7 @@ import type {
   NotificationListParams,
   NotificationListResponse,
   NotificationPreferences,
-} from './types'
+} from '../types'
 
 /**
  * Notifications module — API service layer
@@ -72,7 +72,7 @@ export const notificationsService = {
       },
     )
 
-    return response.data
+    return response
   },
 
   /**
@@ -83,7 +83,7 @@ export const notificationsService = {
       `/notifications/${id}`,
     )
 
-    return response.data
+    return response
   },
 
   /**
@@ -97,7 +97,7 @@ export const notificationsService = {
       '/notifications/unread-count',
     )
 
-    return response.data.count
+    return response.count
   },
 
   /**
@@ -108,7 +108,7 @@ export const notificationsService = {
       `/notifications/${id}/read`,
     )
 
-    return response.data
+    return response
   },
 
   /**
@@ -119,7 +119,7 @@ export const notificationsService = {
       `/notifications/${id}/unread`,
     )
 
-    return response.data
+    return response
   },
 
   /**
@@ -144,7 +144,7 @@ export const notificationsService = {
       '/notifications/preferences',
     )
 
-    return response.data
+    return response
   },
 
   /**
@@ -161,7 +161,7 @@ export const notificationsService = {
       preferences,
     )
 
-    return response.data
+    return response
   },
 } as const
 

@@ -2,11 +2,9 @@
 import {
   BadgeCheck,
   Boxes,
-  CheckCircle2,
   ChevronRight,
   CircleDollarSign,
   ClipboardCheck,
-  Construction,
   Package,
   Search,
   ShieldCheck,
@@ -14,7 +12,6 @@ import {
   SlidersHorizontal,
   Truck,
   Warehouse,
-  XCircle,
 } from 'lucide-react'
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
@@ -136,9 +133,7 @@ export function Catalogue() {
     (product) => product.stock === 'Low Stock',
   ).length
 
-  const outOfStockProducts = products.filter(
-    (product) => product.stock === 'Out of Stock',
-  ).length
+  
 
   return (
     <div className="space-y-7 pb-8">
@@ -700,12 +695,7 @@ function ProductCard({
 
   const status = statusStyle[product.stock]
 
-  const StatusIcon =
-    product.stock === 'Out of Stock'
-      ? XCircle
-      : product.stock === 'Low Stock'
-        ? Construction
-        : CheckCircle2
+  
 
   return (
     <Card
@@ -963,51 +953,6 @@ function ProductDetail({
   )
 }
 
-/* ========================================================= */
-/* Market Metric                                             */
-/* ========================================================= */
-
-function MarketMetric({
-  icon: Icon,
-  label,
-  value,
-  description,
-}: {
-  icon: React.ComponentType<{ className?: string }>
-  label: string
-  value: string
-  description: string
-}) {
-  return (
-    <div className="px-6 py-5 sm:px-7">
-
-      <div className="flex items-center gap-3">
-
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-ink/[0.045]">
-          <Icon className="h-4 w-4 text-ink/45" />
-        </div>
-
-        <div>
-
-          <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-ink/30">
-            {label}
-          </p>
-
-          <p className="mt-0.5 font-display text-[21px] font-semibold tracking-[-0.03em] text-ink">
-            {value}
-          </p>
-
-        </div>
-
-      </div>
-
-      <p className="mt-3 text-[10px] text-ink/35">
-        {description}
-      </p>
-
-    </div>
-  )
-}
 
 /* ========================================================= */
 /* Workflow Step                                             */

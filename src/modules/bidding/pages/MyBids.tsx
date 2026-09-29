@@ -9,7 +9,6 @@ import {
   Send,
   ShieldCheck,
   TrendingUp,
-  XCircle,
 } from 'lucide-react'
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'

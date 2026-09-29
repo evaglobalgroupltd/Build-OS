@@ -39,7 +39,7 @@ import type {
   RiskCategory,
   RiskTrend,
   VerificationAnalytics,
-} from './types'
+} from '../types'
 
 /**
  * Supported analytics reporting periods.
@@ -94,10 +94,7 @@ export interface AnalyticsApiClient {
   get<T>(
     path: string,
     options?: {
-      params?: Record<
-        string,
-        string | number | boolean | undefined
-      >
+      params?: AnalyticsQuery
     },
   ): Promise<T>
 }

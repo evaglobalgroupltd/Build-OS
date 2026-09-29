@@ -1,0 +1,1432 @@
+diff --git a/src/layouts/PublicLayout.tsx b/src/layouts/PublicLayout.tsx
+index 7e519b5..2360423 100644
+--- a/src/layouts/PublicLayout.tsx
++++ b/src/layouts/PublicLayout.tsx
+@@ -4,7 +4,6 @@ import {
+   ArrowUpRight,
+   Menu,
+   ShieldCheck,
+-  X,
+ } from 'lucide-react'
+ 
+ interface PublicLayoutProps {
+diff --git a/src/layouts/components/Sidebar.tsx b/src/layouts/components/Sidebar.tsx
+index a0d1487..ee2670f 100644
+--- a/src/layouts/components/Sidebar.tsx
++++ b/src/layouts/components/Sidebar.tsx
+@@ -25,7 +25,7 @@ import {
+ 
+ import { navByRole, roleLabels } from '@/config/navigation'
+ import { roleMeta, accentClasses, roleOrder } from '@/config/roleUi'
+-import type { AppRole } from '@/config/roleUi'
++import type { AppRole } from '@/config/roles'
+ import { useAuth } from '@/context/AuthContext'
+ 
+ /* -------------------------------------------------------------------------- */
+diff --git a/src/layouts/components/Topbar.tsx b/src/layouts/components/Topbar.tsx
+index a9c89b9..73df9c7 100644
+--- a/src/layouts/components/Topbar.tsx
++++ b/src/layouts/components/Topbar.tsx
+@@ -11,7 +11,7 @@ import { Link } from 'react-router-dom'
+ import { ChevronDown, LogOut, Menu, Search, UserCircle } from 'lucide-react'
+ 
+ import { roleLabels } from '@/config/navigation'
+-import type { AppRole } from '@/config/roleUi'
++import type { AppRole } from '@/config/roles'
+ import { useAuth } from '@/context/AuthContext'
+ 
+ /* -------------------------------------------------------------------------- */
+diff --git a/src/lib/api.ts b/src/lib/api.ts
+index abf18ea..05fc207 100644
+--- a/src/lib/api.ts
++++ b/src/lib/api.ts
+@@ -4,9 +4,7 @@
+ 
+ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '/api'
+ 
+-type QueryParams = Record<string, string | number | boolean | undefined>
+-
+-function buildUrl(path: string, params?: QueryParams): string {
++function buildUrl(path: string, params?: object): string {
+   const url = new URL(
+     path.startsWith('http') ? path : `${API_BASE_URL}${path}`,
+     window.location.origin,
+@@ -29,7 +27,11 @@ function authHeaders(): HeadersInit {
+ async function request<T>(
+   method: string,
+   path: string,
+-  options: { params?: QueryParams; body?: unknown } = {},
++  options: {
++    params?: object
++    body?: unknown
++    responseType?: 'json' | 'blob'
++  } = {},
+ ): Promise<T> {
+   const response = await fetch(buildUrl(path, options.params), {
+     method,
+@@ -47,13 +49,27 @@ async function request<T>(
+ 
+   if (response.status === 204) return undefined as T
+ 
++  if (options.responseType === 'blob') return (await response.blob()) as T
++
+   return (await response.json()) as T
+ }
+ 
+ export const apiClient = {
+-  get: <T>(path: string, params?: QueryParams) => request<T>('GET', path, { params }),
++  get: <T>(
++    path: string,
++    options?: { params?: object; responseType?: 'json' | 'blob' },
++  ) =>
++    request<T>('GET', path, {
++      params: options?.params,
++      responseType: options?.responseType,
++    }),
+   post: <T>(path: string, body?: unknown) => request<T>('POST', path, { body }),
+   patch: <T>(path: string, body?: unknown) => request<T>('PATCH', path, { body }),
+   put: <T>(path: string, body?: unknown) => request<T>('PUT', path, { body }),
+   delete: <T>(path: string) => request<T>('DELETE', path),
+-}
+\ No newline at end of file
++}
++
++// Several module services (documents, escrow, notifications, organizations,
++// reports, users) import `{ api }` rather than `{ apiClient }`. Keep both
++// names available so those imports resolve without touching every call site.
++export const api = apiClient
+\ No newline at end of file
+diff --git a/src/mocks/suppliers.ts b/src/mocks/suppliers.ts
+new file mode 100644
+index 0000000..a383741
+--- /dev/null
++++ b/src/mocks/suppliers.ts
+@@ -0,0 +1,58 @@
++// Temporary mock data for the marketplace supplier list.
++//
++// MarketList.tsx uses this in place of MarketService.list() until that
++// endpoint is wired up. Remove this file once the real API call is in
++// place (see the "Temporary data source" comment in MarketList.tsx).
++
++import type { MarketSupplier } from '@/modules/market/services/MarketService'
++
++export const mockSuppliers: MarketSupplier[] = [
++  {
++    id: 'sup-001',
++    name: 'Lagos Building Materials Co.',
++    initials: 'LB',
++    category: 'General Materials',
++    location: 'Lagos, Nigeria',
++    status: 'Verified',
++    trustScore: 92,
++    rating: 4.7,
++    reviews: 138,
++    products: 214,
++    deliveries: 1042,
++    onTimeDelivery: 96,
++    deliveryCoverage: 'Lagos & Ogun',
++    specialties: ['Cement & Concrete', 'General Materials'],
++  },
++  {
++    id: 'sup-002',
++    name: 'SteelWorks Nigeria',
++    initials: 'SW',
++    category: 'Steel & Reinforcement',
++    location: 'Port Harcourt, Nigeria',
++    status: 'Verified',
++    trustScore: 88,
++    rating: 4.5,
++    reviews: 94,
++    products: 76,
++    deliveries: 512,
++    onTimeDelivery: 91,
++    deliveryCoverage: 'Rivers & Bayelsa',
++    specialties: ['Steel & Reinforcement'],
++  },
++  {
++    id: 'sup-003',
++    name: 'RoofPro Supplies',
++    initials: 'RP',
++    category: 'Roofing',
++    location: 'Abuja, Nigeria',
++    status: 'Pending Review',
++    trustScore: 71,
++    rating: 4.1,
++    reviews: 31,
++    products: 48,
++    deliveries: 190,
++    onTimeDelivery: 84,
++    deliveryCoverage: 'FCT',
++    specialties: ['Roofing', 'Finishing'],
++  },
++]
+diff --git a/src/modules/analytics/pages/ContractorAnalytics.tsx b/src/modules/analytics/pages/ContractorAnalytics.tsx
+index 1fd21fb..450c5d2 100644
+--- a/src/modules/analytics/pages/ContractorAnalytics.tsx
++++ b/src/modules/analytics/pages/ContractorAnalytics.tsx
+@@ -8,7 +8,6 @@ import {
+   Check,
+   CheckCircle2,
+   Clock3,
+-  Construction,
+   DollarSign,
+   FileCheck2,
+   Flag,
+diff --git a/src/modules/analytics/pages/FinancialAnalytics.tsx b/src/modules/analytics/pages/FinancialAnalytics.tsx
+index e20a23f..7f54aeb 100644
+--- a/src/modules/analytics/pages/FinancialAnalytics.tsx
++++ b/src/modules/analytics/pages/FinancialAnalytics.tsx
+@@ -7,7 +7,6 @@ import {
+   Clock3,
+   DollarSign,
+   Download,
+-  FileText,
+   LockKeyhole,
+   Receipt,
+   RefreshCcw,
+diff --git a/src/modules/analytics/pages/ProjectAnalytics.tsx b/src/modules/analytics/pages/ProjectAnalytics.tsx
+index 09e3798..a2e9ac4 100644
+--- a/src/modules/analytics/pages/ProjectAnalytics.tsx
++++ b/src/modules/analytics/pages/ProjectAnalytics.tsx
+@@ -13,7 +13,6 @@ import {
+   GanttChart,
+   HardHat,
+   MapPin,
+-  TrendingUp,
+   XCircle,
+ } from 'lucide-react'
+ 
+diff --git a/src/modules/analytics/services/analyticsService.ts b/src/modules/analytics/services/analyticsService.ts
+index 6229474..aff6027 100644
+--- a/src/modules/analytics/services/analyticsService.ts
++++ b/src/modules/analytics/services/analyticsService.ts
+@@ -39,7 +39,7 @@ import type {
+   RiskCategory,
+   RiskTrend,
+   VerificationAnalytics,
+-} from './types'
++} from '../types'
+ 
+ /**
+  * Supported analytics reporting periods.
+@@ -94,10 +94,7 @@ export interface AnalyticsApiClient {
+   get<T>(
+     path: string,
+     options?: {
+-      params?: Record<
+-        string,
+-        string | number | boolean | undefined
+-      >
++      params?: AnalyticsQuery
+     },
+   ): Promise<T>
+ }
+diff --git a/src/modules/approvals/services/approvalsService.ts b/src/modules/approvals/services/approvalsService.ts
+index 0b12e47..3977791 100644
+--- a/src/modules/approvals/services/approvalsService.ts
++++ b/src/modules/approvals/services/approvalsService.ts
+@@ -293,7 +293,7 @@ export interface ApprovalRejectionPayload {
+ /* Service configuration                                                      */
+ /* -------------------------------------------------------------------------- */
+ 
+-const APPROVALS_BASE_PATH = '/approvals'
++
+ 
+ const DEFAULT_PAGE = 1
+ 
+@@ -359,7 +359,7 @@ export const approvalsService = {
+    * GET /approvals/:id
+    */
+   get: async (
+-    id: string,
++    _id: string,
+   ): Promise<ApprovalDetail> => {
+     /*
+      * TODO:
+@@ -443,7 +443,7 @@ export const approvalsService = {
+    * GET /approvals/:approvalId/evidence
+    */
+   evidence: async (
+-    approvalId: string,
++    _approvalId: string,
+   ): Promise<ApprovalEvidence[]> => {
+     /*
+      * TODO:
+@@ -463,7 +463,7 @@ export const approvalsService = {
+    * GET /approvals/:approvalId/inspection
+    */
+   inspection: async (
+-    approvalId: string,
++    _approvalId: string,
+   ): Promise<ApprovalInspection> => {
+     /*
+      * TODO:
+@@ -497,8 +497,8 @@ export const approvalsService = {
+    * POST /approvals/:approvalId/approve
+    */
+   approve: async (
+-    approvalId: string,
+-    payload: ApprovalDecisionPayload = {},
++    _approvalId: string,
++    _payload: ApprovalDecisionPayload = {},
+   ): Promise<ApprovalDecision> => {
+     /*
+      * TODO:
+@@ -525,8 +525,8 @@ export const approvalsService = {
+    * BRD: Sec. 43.3
+    */
+   reject: async (
+-    approvalId: string,
+-    payload: ApprovalRejectionPayload,
++    _approvalId: string,
++    _payload: ApprovalRejectionPayload,
+   ): Promise<ApprovalDecision> => {
+     /*
+      * TODO:
+@@ -554,8 +554,8 @@ export const approvalsService = {
+    * BRD: Sec. 43.3
+    */
+   requestCorrection: async (
+-    approvalId: string,
+-    payload: ApprovalCorrectionPayload,
++    _approvalId: string,
++    _payload: ApprovalCorrectionPayload,
+   ): Promise<ApprovalDecision> => {
+     /*
+      * TODO:
+@@ -579,7 +579,7 @@ export const approvalsService = {
+    * POST /approvals/:approvalId/resubmit
+    */
+   resubmit: async (
+-    approvalId: string,
++    _approvalId: string,
+   ): Promise<Approval> => {
+     /*
+      * TODO:
+diff --git a/src/modules/authentication/pages/MFA.tsx b/src/modules/authentication/pages/MFA.tsx
+index 2245bc7..25b94ef 100644
+--- a/src/modules/authentication/pages/MFA.tsx
++++ b/src/modules/authentication/pages/MFA.tsx
+@@ -117,7 +117,9 @@ export function MFA() {
+             {digits.map((digit, index) => (
+               <input
+                 key={index}
+-                ref={(el) => (inputRefs.current[index] = el)}
++                ref={(el) => {
++                  inputRefs.current[index] = el
++                }}
+                 type="text"
+                 inputMode="numeric"
+                 autoComplete={index === 0 ? 'one-time-code' : 'off'}
+diff --git a/src/modules/authentication/pages/VerifyPhone.tsx b/src/modules/authentication/pages/VerifyPhone.tsx
+index 485e136..92106a9 100644
+--- a/src/modules/authentication/pages/VerifyPhone.tsx
++++ b/src/modules/authentication/pages/VerifyPhone.tsx
+@@ -152,7 +152,9 @@ export function VerifyPhone() {
+             {digits.map((digit, index) => (
+               <input
+                 key={index}
+-                ref={(el) => (inputRefs.current[index] = el)}
++                ref={(el) => {
++                  inputRefs.current[index] = el
++                }}
+                 type="text"
+                 inputMode="numeric"
+                 autoComplete={index === 0 ? 'one-time-code' : 'off'}
+diff --git a/src/modules/bidding/components/BidList.tsx b/src/modules/bidding/components/BidList.tsx
+index b309f25..ee12c7b 100644
+--- a/src/modules/bidding/components/BidList.tsx
++++ b/src/modules/bidding/components/BidList.tsx
+@@ -13,6 +13,7 @@ import {
+ import { Badge } from '@/components/ui/Badge'
+ 
+ const bidStatusTone = {
++  draft: 'neutral',
+   submitted: 'neutral',
+   shortlisted: 'amber',
+   clarification: 'amber',
+diff --git a/src/modules/bidding/pages/BidComparison.tsx b/src/modules/bidding/pages/BidComparison.tsx
+index f17d026..b054323 100644
+--- a/src/modules/bidding/pages/BidComparison.tsx
++++ b/src/modules/bidding/pages/BidComparison.tsx
+@@ -30,6 +30,7 @@ function formatAmount(amount: number, currency: string) {
+ }
+ 
+ const bidStatusTone = {
++  draft: 'neutral',
+   submitted: 'neutral',
+   shortlisted: 'amber',
+   clarification: 'amber',
+@@ -453,8 +454,8 @@ export function BidComparison() {
+                       {hasRisks ? (
+                         <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F8EEE6] px-2.5 py-1 text-[9px] font-semibold text-[#9A4D0A]">
+                           <AlertTriangle className="h-3 w-3" />
+-                          {bid.riskFlags.length} risk flag
+-                          {bid.riskFlags.length > 1 ? 's' : ''}
++                          {bid.riskFlags?.length ?? 0} risk flag
++                          {(bid.riskFlags?.length ?? 0) > 1 ? 's' : ''}
+                         </span>
+                       ) : (
+                         <span className="inline-flex items-center gap-1.5 rounded-full bg-[#EAF4EE] px-2.5 py-1 text-[9px] font-semibold text-[#12613E]">
+diff --git a/src/modules/bidding/pages/BidDetails.tsx b/src/modules/bidding/pages/BidDetails.tsx
+index 6f27bfc..c785e01 100644
+--- a/src/modules/bidding/pages/BidDetails.tsx
++++ b/src/modules/bidding/pages/BidDetails.tsx
+@@ -11,7 +11,6 @@ import {
+   ShieldCheck,
+   Star,
+   Trophy,
+-  UserRound,
+ } from 'lucide-react'
+ 
+ import { Card } from '@/components/ui/Card'
+@@ -20,6 +19,7 @@ import type { Bid } from '@/modules/bidding/types'
+ import { bids } from '@/data/mockData'
+ 
+ const bidStatusTone = {
++  draft: 'neutral',
+   submitted: 'neutral',
+   shortlisted: 'amber',
+   clarification: 'amber',
+diff --git a/src/modules/bidding/pages/MyBids.tsx b/src/modules/bidding/pages/MyBids.tsx
+index bedbd88..05b1833 100644
+--- a/src/modules/bidding/pages/MyBids.tsx
++++ b/src/modules/bidding/pages/MyBids.tsx
+@@ -9,7 +9,6 @@ import {
+   Send,
+   ShieldCheck,
+   TrendingUp,
+-  XCircle,
+ } from 'lucide-react'
+ 
+ import { Card, CardBody, CardHeader } from '@/components/ui/Card'
+diff --git a/src/modules/bidding/services/biddingService.ts b/src/modules/bidding/services/biddingService.ts
+index 9bfb3f2..4f04346 100644
+--- a/src/modules/bidding/services/biddingService.ts
++++ b/src/modules/bidding/services/biddingService.ts
+@@ -67,25 +67,6 @@ export interface BidDecisionPayload {
+ /* API configuration                                                           */
+ /* -------------------------------------------------------------------------- */
+ 
+-const BIDDING_BASE_PATH = '/bidding'
+-
+-const BID_ENDPOINTS = {
+-  list: `${BIDDING_BASE_PATH}/bids`,
+-  create: `${BIDDING_BASE_PATH}/bids`,
+-  drafts: `${BIDDING_BASE_PATH}/bids/drafts`,
+-
+-  byId: (id: string) =>
+-    `${BIDDING_BASE_PATH}/bids/${encodeURIComponent(id)}`,
+-
+-  submit: (id: string) =>
+-    `${BIDDING_BASE_PATH}/bids/${encodeURIComponent(id)}/submit`,
+-
+-  clarification: (id: string) =>
+-    `${BIDDING_BASE_PATH}/bids/${encodeURIComponent(id)}/clarification`,
+-
+-  decision: (id: string) =>
+-    `${BIDDING_BASE_PATH}/bids/${encodeURIComponent(id)}/decision`,
+-} as const
+ 
+ /* -------------------------------------------------------------------------- */
+ /* Service                                                                     */
+diff --git a/src/modules/contractors/pages/ContractorDetails.tsx b/src/modules/contractors/pages/ContractorDetails.tsx
+index 91361f4..e0de640 100644
+--- a/src/modules/contractors/pages/ContractorDetails.tsx
++++ b/src/modules/contractors/pages/ContractorDetails.tsx
+@@ -160,7 +160,7 @@ export function ContractorDetails() {
+           <ProfileMetric
+             icon={Star}
+             label="Client rating"
+-            value={contractor.rating}
++            value={contractor.rating.toString()}
+             description={`${contractor.reviews} verified reviews`}
+           />
+ 
+diff --git a/src/modules/contractors/pages/ContractorProfile.tsx b/src/modules/contractors/pages/ContractorProfile.tsx
+index e958820..cd11db0 100644
+--- a/src/modules/contractors/pages/ContractorProfile.tsx
++++ b/src/modules/contractors/pages/ContractorProfile.tsx
+@@ -5,8 +5,6 @@ import {
+   CalendarDays,
+   CheckCircle2,
+   ChevronRight,
+-  FileCheck2,
+-  Globe2,
+   Mail,
+   MapPin,
+   Phone,
+diff --git a/src/modules/disputes/pages/DisputeDetails.tsx b/src/modules/disputes/pages/DisputeDetails.tsx
+index 7fcdacc..900d667 100644
+--- a/src/modules/disputes/pages/DisputeDetails.tsx
++++ b/src/modules/disputes/pages/DisputeDetails.tsx
+@@ -3,7 +3,6 @@ import {
+   AlertTriangle,
+   ArrowLeft,
+   ArrowUpRight,
+-  Check,
+   CheckCircle2,
+   Clock3,
+   FileText,
+diff --git a/src/modules/disputes/pages/Resolution.tsx b/src/modules/disputes/pages/Resolution.tsx
+index 50e151b..bed84c3 100644
+--- a/src/modules/disputes/pages/Resolution.tsx
++++ b/src/modules/disputes/pages/Resolution.tsx
+@@ -13,7 +13,6 @@ import {
+ } from 'lucide-react'
+ 
+ import { Card, CardBody, CardHeader } from '@/components/ui/Card'
+-import { Badge } from '@/components/ui/Badge'
+ 
+ const resolution = {
+   disputeId: 'DSP-0042',
+diff --git a/src/modules/disputes/pages/Responses.tsx b/src/modules/disputes/pages/Responses.tsx
+index a3e1491..1785cc4 100644
+--- a/src/modules/disputes/pages/Responses.tsx
++++ b/src/modules/disputes/pages/Responses.tsx
+@@ -10,7 +10,7 @@ import {
+ } from 'lucide-react'
+ 
+ import { Badge } from '@/components/ui/Badge'
+-import { Card, CardBody, CardHeader } from '@/components/ui/Card'
++import { Card, CardBody } from '@/components/ui/Card'
+ 
+ interface DisputeResponse {
+   id: string
+diff --git a/src/modules/documents/pages/DocumentHistory.tsx b/src/modules/documents/pages/DocumentHistory.tsx
+index 756505e..384be11 100644
+--- a/src/modules/documents/pages/DocumentHistory.tsx
++++ b/src/modules/documents/pages/DocumentHistory.tsx
+@@ -458,7 +458,7 @@ export function DocumentHistory() {
+             />
+ 
+             <CardBody className="space-y-3 p-5">
+-              {versions.map((version, index) => (
++              {versions.map((version, _index) => (
+                 <div
+                   key={version.version}
+                   className="
+diff --git a/src/modules/documents/pages/UploadDocument.tsx b/src/modules/documents/pages/UploadDocument.tsx
+index 5a81d24..36a1458 100644
+--- a/src/modules/documents/pages/UploadDocument.tsx
++++ b/src/modules/documents/pages/UploadDocument.tsx
+@@ -13,7 +13,6 @@ import {
+ } from 'lucide-react'
+ 
+ import { Card, CardBody, CardHeader } from '@/components/ui/Card'
+-import { Badge } from '@/components/ui/Badge'
+ 
+ const documentCategories = [
+   'Land & Ownership',
+diff --git a/src/modules/escrow/pages/FrozenPayments.tsx b/src/modules/escrow/pages/FrozenPayments.tsx
+index 116d667..48ee7d1 100644
+--- a/src/modules/escrow/pages/FrozenPayments.tsx
++++ b/src/modules/escrow/pages/FrozenPayments.tsx
+@@ -77,10 +77,7 @@ function formatStatus(status: FrozenPayment['status']) {
+ }
+ 
+ export function FrozenPayments() {
+-  const totalFrozen = frozenPayments.reduce(
+-    (total, payment) => total + parseAmount(payment.amount),
+-    0,
+-  )
++  
+ 
+   const activePayments = frozenPayments.filter(
+     (payment) => payment.status !== 'resolved',
+diff --git a/src/modules/escrow/pages/Funding.tsx b/src/modules/escrow/pages/Funding.tsx
+index c92c023..ecd97d2 100644
+--- a/src/modules/escrow/pages/Funding.tsx
++++ b/src/modules/escrow/pages/Funding.tsx
+@@ -3,7 +3,6 @@ import {
+   ArrowRight,
+   Building2,
+   Check,
+-  CheckCircle2,
+   ChevronDown,
+   CreditCard,
+   Info,
+@@ -14,7 +13,6 @@ import {
+ } from 'lucide-react'
+ 
+ import { Card, CardBody, CardHeader } from '@/components/ui/Card'
+-import { Badge } from '@/components/ui/Badge'
+ import { CustodyNotice } from '@/modules/escrow/components/CustodyNotice'
+ 
+ type FundingSource = 'partner_escrow' | 'direct_bank_transfer'
+diff --git a/src/modules/escrow/pages/PaymentApprovals.tsx b/src/modules/escrow/pages/PaymentApprovals.tsx
+index e799345..42617b2 100644
+--- a/src/modules/escrow/pages/PaymentApprovals.tsx
++++ b/src/modules/escrow/pages/PaymentApprovals.tsx
+@@ -4,7 +4,6 @@ import {
+   Check,
+   CheckCircle2,
+   Clock3,
+-  FileCheck2,
+   FileText,
+   LockKeyhole,
+   MessageSquare,
+diff --git a/src/modules/escrow/pages/PaymentRequests.tsx b/src/modules/escrow/pages/PaymentRequests.tsx
+index 3cca4b2..e6b470e 100644
+--- a/src/modules/escrow/pages/PaymentRequests.tsx
++++ b/src/modules/escrow/pages/PaymentRequests.tsx
+@@ -9,7 +9,6 @@ import {
+   Plus,
+   ShieldCheck,
+   User,
+-  WalletCards,
+ } from 'lucide-react'
+ 
+ import { Card, CardBody, CardHeader } from '@/components/ui/Card'
+diff --git a/src/modules/escrow/services/escrowService.ts b/src/modules/escrow/services/escrowService.ts
+index a3eded3..0022da3 100644
+--- a/src/modules/escrow/services/escrowService.ts
++++ b/src/modules/escrow/services/escrowService.ts
+@@ -31,7 +31,7 @@ import type {
+   EscrowSummary,
+   ProjectWallet,
+   EscrowFundingSource,
+-} from './types'
++} from '../types'
+ 
+ /**
+  * Replace this import with the application's shared API client.
+diff --git a/src/modules/evidence/pages/EvidenceLibrary.tsx b/src/modules/evidence/pages/EvidenceLibrary.tsx
+index b3de2dd..fa64701 100644
+--- a/src/modules/evidence/pages/EvidenceLibrary.tsx
++++ b/src/modules/evidence/pages/EvidenceLibrary.tsx
+@@ -704,7 +704,7 @@ function EvidencePrinciple({
+   title,
+   description,
+ }: {
+-  icon: typeof ShieldCheck
++  icon: React.ComponentType<{ className?: string }>
+   title: string
+   description: string
+ }) {
+diff --git a/src/modules/evidence/pages/EvidenceReview.tsx b/src/modules/evidence/pages/EvidenceReview.tsx
+index fb8125c..3201025 100644
+--- a/src/modules/evidence/pages/EvidenceReview.tsx
++++ b/src/modules/evidence/pages/EvidenceReview.tsx
+@@ -455,7 +455,7 @@ export function EvidenceReview() {
+                     key={check.id}
+                     label={check.label}
+                     description={check.description}
+-                    status={check.status}
++                    status={check.status as 'passed' | 'pending'}
+                   />
+                 ))}
+               </div>
+diff --git a/src/modules/market/pages/Catalogue.tsx b/src/modules/market/pages/Catalogue.tsx
+index 42e5ece..17c1d30 100644
+--- a/src/modules/market/pages/Catalogue.tsx
++++ b/src/modules/market/pages/Catalogue.tsx
+@@ -2,11 +2,9 @@
+ import {
+   BadgeCheck,
+   Boxes,
+-  CheckCircle2,
+   ChevronRight,
+   CircleDollarSign,
+   ClipboardCheck,
+-  Construction,
+   Package,
+   Search,
+   ShieldCheck,
+@@ -14,7 +12,6 @@ import {
+   SlidersHorizontal,
+   Truck,
+   Warehouse,
+-  XCircle,
+ } from 'lucide-react'
+ 
+ import { Card, CardBody, CardHeader } from '@/components/ui/Card'
+@@ -136,9 +133,7 @@ export function Catalogue() {
+     (product) => product.stock === 'Low Stock',
+   ).length
+ 
+-  const outOfStockProducts = products.filter(
+-    (product) => product.stock === 'Out of Stock',
+-  ).length
++  
+ 
+   return (
+     <div className="space-y-7 pb-8">
+@@ -700,12 +695,7 @@ function ProductCard({
+ 
+   const status = statusStyle[product.stock]
+ 
+-  const StatusIcon =
+-    product.stock === 'Out of Stock'
+-      ? XCircle
+-      : product.stock === 'Low Stock'
+-        ? Construction
+-        : CheckCircle2
++  
+ 
+   return (
+     <Card
+@@ -963,51 +953,6 @@ function ProductDetail({
+   )
+ }
+ 
+-/* ========================================================= */
+-/* Market Metric                                             */
+-/* ========================================================= */
+-
+-function MarketMetric({
+-  icon: Icon,
+-  label,
+-  value,
+-  description,
+-}: {
+-  icon: React.ComponentType<{ className?: string }>
+-  label: string
+-  value: string
+-  description: string
+-}) {
+-  return (
+-    <div className="px-6 py-5 sm:px-7">
+-
+-      <div className="flex items-center gap-3">
+-
+-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-ink/[0.045]">
+-          <Icon className="h-4 w-4 text-ink/45" />
+-        </div>
+-
+-        <div>
+-
+-          <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-ink/30">
+-            {label}
+-          </p>
+-
+-          <p className="mt-0.5 font-display text-[21px] font-semibold tracking-[-0.03em] text-ink">
+-            {value}
+-          </p>
+-
+-        </div>
+-
+-      </div>
+-
+-      <p className="mt-3 text-[10px] text-ink/35">
+-        {description}
+-      </p>
+-
+-    </div>
+-  )
+-}
+ 
+ /* ========================================================= */
+ /* Workflow Step                                             */
+diff --git a/src/modules/market/pages/MarketDetails.tsx b/src/modules/market/pages/MarketDetails.tsx
+index 9197973..cec318e 100644
+--- a/src/modules/market/pages/MarketDetails.tsx
++++ b/src/modules/market/pages/MarketDetails.tsx
+@@ -6,7 +6,6 @@ import {
+   CheckCircle2,
+   ChevronRight,
+   ClipboardCheck,
+-  Clock3,
+   FileCheck2,
+   Globe2,
+   Mail,
+diff --git a/src/modules/market/pages/MarketList.tsx b/src/modules/market/pages/MarketList.tsx
+index 7d39edb..420dc7e 100644
+--- a/src/modules/market/pages/MarketList.tsx
++++ b/src/modules/market/pages/MarketList.tsx
+@@ -18,7 +18,7 @@ import {
+ } from 'lucide-react'
+ 
+ import { Card, CardBody, CardHeader } from '@/components/ui/Card'
+-import type { MarketSupplier } from '@/services/MarketService'
++import type { MarketSupplier } from '@/modules/market/services/MarketService'
+ import { mockSuppliers } from '@/mocks/suppliers'
+ 
+ const categories = [
+diff --git a/src/modules/milestones/services/milestonesService.ts b/src/modules/milestones/services/milestonesService.ts
+index c5cf4d1..8d16b1b 100644
+--- a/src/modules/milestones/services/milestonesService.ts
++++ b/src/modules/milestones/services/milestonesService.ts
+@@ -22,7 +22,7 @@ import type {
+   MilestoneEvidence,
+   MilestoneReviewInput,
+   MilestoneStatus,
+-} from './types'
++} from '../types'
+ 
+ /**
+  * Import the project's configured API client here.
+diff --git a/src/modules/monitoring/pages/MonthlyReport.tsx b/src/modules/monitoring/pages/MonthlyReport.tsx
+index 6dcff3a..0551e71 100644
+--- a/src/modules/monitoring/pages/MonthlyReport.tsx
++++ b/src/modules/monitoring/pages/MonthlyReport.tsx
+@@ -1,4 +1,4 @@
+-import type { ComponentType, ReactNode } from 'react'
++import type { ComponentType } from 'react'
+ import {
+   ArrowDownRight,
+   ArrowUpRight,
+@@ -239,7 +239,7 @@ export function MonthlyReport() {
+ 
+         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+           {monthlyStats.map((stat, index) => {
+-            const Icon = stat.icon
++            
+ 
+             return (
+               <MetricCard
+diff --git a/src/modules/monitoring/pages/Reports.tsx b/src/modules/monitoring/pages/Reports.tsx
+index a4b07d7..ac71805 100644
+--- a/src/modules/monitoring/pages/Reports.tsx
++++ b/src/modules/monitoring/pages/Reports.tsx
+@@ -79,7 +79,7 @@ const reportTypes = [
+   },
+ ]
+ 
+-const accentStyles = {
++const accentStyles: Record<string, { icon: string; count: string; line: string }> = {
+   green: {
+     icon: 'bg-[#12613E]/[0.08] text-[#12613E]',
+     count: 'text-[#12613E]',
+diff --git a/src/modules/notifications/pages/NotificationSettings.tsx b/src/modules/notifications/pages/NotificationSettings.tsx
+index cfc7c9b..21d9f77 100644
+--- a/src/modules/notifications/pages/NotificationSettings.tsx
++++ b/src/modules/notifications/pages/NotificationSettings.tsx
+@@ -1,6 +1,5 @@
+ import { useState } from 'react'
+ import {
+-  Bell,
+   Check,
+   ChevronRight,
+   Clock3,
+diff --git a/src/modules/notifications/services/notificationsService.ts b/src/modules/notifications/services/notificationsService.ts
+index 8a4d8c6..da0a53e 100644
+--- a/src/modules/notifications/services/notificationsService.ts
++++ b/src/modules/notifications/services/notificationsService.ts
+@@ -4,7 +4,7 @@ import type {
+   NotificationListParams,
+   NotificationListResponse,
+   NotificationPreferences,
+-} from './types'
++} from '../types'
+ 
+ /**
+  * Notifications module — API service layer
+@@ -72,7 +72,7 @@ export const notificationsService = {
+       },
+     )
+ 
+-    return response.data
++    return response
+   },
+ 
+   /**
+@@ -83,7 +83,7 @@ export const notificationsService = {
+       `/notifications/${id}`,
+     )
+ 
+-    return response.data
++    return response
+   },
+ 
+   /**
+@@ -97,7 +97,7 @@ export const notificationsService = {
+       '/notifications/unread-count',
+     )
+ 
+-    return response.data.count
++    return response.count
+   },
+ 
+   /**
+@@ -108,7 +108,7 @@ export const notificationsService = {
+       `/notifications/${id}/read`,
+     )
+ 
+-    return response.data
++    return response
+   },
+ 
+   /**
+@@ -119,7 +119,7 @@ export const notificationsService = {
+       `/notifications/${id}/unread`,
+     )
+ 
+-    return response.data
++    return response
+   },
+ 
+   /**
+@@ -144,7 +144,7 @@ export const notificationsService = {
+       '/notifications/preferences',
+     )
+ 
+-    return response.data
++    return response
+   },
+ 
+   /**
+@@ -161,7 +161,7 @@ export const notificationsService = {
+       preferences,
+     )
+ 
+-    return response.data
++    return response
+   },
+ } as const
+ 
+diff --git a/src/modules/organizations/services/organizationsService.ts b/src/modules/organizations/services/organizationsService.ts
+index 44d7f97..4225a04 100644
+--- a/src/modules/organizations/services/organizationsService.ts
++++ b/src/modules/organizations/services/organizationsService.ts
+@@ -45,7 +45,7 @@ import type {
+   UpdateOrganizationMemberInput,
+   UpdateOrganizationProfileInput,
+   UpdateOrganizationRoleInput,
+-} from './types'
++} from '../types'
+ 
+ const ORGANIZATIONS_BASE = '/organizations'
+ 
+@@ -77,7 +77,7 @@ export const organizationsService = {
+   get: async (): Promise<Organization> => {
+     const response = await api.get<Organization>(endpoints.current)
+ 
+-    return response.data
++    return response
+   },
+ 
+   /**
+@@ -91,7 +91,7 @@ export const organizationsService = {
+       input,
+     )
+ 
+-    return response.data
++    return response
+   },
+ 
+   // ---------------------------------------------------------------------------
+@@ -106,7 +106,7 @@ export const organizationsService = {
+       endpoints.members,
+     )
+ 
+-    return response.data
++    return response
+   },
+ 
+   /**
+@@ -119,7 +119,7 @@ export const organizationsService = {
+       endpoints.member(memberId),
+     )
+ 
+-    return response.data
++    return response
+   },
+ 
+   /**
+@@ -133,7 +133,7 @@ export const organizationsService = {
+       input,
+     )
+ 
+-    return response.data
++    return response
+   },
+ 
+   /**
+@@ -148,7 +148,7 @@ export const organizationsService = {
+       input,
+     )
+ 
+-    return response.data
++    return response
+   },
+ 
+   /**
+@@ -170,7 +170,7 @@ export const organizationsService = {
+       endpoints.roles,
+     )
+ 
+-    return response.data
++    return response
+   },
+ 
+   /**
+@@ -181,7 +181,7 @@ export const organizationsService = {
+       endpoints.role(roleId),
+     )
+ 
+-    return response.data
++    return response
+   },
+ 
+   /**
+@@ -195,7 +195,7 @@ export const organizationsService = {
+       input,
+     )
+ 
+-    return response.data
++    return response
+   },
+ 
+   /**
+@@ -210,7 +210,7 @@ export const organizationsService = {
+       input,
+     )
+ 
+-    return response.data
++    return response
+   },
+ 
+   /**
+@@ -235,7 +235,7 @@ export const organizationsService = {
+       endpoints.permissions,
+     )
+ 
+-    return response.data
++    return response
+   },
+ 
+   /**
+@@ -248,7 +248,7 @@ export const organizationsService = {
+       endpoints.rolePermissions(roleId),
+     )
+ 
+-    return response.data
++    return response
+   },
+ 
+   /**
+@@ -266,7 +266,7 @@ export const organizationsService = {
+       { permissionIds },
+     )
+ 
+-    return response.data
++    return response
+   },
+ } as const
+ 
+diff --git a/src/modules/procurement/pages/MaterialRequests.tsx b/src/modules/procurement/pages/MaterialRequests.tsx
+index 53b54ab..eefe35e 100644
+--- a/src/modules/procurement/pages/MaterialRequests.tsx
++++ b/src/modules/procurement/pages/MaterialRequests.tsx
+@@ -119,7 +119,7 @@ export function MaterialRequests() {
+               label="Active"
+               value={active}
+               description="In procurement"
+-              accent="ink"
++              accent="default"
+             />
+ 
+             <SummaryCard
+diff --git a/src/modules/procurement/pages/QuoteComparison.tsx b/src/modules/procurement/pages/QuoteComparison.tsx
+index 34babe8..d5f5811 100644
+--- a/src/modules/procurement/pages/QuoteComparison.tsx
++++ b/src/modules/procurement/pages/QuoteComparison.tsx
+@@ -3,7 +3,6 @@ import {
+   CalendarDays,
+   CheckCircle2,
+   Clock3,
+-  FileText,
+   Package,
+   ShieldCheck,
+   Star,
+diff --git a/src/modules/procurement/types/index.ts b/src/modules/procurement/types/index.ts
+index 6fcfb7a..edcd4e9 100644
+--- a/src/modules/procurement/types/index.ts
++++ b/src/modules/procurement/types/index.ts
+@@ -37,6 +37,8 @@ export type MaterialRequestStatus =
+   | 'ordered'
+   | 'delivered'
+   | 'verified'
++  | 'in transit'
++  | 'disputed'
+ 
+ export interface MaterialRequest {
+   id: string
+@@ -337,6 +339,8 @@ export const MATERIAL_REQUEST_STATUSES = [
+   'ordered',
+   'delivered',
+   'verified',
++  'in transit',
++  'disputed',
+ ] as const
+ 
+ export const QUOTATION_STATUSES = [
+diff --git a/src/modules/professionals/pages/ProfessionalList.tsx b/src/modules/professionals/pages/ProfessionalList.tsx
+index e6e9375..75187cd 100644
+--- a/src/modules/professionals/pages/ProfessionalList.tsx
++++ b/src/modules/professionals/pages/ProfessionalList.tsx
+@@ -4,7 +4,6 @@ import {
+   BadgeCheck,
+   BriefcaseBusiness,
+   ChevronRight,
+-  Clock3,
+   Filter,
+   MapPin,
+   Search,
+diff --git a/src/modules/professionals/services/professionalsService.ts b/src/modules/professionals/services/professionalsService.ts
+index 7e8f6a7..95d44b8 100644
+--- a/src/modules/professionals/services/professionalsService.ts
++++ b/src/modules/professionals/services/professionalsService.ts
+@@ -283,7 +283,7 @@ async function request<T>(
+  * null-like, and empty-string values.
+  */
+ function toQueryString(
+-  params: Record<string, string | number | undefined>,
++  params: object,
+ ): string {
+   const searchParams = new URLSearchParams()
+ 
+diff --git a/src/modules/projects/pages/CreateProject.tsx b/src/modules/projects/pages/CreateProject.tsx
+index 93fab53..c7f2ff0 100644
+--- a/src/modules/projects/pages/CreateProject.tsx
++++ b/src/modules/projects/pages/CreateProject.tsx
+@@ -1444,7 +1444,7 @@ function StepSection({
+   description,
+   children,
+ }: {
+-  icon: React.ComponentType<{ className?: string }>
++  icon: React.ComponentType<{ className?: string; strokeWidth?: number }>
+   eyebrow: string
+   title: string
+   description: string
+diff --git a/src/modules/projects/pages/EditProject.tsx b/src/modules/projects/pages/EditProject.tsx
+index c7fc045..479ad40 100644
+--- a/src/modules/projects/pages/EditProject.tsx
++++ b/src/modules/projects/pages/EditProject.tsx
+@@ -21,7 +21,6 @@ import type {
+   SetStateAction,
+ } from 'react'
+ 
+-import { Card, CardBody } from '@/components/ui/Card'
+ 
+ const sections = [
+   {
+diff --git a/src/modules/projects/pages/ProjectDetails.tsx b/src/modules/projects/pages/ProjectDetails.tsx
+index 97307d3..40337e9 100644
+--- a/src/modules/projects/pages/ProjectDetails.tsx
++++ b/src/modules/projects/pages/ProjectDetails.tsx
+@@ -19,7 +19,7 @@ import {
+ import type { ElementType, ReactNode } from 'react'
+ 
+ import type { Project } from '@/modules/projects/types'
+-import { StagePill } from './StagePill'
++import { StagePill } from '../components/StagePill'
+ import { ProgressBar } from '@/components/ui/ProgressBar'
+ import { Badge } from '@/components/ui/Badge'
+ 
+diff --git a/src/modules/projects/pages/ProjectDocuments.tsx b/src/modules/projects/pages/ProjectDocuments.tsx
+index 98d2135..d2c00d4 100644
+--- a/src/modules/projects/pages/ProjectDocuments.tsx
++++ b/src/modules/projects/pages/ProjectDocuments.tsx
+@@ -11,7 +11,6 @@ import {
+   ShieldCheck,
+   Upload,
+   ArrowUpRight,
+-  ChevronDown,
+ } from 'lucide-react'
+ 
+ import { Card } from '@/components/ui/Card'
+diff --git a/src/modules/projects/pages/ProjectList.tsx b/src/modules/projects/pages/ProjectList.tsx
+index b0aa2c0..84af30a 100644
+--- a/src/modules/projects/pages/ProjectList.tsx
++++ b/src/modules/projects/pages/ProjectList.tsx
+@@ -10,7 +10,7 @@ import {
+   SlidersHorizontal,
+ } from 'lucide-react'
+ 
+-import { Card, CardBody, CardHeader } from '@/components/ui/Card'
++import { Card, CardBody } from '@/components/ui/Card'
+ import { ProjectCard } from '@/modules/projects/components/ProjectCard'
+ import type { Project, ProjectStage } from '@/modules/projects/types'
+ import { projects } from '@/data/mockData'
+@@ -51,7 +51,11 @@ export function ProjectList() {
+ 
+       return matchesFilter && matchesSearch
+     })
+-  }, [search, filter])
++  }, [
++	search,
++	filter,
++	allProjects
++])
+ 
+   const activeProjects = allProjects.filter(
+     (project) =>
+diff --git a/src/modules/projects/pages/ProjectTeam.tsx b/src/modules/projects/pages/ProjectTeam.tsx
+index d53acab..3af4f02 100644
+--- a/src/modules/projects/pages/ProjectTeam.tsx
++++ b/src/modules/projects/pages/ProjectTeam.tsx
+@@ -10,7 +10,6 @@ import {
+   Users,
+ } from 'lucide-react'
+ 
+-import { Badge } from '@/components/ui/Badge'
+ import { Card, CardBody, CardHeader } from '@/components/ui/Card'
+ 
+ type TeamRole =
+diff --git a/src/modules/projects/pages/ProjectTimeline.tsx b/src/modules/projects/pages/ProjectTimeline.tsx
+index ec78327..7b5ffe8 100644
+--- a/src/modules/projects/pages/ProjectTimeline.tsx
++++ b/src/modules/projects/pages/ProjectTimeline.tsx
+@@ -10,7 +10,6 @@ import {
+   History,
+   Package,
+   Search,
+-  ShieldAlert,
+   ShieldCheck,
+   UserRound,
+   Wallet,
+@@ -245,9 +244,7 @@ export function ProjectTimeline() {
+     (event) => event.type === 'milestone',
+   ).length
+ 
+-  const approvalCount = timelineEvents.filter(
+-    (event) => event.type === 'approval',
+-  ).length
++  
+ 
+   return (
+     <div className="space-y-7">
+diff --git a/src/modules/property-passport/pages/Contracts.tsx b/src/modules/property-passport/pages/Contracts.tsx
+index 0531f54..b6da9b0 100644
+--- a/src/modules/property-passport/pages/Contracts.tsx
++++ b/src/modules/property-passport/pages/Contracts.tsx
+@@ -454,7 +454,7 @@ function SummaryMetric({
+   description,
+   accent,
+ }: {
+-  icon: React.ComponentType<{ className?: string }>
++  icon: React.ComponentType<{ className?: string; size?: number }>
+   label: string
+   value: string
+   description: string
+diff --git a/src/modules/property-passport/pages/Designs.tsx b/src/modules/property-passport/pages/Designs.tsx
+index e128aa0..4a953df 100644
+--- a/src/modules/property-passport/pages/Designs.tsx
++++ b/src/modules/property-passport/pages/Designs.tsx
+@@ -4,7 +4,6 @@ import {
+   ChevronRight,
+   Download,
+   FileCheck2,
+-  FileText,
+   Layers3,
+   Ruler,
+   ShieldCheck,
+@@ -501,7 +500,7 @@ function SummaryMetric({
+   description,
+   accent,
+ }: {
+-  icon: React.ComponentType<{ className?: string }>
++  icon: React.ComponentType<{ className?: string; size?: number }>
+   label: string
+   value: string
+   description: string
+diff --git a/src/modules/property-passport/pages/Passport.tsx b/src/modules/property-passport/pages/Passport.tsx
+index 7b7f09e..d45d53d 100644
+--- a/src/modules/property-passport/pages/Passport.tsx
++++ b/src/modules/property-passport/pages/Passport.tsx
+@@ -1,8 +1,6 @@
+ import {
+-  ArrowRight,
+   ArrowUpRight,
+   CheckCircle2,
+-  ChevronRight,
+   ClipboardCheck,
+   FileCheck2,
+   FileText,
+diff --git a/src/modules/property-passport/pages/PropertyOverview.tsx b/src/modules/property-passport/pages/PropertyOverview.tsx
+index 4f7222c..a916851 100644
+--- a/src/modules/property-passport/pages/PropertyOverview.tsx
++++ b/src/modules/property-passport/pages/PropertyOverview.tsx
+@@ -409,7 +409,7 @@ export function PropertyOverview() {
+                   </div>
+ 
+                   <div className="flex shrink-0 items-center gap-3">
+-                    <StatusBadge status={item.status} />
++                    <StatusBadge status={item.status as 'Verified' | 'Review' | 'Pending'} />
+ 
+                     <ChevronRight className="hidden h-4 w-4 text-ink/20 transition-transform group-hover:translate-x-0.5 group-hover:text-[#1657FF]/60 sm:block" />
+                   </div>
+diff --git a/src/modules/property-passport/services/propertyPassportService.ts b/src/modules/property-passport/services/propertyPassportService.ts
+index 5d73b30..df6b21f 100644
+--- a/src/modules/property-passport/services/propertyPassportService.ts
++++ b/src/modules/property-passport/services/propertyPassportService.ts
+@@ -27,7 +27,7 @@
+ import type {
+   PropertyPassport,
+   PropertyPassportSection,
+-} from '@/types/propertyPassport'
++} from '../types'
+ 
+ /* -------------------------------------------------------------------------- */
+ /* API configuration                                                            */
+diff --git a/src/modules/reports/pages/ProjectReports.tsx b/src/modules/reports/pages/ProjectReports.tsx
+index 6626513..f5f3126 100644
+--- a/src/modules/reports/pages/ProjectReports.tsx
++++ b/src/modules/reports/pages/ProjectReports.tsx
+@@ -138,7 +138,7 @@ const milestoneStatusStyles = {
+ 
+ export function ProjectReports() {
+   const budgetUsage = 74
+-  const remainingBudget = 122
++  
+ 
+   return (
+     <div className="space-y-6">
+diff --git a/src/modules/users/pages/Security.tsx b/src/modules/users/pages/Security.tsx
+index 012c4ed..fd5db21 100644
+--- a/src/modules/users/pages/Security.tsx
++++ b/src/modules/users/pages/Security.tsx
+@@ -10,7 +10,6 @@ import {
+   LogOut,
+   Monitor,
+   RefreshCw,
+-  Shield,
+   ShieldCheck,
+   Smartphone,
+   SmartphoneNfc,
+diff --git a/src/modules/users/services/usersService.ts b/src/modules/users/services/usersService.ts
+index 3b30a47..da9f132 100644
+--- a/src/modules/users/services/usersService.ts
++++ b/src/modules/users/services/usersService.ts
+@@ -38,7 +38,7 @@ import type {
+   UserDocument,
+   UserVerification,
+   VerificationStatus,
+-} from './types'
++} from '../types'
+ 
+ /* ========================================================================== */
+ /* Response contracts                                                         */
+diff --git a/src/modules/verification/pages/DocumentSubmission.tsx b/src/modules/verification/pages/DocumentSubmission.tsx
+index 5c768f6..5708009 100644
+--- a/src/modules/verification/pages/DocumentSubmission.tsx
++++ b/src/modules/verification/pages/DocumentSubmission.tsx
+@@ -1,6 +1,5 @@
+ import {
+   AlertCircle,
+-  BadgeCheck,
+   Building2,
+   CheckCircle2,
+   ChevronRight,
+@@ -15,7 +14,7 @@ import {
+   XCircle,
+ } from 'lucide-react'
+ 
+-import { Card, CardBody, CardHeader } from '@/components/ui/Card'
++import { Card, CardBody } from '@/components/ui/Card'
+ 
+ type DocumentStatus =
+   | 'Approved'
+diff --git a/src/modules/verification/services/verificationService.ts b/src/modules/verification/services/verificationService.ts
+index e8904fe..2e4387a 100644
+--- a/src/modules/verification/services/verificationService.ts
++++ b/src/modules/verification/services/verificationService.ts
+@@ -25,7 +25,7 @@ import type {
+   VerificationDocument,
+   VerificationReview,
+   VerificationStatus,
+-} from './types'
++} from '../types'
+ 
+ // -----------------------------------------------------------------------------
+ // API client
+@@ -346,7 +346,7 @@ export const verificationService = {
+    */
+   approve: async (
+     id: string,
+-    comment?: string,
++    _comment?: string,
+   ): Promise<VerificationReview> => {
+     requireId(id)
+ 
+diff --git a/src/pages/client/Dashboard.tsx b/src/pages/client/Dashboard.tsx
+index 29b16ef..d3f9933 100644
+--- a/src/pages/client/Dashboard.tsx
++++ b/src/pages/client/Dashboard.tsx
+@@ -77,7 +77,7 @@ const recentUpdates = [
+   },
+ ]
+ 
+-const activityDotClasses = {
++const activityDotClasses: Record<string, string> = {
+   complete: 'bg-[#12613E]',
+   current: 'bg-[#B85C12]',
+   muted: 'bg-ink/25',
+diff --git a/src/pages/contractor/Dashboard.tsx b/src/pages/contractor/Dashboard.tsx
+index bfa60a0..02fa006 100644
+--- a/src/pages/contractor/Dashboard.tsx
++++ b/src/pages/contractor/Dashboard.tsx
+@@ -133,12 +133,12 @@ const teamActivity = [
+   },
+ ]
+ 
+-const actionToneClasses = {
++const actionToneClasses: Record<string, { chip: string }> = {
+   amber: { chip: 'bg-[#F8EEE6] text-[#B85C12]' },
+   ink: { chip: 'bg-ink/[0.05] text-ink/60' },
+ }
+ 
+-const activityDotClasses = {
++const activityDotClasses: Record<string, string> = {
+   complete: 'bg-[#12613E]',
+   current: 'bg-[#B85C12]',
+   muted: 'bg-ink/25',
+diff --git a/src/pages/market-place/Dashboard.tsx b/src/pages/market-place/Dashboard.tsx
+index 2f316f3..c49be73 100644
+--- a/src/pages/market-place/Dashboard.tsx
++++ b/src/pages/market-place/Dashboard.tsx
+@@ -63,7 +63,7 @@ const CATALOGUE_CATEGORY_MAP: Record<string, string[]> = {
+   'External Works': ['roofing', 'timber'],
+ }
+ 
+-const catalogueStatusMeta = {
++const catalogueStatusMeta: Record<string, { label: string; bg: string; text: string }> = {
+   active: { label: 'Active', bg: 'bg-white/15', text: 'text-white' },
+   featured: { label: 'Featured', bg: 'bg-[#B85C12]', text: 'text-white' },
+   low: { label: 'Low stock', bg: 'bg-white/15', text: 'text-amber-200' },
+@@ -72,7 +72,7 @@ const catalogueStatusMeta = {
+ export function MarketDashboard() {
+   const { user } = useAuth()
+   const [catalogueView, setCatalogueView] = useState('categories')
+-  const [savedCategories, setSavedCategories] = useState([])
++  const [savedCategories, setSavedCategories] = useState<string[]>([])
+ 
+   // Single source of truth for the Project Studio (SUPPLIER_FLOW) answers.
+   const profile = useProjectProfile()
+@@ -92,7 +92,7 @@ export function MarketDashboard() {
+ 
+   const firstName = user.fullName.split(' ')[0]
+ 
+-  const toggleSaved = (name) => {
++  const toggleSaved = (name: string) => {
+     setSavedCategories((prev) =>
+       prev.includes(name) ? prev.filter((item) => item !== name) : [...prev, name]
+     )
+diff --git a/src/pages/public/Home.tsx b/src/pages/public/Home.tsx
+index c0cc153..706f8dd 100644
+--- a/src/pages/public/Home.tsx
++++ b/src/pages/public/Home.tsx
+@@ -19,21 +19,12 @@ import {
+   PackageCheck,
+   CreditCard,
+   ScanSearch,
+-  TrendingUp,
+   LockKeyhole,
+-  CircleCheck,
+   Activity,
+   ChevronDown,
+-  Plus,
+   Landmark,
+   FileText,
+-  Gavel,
+-  Eye,
+-  Layers3,
+-  MapPinned,
+   BadgeCheck,
+-  Clock3,
+-  CircleDollarSign,
+   Workflow,
+   ShieldAlert,
+   ArrowUpRight,

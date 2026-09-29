@@ -293,7 +293,7 @@ export interface ApprovalRejectionPayload {
 /* Service configuration                                                      */
 /* -------------------------------------------------------------------------- */
 
-const APPROVALS_BASE_PATH = '/approvals'
+
 
 const DEFAULT_PAGE = 1
 
@@ -359,7 +359,7 @@ export const approvalsService = {
    * GET /approvals/:id
    */
   get: async (
-    id: string,
+    _id: string,
   ): Promise<ApprovalDetail> => {
     /*
      * TODO:
@@ -443,7 +443,7 @@ export const approvalsService = {
    * GET /approvals/:approvalId/evidence
    */
   evidence: async (
-    approvalId: string,
+    _approvalId: string,
   ): Promise<ApprovalEvidence[]> => {
     /*
      * TODO:
@@ -463,7 +463,7 @@ export const approvalsService = {
    * GET /approvals/:approvalId/inspection
    */
   inspection: async (
-    approvalId: string,
+    _approvalId: string,
   ): Promise<ApprovalInspection> => {
     /*
      * TODO:
@@ -497,8 +497,8 @@ export const approvalsService = {
    * POST /approvals/:approvalId/approve
    */
   approve: async (
-    approvalId: string,
-    payload: ApprovalDecisionPayload = {},
+    _approvalId: string,
+    _payload: ApprovalDecisionPayload = {},
   ): Promise<ApprovalDecision> => {
     /*
      * TODO:
@@ -525,8 +525,8 @@ export const approvalsService = {
    * BRD: Sec. 43.3
    */
   reject: async (
-    approvalId: string,
-    payload: ApprovalRejectionPayload,
+    _approvalId: string,
+    _payload: ApprovalRejectionPayload,
   ): Promise<ApprovalDecision> => {
     /*
      * TODO:
@@ -554,8 +554,8 @@ export const approvalsService = {
    * BRD: Sec. 43.3
    */
   requestCorrection: async (
-    approvalId: string,
-    payload: ApprovalCorrectionPayload,
+    _approvalId: string,
+    _payload: ApprovalCorrectionPayload,
   ): Promise<ApprovalDecision> => {
     /*
      * TODO:
@@ -579,7 +579,7 @@ export const approvalsService = {
    * POST /approvals/:approvalId/resubmit
    */
   resubmit: async (
-    approvalId: string,
+    _approvalId: string,
   ): Promise<Approval> => {
     /*
      * TODO:

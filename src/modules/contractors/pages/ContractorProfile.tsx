@@ -5,8 +5,6 @@ import {
   CalendarDays,
   CheckCircle2,
   ChevronRight,
-  FileCheck2,
-  Globe2,
   Mail,
   MapPin,
   Phone,

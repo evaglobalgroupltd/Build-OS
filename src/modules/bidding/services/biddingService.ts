@@ -67,25 +67,6 @@ export interface BidDecisionPayload {
 /* API configuration                                                           */
 /* -------------------------------------------------------------------------- */
 
-const BIDDING_BASE_PATH = '/bidding'
-
-const BID_ENDPOINTS = {
-  list: `${BIDDING_BASE_PATH}/bids`,
-  create: `${BIDDING_BASE_PATH}/bids`,
-  drafts: `${BIDDING_BASE_PATH}/bids/drafts`,
-
-  byId: (id: string) =>
-    `${BIDDING_BASE_PATH}/bids/${encodeURIComponent(id)}`,
-
-  submit: (id: string) =>
-    `${BIDDING_BASE_PATH}/bids/${encodeURIComponent(id)}/submit`,
-
-  clarification: (id: string) =>
-    `${BIDDING_BASE_PATH}/bids/${encodeURIComponent(id)}/clarification`,
-
-  decision: (id: string) =>
-    `${BIDDING_BASE_PATH}/bids/${encodeURIComponent(id)}/decision`,
-} as const
 
 /* -------------------------------------------------------------------------- */
 /* Service                                                                     */

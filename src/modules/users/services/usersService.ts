@@ -38,7 +38,7 @@ import type {
   UserDocument,
   UserVerification,
   VerificationStatus,
-} from './types'
+} from '../types'
 
 /* ========================================================================== */
 /* Response contracts                                                         */

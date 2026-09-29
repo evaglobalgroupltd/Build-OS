@@ -27,7 +27,7 @@
 import type {
   PropertyPassport,
   PropertyPassportSection,
-} from '@/types/propertyPassport'
+} from '../types'
 
 /* -------------------------------------------------------------------------- */
 /* API configuration                                                            */

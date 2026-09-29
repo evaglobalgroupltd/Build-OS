@@ -13,7 +13,6 @@ import {
 } from 'lucide-react'
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
-import { Badge } from '@/components/ui/Badge'
 
 const documentCategories = [
   'Land & Ownership',

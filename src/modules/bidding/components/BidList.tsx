@@ -13,6 +13,7 @@ import {
 import { Badge } from '@/components/ui/Badge'
 
 const bidStatusTone = {
+  draft: 'neutral',
   submitted: 'neutral',
   shortlisted: 'amber',
   clarification: 'amber',

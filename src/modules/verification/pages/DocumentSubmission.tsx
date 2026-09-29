@@ -1,6 +1,5 @@
 import {
   AlertCircle,
-  BadgeCheck,
   Building2,
   CheckCircle2,
   ChevronRight,
@@ -15,7 +14,7 @@ import {
   XCircle,
 } from 'lucide-react'
 
-import { Card, CardBody, CardHeader } from '@/components/ui/Card'
+import { Card, CardBody } from '@/components/ui/Card'
 
 type DocumentStatus =
   | 'Approved'

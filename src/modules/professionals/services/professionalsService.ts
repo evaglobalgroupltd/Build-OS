@@ -283,7 +283,7 @@ async function request<T>(
  * null-like, and empty-string values.
  */
 function toQueryString(
-  params: Record<string, string | number | undefined>,
+  params: object,
 ): string {
   const searchParams = new URLSearchParams()
 

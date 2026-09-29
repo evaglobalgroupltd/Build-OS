@@ -4,7 +4,6 @@ import {
   ArrowUpRight,
   Menu,
   ShieldCheck,
-  X,
 } from 'lucide-react'
 
 interface PublicLayoutProps {

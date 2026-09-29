@@ -9,7 +9,6 @@ import {
   Plus,
   ShieldCheck,
   User,
-  WalletCards,
 } from 'lucide-react'
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'

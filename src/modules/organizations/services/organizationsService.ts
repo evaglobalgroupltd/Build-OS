@@ -45,7 +45,7 @@ import type {
   UpdateOrganizationMemberInput,
   UpdateOrganizationProfileInput,
   UpdateOrganizationRoleInput,
-} from './types'
+} from '../types'
 
 const ORGANIZATIONS_BASE = '/organizations'
 
@@ -77,7 +77,7 @@ export const organizationsService = {
   get: async (): Promise<Organization> => {
     const response = await api.get<Organization>(endpoints.current)
 
-    return response.data
+    return response
   },
 
   /**
@@ -91,7 +91,7 @@ export const organizationsService = {
       input,
     )
 
-    return response.data
+    return response
   },
 
   // ---------------------------------------------------------------------------
@@ -106,7 +106,7 @@ export const organizationsService = {
       endpoints.members,
     )
 
-    return response.data
+    return response
   },
 
   /**
@@ -119,7 +119,7 @@ export const organizationsService = {
       endpoints.member(memberId),
     )
 
-    return response.data
+    return response
   },
 
   /**
@@ -133,7 +133,7 @@ export const organizationsService = {
       input,
     )
 
-    return response.data
+    return response
   },
 
   /**
@@ -148,7 +148,7 @@ export const organizationsService = {
       input,
     )
 
-    return response.data
+    return response
   },
 
   /**
@@ -170,7 +170,7 @@ export const organizationsService = {
       endpoints.roles,
     )
 
-    return response.data
+    return response
   },
 
   /**
@@ -181,7 +181,7 @@ export const organizationsService = {
       endpoints.role(roleId),
     )
 
-    return response.data
+    return response
   },
 
   /**
@@ -195,7 +195,7 @@ export const organizationsService = {
       input,
     )
 
-    return response.data
+    return response
   },
 
   /**
@@ -210,7 +210,7 @@ export const organizationsService = {
       input,
     )
 
-    return response.data
+    return response
   },
 
   /**
@@ -235,7 +235,7 @@ export const organizationsService = {
       endpoints.permissions,
     )
 
-    return response.data
+    return response
   },
 
   /**
@@ -248,7 +248,7 @@ export const organizationsService = {
       endpoints.rolePermissions(roleId),
     )
 
-    return response.data
+    return response
   },
 
   /**
@@ -266,7 +266,7 @@ export const organizationsService = {
       { permissionIds },
     )
 
-    return response.data
+    return response
   },
 } as const
 

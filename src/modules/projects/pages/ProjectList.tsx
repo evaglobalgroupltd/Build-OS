@@ -10,7 +10,7 @@ import {
   SlidersHorizontal,
 } from 'lucide-react'
 
-import { Card, CardBody, CardHeader } from '@/components/ui/Card'
+import { Card, CardBody } from '@/components/ui/Card'
 import { ProjectCard } from '@/modules/projects/components/ProjectCard'
 import type { Project, ProjectStage } from '@/modules/projects/types'
 import { projects } from '@/data/mockData'
@@ -51,7 +51,11 @@ export function ProjectList() {
 
       return matchesFilter && matchesSearch
     })
-  }, [search, filter])
+  }, [
+	search,
+	filter,
+	allProjects
+])
 
   const activeProjects = allProjects.filter(
     (project) =>

@@ -18,7 +18,7 @@ import {
 } from 'lucide-react'
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
-import type { MarketSupplier } from '@/services/MarketService'
+import type { MarketSupplier } from '@/modules/market/services/MarketService'
 import { mockSuppliers } from '@/mocks/suppliers'
 
 const categories = [

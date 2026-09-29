@@ -19,7 +19,7 @@ import {
 import type { ElementType, ReactNode } from 'react'
 
 import type { Project } from '@/modules/projects/types'
-import { StagePill } from './StagePill'
+import { StagePill } from '../components/StagePill'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { Badge } from '@/components/ui/Badge'
 

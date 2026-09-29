@@ -458,7 +458,7 @@ export function DocumentHistory() {
             />
 
             <CardBody className="space-y-3 p-5">
-              {versions.map((version, index) => (
+              {versions.map((version, _index) => (
                 <div
                   key={version.version}
                   className="

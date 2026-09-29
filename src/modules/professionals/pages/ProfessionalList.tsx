@@ -4,7 +4,6 @@ import {
   BadgeCheck,
   BriefcaseBusiness,
   ChevronRight,
-  Clock3,
   Filter,
   MapPin,
   Search,

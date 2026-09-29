@@ -21,7 +21,6 @@ import type {
   SetStateAction,
 } from 'react'
 
-import { Card, CardBody } from '@/components/ui/Card'
 
 const sections = [
   {

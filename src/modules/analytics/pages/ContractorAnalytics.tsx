@@ -8,7 +8,6 @@ import {
   Check,
   CheckCircle2,
   Clock3,
-  Construction,
   DollarSign,
   FileCheck2,
   Flag,

@@ -77,7 +77,7 @@ const recentUpdates = [
   },
 ]
 
-const activityDotClasses = {
+const activityDotClasses: Record<string, string> = {
   complete: 'bg-[#12613E]',
   current: 'bg-[#B85C12]',
   muted: 'bg-ink/25',

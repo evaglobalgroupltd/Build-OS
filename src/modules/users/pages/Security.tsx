@@ -10,7 +10,6 @@ import {
   LogOut,
   Monitor,
   RefreshCw,
-  Shield,
   ShieldCheck,
   Smartphone,
   SmartphoneNfc,

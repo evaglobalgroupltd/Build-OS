@@ -160,7 +160,7 @@ export function ContractorDetails() {
           <ProfileMetric
             icon={Star}
             label="Client rating"
-            value={contractor.rating}
+            value={contractor.rating.toString()}
             description={`${contractor.reviews} verified reviews`}
           />
 

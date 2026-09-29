@@ -1444,7 +1444,7 @@ function StepSection({
   description,
   children,
 }: {
-  icon: React.ComponentType<{ className?: string }>
+  icon: React.ComponentType<{ className?: string; strokeWidth?: number }>
   eyebrow: string
   title: string
   description: string

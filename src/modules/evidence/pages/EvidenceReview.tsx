@@ -455,7 +455,7 @@ export function EvidenceReview() {
                     key={check.id}
                     label={check.label}
                     description={check.description}
-                    status={check.status}
+                    status={check.status as 'passed' | 'pending'}
                   />
                 ))}
               </div>

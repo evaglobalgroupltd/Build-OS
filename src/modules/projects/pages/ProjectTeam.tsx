@@ -10,7 +10,6 @@ import {
   Users,
 } from 'lucide-react'
 
-import { Badge } from '@/components/ui/Badge'
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 
 type TeamRole =

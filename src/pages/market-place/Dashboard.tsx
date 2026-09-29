@@ -63,7 +63,7 @@ const CATALOGUE_CATEGORY_MAP: Record<string, string[]> = {
   'External Works': ['roofing', 'timber'],
 }
 
-const catalogueStatusMeta = {
+const catalogueStatusMeta: Record<string, { label: string; bg: string; text: string }> = {
   active: { label: 'Active', bg: 'bg-white/15', text: 'text-white' },
   featured: { label: 'Featured', bg: 'bg-[#B85C12]', text: 'text-white' },
   low: { label: 'Low stock', bg: 'bg-white/15', text: 'text-amber-200' },
@@ -72,7 +72,7 @@ const catalogueStatusMeta = {
 export function MarketDashboard() {
   const { user } = useAuth()
   const [catalogueView, setCatalogueView] = useState('categories')
-  const [savedCategories, setSavedCategories] = useState([])
+  const [savedCategories, setSavedCategories] = useState<string[]>([])
 
   // Single source of truth for the Project Studio (SUPPLIER_FLOW) answers.
   const profile = useProjectProfile()
@@ -92,7 +92,7 @@ export function MarketDashboard() {
 
   const firstName = user.fullName.split(' ')[0]
 
-  const toggleSaved = (name) => {
+  const toggleSaved = (name: string) => {
     setSavedCategories((prev) =>
       prev.includes(name) ? prev.filter((item) => item !== name) : [...prev, name]
     )

@@ -79,7 +79,7 @@ const reportTypes = [
   },
 ]
 
-const accentStyles = {
+const accentStyles: Record<string, { icon: string; count: string; line: string }> = {
   green: {
     icon: 'bg-[#12613E]/[0.08] text-[#12613E]',
     count: 'text-[#12613E]',

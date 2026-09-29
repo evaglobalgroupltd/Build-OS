@@ -13,7 +13,6 @@ import {
   GanttChart,
   HardHat,
   MapPin,
-  TrendingUp,
   XCircle,
 } from 'lucide-react'
 

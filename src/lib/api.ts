@@ -4,9 +4,7 @@
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '/api'
 
-type QueryParams = Record<string, string | number | boolean | undefined>
-
-function buildUrl(path: string, params?: QueryParams): string {
+function buildUrl(path: string, params?: object): string {
   const url = new URL(
     path.startsWith('http') ? path : `${API_BASE_URL}${path}`,
     window.location.origin,
@@ -29,7 +27,11 @@ function authHeaders(): HeadersInit {
 async function request<T>(
   method: string,
   path: string,
-  options: { params?: QueryParams; body?: unknown } = {},
+  options: {
+    params?: object
+    body?: unknown
+    responseType?: 'json' | 'blob'
+  } = {},
 ): Promise<T> {
   const response = await fetch(buildUrl(path, options.params), {
     method,
@@ -47,13 +49,27 @@ async function request<T>(
 
   if (response.status === 204) return undefined as T
 
+  if (options.responseType === 'blob') return (await response.blob()) as T
+
   return (await response.json()) as T
 }
 
 export const apiClient = {
-  get: <T>(path: string, params?: QueryParams) => request<T>('GET', path, { params }),
+  get: <T>(
+    path: string,
+    options?: { params?: object; responseType?: 'json' | 'blob' },
+  ) =>
+    request<T>('GET', path, {
+      params: options?.params,
+      responseType: options?.responseType,
+    }),
   post: <T>(path: string, body?: unknown) => request<T>('POST', path, { body }),
   patch: <T>(path: string, body?: unknown) => request<T>('PATCH', path, { body }),
   put: <T>(path: string, body?: unknown) => request<T>('PUT', path, { body }),
   delete: <T>(path: string) => request<T>('DELETE', path),
 }
+
+// Several module services (documents, escrow, notifications, organizations,
+// reports, users) import `{ api }` rather than `{ apiClient }`. Keep both
+// names available so those imports resolve without touching every call site.
+export const api = apiClient

@@ -77,10 +77,7 @@ function formatStatus(status: FrozenPayment['status']) {
 }
 
 export function FrozenPayments() {
-  const totalFrozen = frozenPayments.reduce(
-    (total, payment) => total + parseAmount(payment.amount),
-    0,
-  )
+  
 
   const activePayments = frozenPayments.filter(
     (payment) => payment.status !== 'resolved',

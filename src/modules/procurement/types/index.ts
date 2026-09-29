@@ -37,6 +37,8 @@ export type MaterialRequestStatus =
   | 'ordered'
   | 'delivered'
   | 'verified'
+  | 'in transit'
+  | 'disputed'
 
 export interface MaterialRequest {
   id: string
@@ -337,6 +339,8 @@ export const MATERIAL_REQUEST_STATUSES = [
   'ordered',
   'delivered',
   'verified',
+  'in transit',
+  'disputed',
 ] as const
 
 export const QUOTATION_STATUSES = [

@@ -1,4 +1,4 @@
-import type { ComponentType, ReactNode } from 'react'
+import type { ComponentType } from 'react'
 import {
   ArrowDownRight,
   ArrowUpRight,
@@ -239,7 +239,7 @@ export function MonthlyReport() {
 
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           {monthlyStats.map((stat, index) => {
-            const Icon = stat.icon
+            
 
             return (
               <MetricCard

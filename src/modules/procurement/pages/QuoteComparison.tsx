@@ -3,7 +3,6 @@ import {
   CalendarDays,
   CheckCircle2,
   Clock3,
-  FileText,
   Package,
   ShieldCheck,
   Star,

@@ -31,7 +31,7 @@ import type {
   EscrowSummary,
   ProjectWallet,
   EscrowFundingSource,
-} from './types'
+} from '../types'
 
 /**
  * Replace this import with the application's shared API client.

@@ -25,7 +25,7 @@ import type {
   VerificationDocument,
   VerificationReview,
   VerificationStatus,
-} from './types'
+} from '../types'
 
 // -----------------------------------------------------------------------------
 // API client
@@ -346,7 +346,7 @@ export const verificationService = {
    */
   approve: async (
     id: string,
-    comment?: string,
+    _comment?: string,
   ): Promise<VerificationReview> => {
     requireId(id)
 

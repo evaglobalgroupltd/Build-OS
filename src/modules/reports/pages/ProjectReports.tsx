@@ -138,7 +138,7 @@ const milestoneStatusStyles = {
 
 export function ProjectReports() {
   const budgetUsage = 74
-  const remainingBudget = 122
+  
 
   return (
     <div className="space-y-6">

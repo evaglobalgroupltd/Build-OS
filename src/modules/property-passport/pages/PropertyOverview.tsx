@@ -409,7 +409,7 @@ export function PropertyOverview() {
                   </div>
 
                   <div className="flex shrink-0 items-center gap-3">
-                    <StatusBadge status={item.status} />
+                    <StatusBadge status={item.status as 'Verified' | 'Review' | 'Pending'} />
 
                     <ChevronRight className="hidden h-4 w-4 text-ink/20 transition-transform group-hover:translate-x-0.5 group-hover:text-[#1657FF]/60 sm:block" />
                   </div>

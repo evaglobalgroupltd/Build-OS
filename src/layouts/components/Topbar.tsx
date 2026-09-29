@@ -11,7 +11,7 @@ import { Link } from 'react-router-dom'
 import { ChevronDown, LogOut, Menu, Search, UserCircle } from 'lucide-react'
 
 import { roleLabels } from '@/config/navigation'
-import type { AppRole } from '@/config/roleUi'
+import type { AppRole } from '@/config/roles'
 import { useAuth } from '@/context/AuthContext'
 
 /* -------------------------------------------------------------------------- */

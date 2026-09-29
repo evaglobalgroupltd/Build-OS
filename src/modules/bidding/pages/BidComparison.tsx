@@ -30,6 +30,7 @@ function formatAmount(amount: number, currency: string) {
 }
 
 const bidStatusTone = {
+  draft: 'neutral',
   submitted: 'neutral',
   shortlisted: 'amber',
   clarification: 'amber',
@@ -453,8 +454,8 @@ export function BidComparison() {
                       {hasRisks ? (
                         <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F8EEE6] px-2.5 py-1 text-[9px] font-semibold text-[#9A4D0A]">
                           <AlertTriangle className="h-3 w-3" />
-                          {bid.riskFlags.length} risk flag
-                          {bid.riskFlags.length > 1 ? 's' : ''}
+                          {bid.riskFlags?.length ?? 0} risk flag
+                          {(bid.riskFlags?.length ?? 0) > 1 ? 's' : ''}
                         </span>
                       ) : (
                         <span className="inline-flex items-center gap-1.5 rounded-full bg-[#EAF4EE] px-2.5 py-1 text-[9px] font-semibold text-[#12613E]">

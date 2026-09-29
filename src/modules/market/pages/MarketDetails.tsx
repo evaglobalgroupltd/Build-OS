@@ -6,7 +6,6 @@ import {
   CheckCircle2,
   ChevronRight,
   ClipboardCheck,
-  Clock3,
   FileCheck2,
   Globe2,
   Mail,

@@ -3,7 +3,6 @@ import {
   AlertTriangle,
   ArrowLeft,
   ArrowUpRight,
-  Check,
   CheckCircle2,
   Clock3,
   FileText,

@@ -454,7 +454,7 @@ function SummaryMetric({
   description,
   accent,
 }: {
-  icon: React.ComponentType<{ className?: string }>
+  icon: React.ComponentType<{ className?: string; size?: number }>
   label: string
   value: string
   description: string

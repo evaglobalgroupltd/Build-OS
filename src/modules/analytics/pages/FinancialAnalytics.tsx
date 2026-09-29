@@ -7,7 +7,6 @@ import {
   Clock3,
   DollarSign,
   Download,
-  FileText,
   LockKeyhole,
   Receipt,
   RefreshCcw,

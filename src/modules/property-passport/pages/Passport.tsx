@@ -1,8 +1,6 @@
 import {
-  ArrowRight,
   ArrowUpRight,
   CheckCircle2,
-  ChevronRight,
   ClipboardCheck,
   FileCheck2,
   FileText,

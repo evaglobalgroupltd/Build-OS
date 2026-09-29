@@ -4,7 +4,6 @@ import {
   ChevronRight,
   Download,
   FileCheck2,
-  FileText,
   Layers3,
   Ruler,
   ShieldCheck,
@@ -501,7 +500,7 @@ function SummaryMetric({
   description,
   accent,
 }: {
-  icon: React.ComponentType<{ className?: string }>
+  icon: React.ComponentType<{ className?: string; size?: number }>
   label: string
   value: string
   description: string

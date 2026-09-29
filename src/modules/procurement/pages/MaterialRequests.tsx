@@ -119,7 +119,7 @@ export function MaterialRequests() {
               label="Active"
               value={active}
               description="In procurement"
-              accent="ink"
+              accent="default"
             />
 
             <SummaryCard

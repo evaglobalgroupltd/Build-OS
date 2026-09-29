@@ -3,7 +3,6 @@ import {
   ArrowRight,
   Building2,
   Check,
-  CheckCircle2,
   ChevronDown,
   CreditCard,
   Info,
@@ -14,7 +13,6 @@ import {
 } from 'lucide-react'
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
-import { Badge } from '@/components/ui/Badge'
 import { CustodyNotice } from '@/modules/escrow/components/CustodyNotice'
 
 type FundingSource = 'partner_escrow' | 'direct_bank_transfer'
