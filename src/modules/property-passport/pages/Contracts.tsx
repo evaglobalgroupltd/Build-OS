@@ -9,6 +9,7 @@ import {
   Users,
 } from 'lucide-react'
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
+import { RoleLink } from '@/components/ui/ModuleActions'
 
 /**
  * Contracts — Digital Property Passport module
@@ -312,8 +313,7 @@ export function Contracts() {
 
                   <div className="col-span-2 sm:col-span-1">
 
-                    <button
-                      type="button"
+                    <RoleLink route="documents" sub="current"
                       aria-label={`Open ${contract.title}`}
                       className="
                         flex
@@ -349,7 +349,7 @@ export function Contracts() {
                         size={13}
                         className="text-ink/25 transition group-hover:text-[#1657FF]"
                       />
-                    </button>
+                    </RoleLink>
 
                   </div>
 
@@ -408,8 +408,7 @@ export function Contracts() {
 
             </div>
 
-            <button
-              type="button"
+            <RoleLink route="passport"
               className="
                 flex
                 shrink-0
@@ -432,7 +431,7 @@ export function Contracts() {
             >
               View passport
               <ChevronRight size={13} />
-            </button>
+            </RoleLink>
 
           </div>
 

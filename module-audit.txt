@@ -1,0 +1,394 @@
+MODULE PAGE AUDIT v2  (71 pages, only: escrow, disputes, procurement, reports, monitoring, property-passport, projects, approvals, notifications, milestones, evidence, documents)
+========================================================================
+
+[approvals]
+  ORPHAN   ApprovalDetails            exports: ApprovalDetails
+           DEAD BTN 5/5
+             line 255  "Back to approvals"
+             line 637  "Approve & release"
+             line 670  "Correction"
+             line 697  "Reject"
+             line 968  "View complete audit log"
+  ORPHAN   ApprovalHistory            exports: ApprovalHistory
+           DEAD BTN 1/1
+             line 293  "View record"
+  ORPHAN   ApprovalInbox              exports: ApprovalInbox
+           DEAD BTN 3/3
+             line 394  "Review submission"
+             line 404  "Approve & Release"
+             line 414  "Request Correction"
+
+[disputes]
+  ORPHAN   CreateDispute              exports: CreateDispute
+           DEAD BTN 2/5
+             line 221  "View disputes"
+             line 796  "Dispute policy & guidance"
+  ORPHAN   DisputeDetails             exports: DisputeDetails
+           DEAD BTN 3/3
+             line 203  "Back to disputes"
+             line 498  "View"
+             line 709  "Add case note"
+  WIRED    DisputeList                exports: DisputeList
+           imported by: src/pages/admin/Disputes.tsx, src/pages/client/Disputes.tsx, src/pages/contractor/Disputes.tsx, src/pages/market-place/Disputes.tsx
+           DEAD BTN 1/1
+             line 305  "(icon)"
+  ORPHAN   Evidence                   exports: Evidence
+           DEAD BTN 2/2
+             line 272  "Upload evidence"
+             line 376  "View ↗"
+  ORPHAN   Resolution                 exports: Resolution
+           DEAD BTN 2/2
+             line 449  "Request further review"
+             line 456  "Approve resolution"
+  ORPHAN   Responses                  exports: Responses
+           DEAD BTN 2/2
+             line 387  "Attach evidence"
+             line 395  "Submit response"
+
+[documents]
+  ORPHAN   DocumentDetails            exports: DocumentDetails
+           DEAD BTN 7/7
+             line 171  "Back to documents"
+             line 288  "More document actions"
+             line 352  "View document"
+             line 375  "Download"
+             line 635  "Open project"
+             line 730  "View document"
+             line 752  "Download copy"
+  ORPHAN   DocumentHistory            exports: DocumentHistory
+           DEAD BTN 3/3
+             line 223  "Back to document"
+             line 518  "View version"
+             line 660  "Document Return to document record"
+  ORPHAN   DocumentVault              exports: DocumentVault
+           DEAD BTN 6/6
+             line 181  "Upload document"
+             line 241  "{…} {…} {…}"
+             line 311  "Filter"
+             line 371  "View audit history"
+             line 467  "View"
+             line 475  "(icon)"
+  ORPHAN   UploadDocument             exports: UploadDocument
+           DEAD BTN 4/4
+             line 80   "Back to vault"
+             line 300  "Remove selected document"
+             line 351  "Save as draft"
+             line 358  "Upload document"
+
+[escrow]
+  ORPHAN   FrozenPayments             exports: FrozenPayments
+           DEAD BTN 2/2
+             line 155  "View payment history"
+             line 559  "View case"
+  ORPHAN   Funding                    exports: Funding
+           DEAD BTN 3/3
+             line 102  "Back to escrow"
+             line 477  "Cancel"
+             line 496  "Continue to payment"
+  ORPHAN   PaymentApprovals           exports: PaymentApprovals
+           DEAD BTN 3/5
+             line 215  "View payment history"
+             line 584  "{…}"
+             line 654  "Add review note"
+  ORPHAN   PaymentRequests            exports: PaymentRequests
+           DEAD BTN 3/4
+             line 210  "New payment request"
+             line 560  "View evidence"
+             line 578  "View request"
+  ORPHAN   Refunds                    exports: Refunds
+           DEAD BTN 2/3
+             line 225  "Request refund"
+             line 615  "View details"
+  WIRED    Transactions               exports: Transactions
+           imported by: src/pages/contractor/Payments.tsx, src/pages/market-place/Payments.tsx, src/pages/professional/Payments.tsx
+           DEAD BTN 5/5
+             line 253  "Export ledger"
+             line 358  "All types"
+             line 370  "All statuses"
+             line 561  "View transaction"
+             line 695  "View transaction"
+  WIRED    Wallet                     exports: Wallet
+           imported by: src/pages/admin/Escrow.tsx, src/pages/client/Escrow.tsx
+           DEAD BTN 4/4
+             line 357  "View all"
+             line 384  "View all transactions"
+             line 600  "(icon)"
+             line 690  "(icon)"
+
+[evidence]
+  ORPHAN   EvidenceDetails            exports: EvidenceDetails
+           DEAD BTN 5/6
+             line 174  "Back to evidence"
+             line 221  "Export evidence"
+             line 229  "More actions"
+             line 673  "View evidence"
+             line 730  "{…}"
+  WIRED    EvidenceLibrary            exports: EvidenceLibrary
+           imported by: src/pages/project-manager/Evidence.tsx
+           DEAD BTN 3/3
+             line 245  "Filters"
+             line 484  "{…}"
+             line 522  "{…} {…} {…} {…} {…} {…} {…} {…} {…} {…} {…} "
+  ORPHAN   EvidenceReview             exports: EvidenceReview
+           DEAD BTN 5/6
+             line 193  "Back to review queue"
+             line 242  "Export record"
+             line 367  "(icon)"
+             line 540  "Record review"
+             line 777  "{…}"
+  ORPHAN   UploadEvidence             exports: EvidenceReview
+           NAME MISMATCH  |  DEAD BTN 4/5
+             line 391  "Record review decision"
+             line 612  "(icon)"
+             line 630  "Inspect evidence"
+             line 685  "{…}"
+
+[milestones]
+  ORPHAN   CreateMilestone            exports: CreateMilestone
+  ORPHAN   MilestoneDetails           exports: MilestoneDetails
+           DEAD BTN 6/6
+             line 294  "Request Evidence"
+             line 302  "Review Milestone"
+             line 783  "Reject"
+             line 791  "Request Evidence"
+             line 799  "Approve Milestone"
+             line 1041 "(icon)"
+  WIRED    MilestoneList              exports: MilestoneList
+           imported by: src/pages/contractor/Milestones.tsx
+           DEAD BTN 5/5
+             line 290  "View controls"
+             line 298  "Review active milestone"
+             line 753  "View details"
+             line 970  "{…}"
+             line 1147 "{…}"
+  WIRED    MilestoneReview            exports: MilestoneReview
+           imported by: src/pages/project-manager/Milestones.tsx
+           DEAD BTN 5/5
+             line 47   "Back to milestones"
+             line 364  "Approve milestone"
+             line 372  "Request evidence"
+             line 380  "Reject"
+             line 646  "{…} {…} {…}"
+
+[monitoring]
+  ORPHAN   DailyReport                exports: DailyReport
+           DEAD BTN 5/5
+             line 254  "Export Report"
+             line 270  "Review Report"
+             line 760  "Reject Report"
+             line 774  "Request Clarification"
+             line 788  "Approve Report"
+  WIRED    Inspections                exports: Inspections
+           imported by: src/pages/project-manager/Inspections.tsx
+           DEAD BTN 4/4
+             line 240  "Schedule inspection"
+             line 453  "Create inspection"
+             line 563  "Open inspection"
+             line 735  "{…}"
+  ORPHAN   MonitoringDashboard        exports: DailyReport
+           NAME MISMATCH  |  DEAD BTN 3/3
+             line 122  "New daily report"
+             line 228  "Add site photos JPG or PNG · up to 10MB"
+             line 321  "{…} {…} {…} {…} {…} Submitted {…} {…} Progre"
+  ORPHAN   MonthlyReport              exports: MonthlyReport
+           DEAD BTN 6/6
+             line 164  "August 2026"
+             line 172  "Export Report"
+             line 211  "More report options"
+             line 406  "View all"
+             line 451  "View project activity"
+             line 495  "Open Full Report"
+  ORPHAN   Progress                   exports: Progress
+  ORPHAN   Reports                    exports: Reports
+           DEAD BTN 5/5
+             line 111  "{…} reports {…} {…}"
+             line 221  "Download"
+             line 230  "(icon)"
+             line 282  "Export library"
+             line 413  "View all reports"
+  WIRED    RiskAlerts                 exports: RiskAlerts
+           imported by: src/pages/project-manager/Risks.tsx
+           DEAD BTN 1/3
+             line 389  "Review risk"
+  ORPHAN   WeeklyReport               exports: WeeklyReport
+           DEAD BTN 5/5
+             line 395  "Previous week"
+             line 403  "Current week"
+             line 411  "Next week"
+             line 495  "View progress"
+             line 644  "Details"
+
+[notifications]
+  ORPHAN   Notifications              exports: Notifications
+  ORPHAN   NotificationSettings       exports: NotificationSettings
+
+[procurement]
+  ORPHAN   CreateRequest              exports: CreateRequest
+           DEAD BTN 1/4
+             line 449  "Save draft"
+  WIRED    Deliveries                 exports: Deliveries
+           imported by: src/pages/market-place/Deliveries.tsx
+           DEAD BTN 2/2
+             line 371  "(icon)"
+             line 432  "Verify delivery"
+  ORPHAN   DeliveryVerification       exports: DeliveryVerification
+           DEAD BTN 1/3
+             line 777  "View evidence"
+  WIRED    MaterialRequests           exports: MaterialRequests
+           imported by: src/pages/client/Procurement.tsx, src/pages/contractor/Materials.tsx
+           DEAD BTN 2/2
+             line 67   "Create request"
+             line 157  "New request"
+  WIRED    ProcurementDashboard       exports: ProcurementDashboard
+           imported by: src/pages/admin/Procurement.tsx
+           DEAD BTN 4/4
+             line 88   "Create request"
+             line 290  "View all"
+             line 517  "{…}"
+             line 663  "(icon)"
+  WIRED    PurchaseOrders             exports: PurchaseOrders
+           imported by: src/pages/market-place/Orders.tsx
+           DEAD BTN 3/3
+             line 167  "Create purchase order"
+             line 449  "(icon)"
+             line 500  "{…}"
+  WIRED    Quotations                 exports: Quotations
+           imported by: src/pages/market-place/Quotations.tsx
+           DEAD BTN 3/3
+             line 188  "Request quotation"
+             line 512  "(icon)"
+             line 555  "Select supplier"
+  ORPHAN   QuoteComparison            exports: QuoteComparison
+           DEAD BTN 5/5
+             line 128  "Back to quotations"
+             line 136  "Select supplier"
+             line 481  "{…}"
+             line 535  "Keep reviewing"
+             line 542  "Select {…}"
+
+[projects]
+  WIRED    CreateProject              exports: CreateProject
+           imported by: src/pages/client/Projects.tsx
+  WIRED    EditProject                exports: EditProject
+           imported by: src/pages/client/Projects.tsx
+           DEAD BTN 1/14
+             line 1261 "Choose files"
+  WIRED    ProjectDetails             exports: ProjectDetails
+           imported by: src/pages/client/Projects.tsx
+           needs: PROPS({ project }: ProjectDetailsProps)
+           DEAD BTN 7/11
+             line 219  "Edit Project"
+             line 236  "Project Actions"
+             line 661  "Review evidence"
+             line 676  "Request more evidence"
+             line 1068 "View Passport"
+             line 1526 "{…}"
+             line 1547 "{…}"
+  ORPHAN   ProjectDocuments           exports: ProjectDocuments
+           DEAD BTN 4/5
+             line 239  "Upload document"
+             line 503  "View Property Passport"
+             line 668  "(icon)"
+             line 688  "(icon)"
+  WIRED    ProjectList                exports: ProjectList
+           imported by: src/pages/admin/Projects.tsx, src/pages/client/Projects.tsx, src/pages/project-manager/Projects.tsx
+           DEAD BTN 3/6
+             line 105  "Create project"
+             line 290  "Filters"
+             line 403  "Open project"
+  ORPHAN   ProjectOverview            exports: ProjectOverview
+           needs: PROPS({ project, }: ProjectOverviewProps)
+           DEAD BTN 4/4
+             line 147  "View project details"
+             line 338  "View milestone details"
+             line 529  "Review now"
+             line 868  "{…}"
+  ORPHAN   ProjectSettings            exports: ProjectSettings
+           needs: PROPS({ projectId, }: ProjectSettingsProps)
+           DEAD BTN 2/4
+             line 397  "Open change requests"
+             line 552  "{…} {…} {…} {…}"
+  ORPHAN   ProjectTeam                exports: ProjectTeam
+           DEAD BTN 5/6
+             line 205  "Add team member"
+             line 603  "(icon)"
+             line 638  "Assign {…}"
+             line 714  "(icon)"
+             line 772  "{…}"
+  ORPHAN   ProjectTimeline            exports: ProjectTimeline
+           DEAD BTN 1/2
+             line 621  "View record"
+
+[property-passport]
+  ORPHAN   Contracts                  exports: Contracts
+           DEAD BTN 2/2
+             line 315  "Document"
+             line 411  "View passport"
+  ORPHAN   Designs                    exports: Designs
+           DEAD BTN 2/2
+             line 357  "Document"
+             line 457  "View passport"
+  ORPHAN   Handover                   exports: Handover
+           DEAD BTN 1/1
+             line 584  "View certificate"
+  ORPHAN   Inspections                exports: Inspections
+           DEAD BTN 1/1
+             line 313  "Report"
+  ORPHAN   LandDocuments              exports: LandDocuments
+           DEAD BTN 1/1
+             line 282  "Document"
+  ORPHAN   Ownership                  exports: Ownership
+           DEAD BTN 1/1
+             line 333  "Document"
+  WIRED    Passport                   exports: Passport
+           imported by: src/pages/client/Passport.tsx
+           REL LINK 6
+  ORPHAN   Payments                   exports: Payments
+           DEAD BTN 1/1
+             line 347  "Receipt"
+  ORPHAN   Procurement                exports: Procurement
+           DEAD BTN 1/1
+             line 338  "Record"
+  ORPHAN   PropertyOverview           exports: PropertyOverview
+           DEAD BTN 1/1
+             line 464  "Passport record"
+  ORPHAN   Warranties                 exports: Warranties
+           DEAD BTN 1/1
+             line 341  "Warranty"
+
+[reports]
+  ORPHAN   AuditReports               exports: AuditReports
+           DEAD BTN 4/4
+             line 165  "Export audit log"
+             line 189  "Advanced search"
+             line 396  "View complete audit history"
+             line 643  "Open detailed records"
+  ORPHAN   ComplianceReports          exports: ComplianceReports
+           DEAD BTN 3/3
+             line 148  "Export compliance report"
+             line 458  "Review all alerts"
+             line 661  "Open detailed controls"
+  ORPHAN   FinancialReports           exports: FinancialReports
+           DEAD BTN 4/4
+             line 174  "Reconciliation"
+             line 182  "Export Report"
+             line 316  "View complete transaction ledger"
+             line 600  "Open detailed controls"
+  WIRED    ManagementReports          exports: ManagementReports
+           imported by: src/pages/admin/Reports.tsx
+           DEAD BTN 5/5
+             line 191  "Portfolio View"
+             line 199  "Export Report"
+             line 352  "Open portfolio register"
+             line 434  "Review management queue"
+             line 652  "Open detailed controls"
+  WIRED    ProjectReports             exports: ProjectReports
+           imported by: src/pages/client/Reports.tsx, src/pages/contractor/Reports.tsx, src/pages/project-manager/Reports.tsx
+           DEAD BTN 3/3
+             line 189  "Export Report"
+             line 586  "View complete project activity"
+             line 758  "Open detailed controls"
+
+========================================================================
+WIRED 20   INDIRECT 0   ORPHAN 51
+Dead buttons: 204   Relative links: 6   Name mismatches: 2

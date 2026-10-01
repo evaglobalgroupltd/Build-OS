@@ -13,6 +13,7 @@ import {
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
+import { RoleLink, SoonButton } from '@/components/ui/ModuleActions'
 
 type DocumentStatus = 'Verified' | 'Pending Review' | 'Needs Information'
 
@@ -178,13 +179,12 @@ export function DocumentVault() {
             </div>
           </div>
 
-          <button
-            type="button"
+          <RoleLink route="documents" sub="upload"
             className="group inline-flex w-fit shrink-0 items-center gap-2.5 rounded-xl bg-white px-4 py-2.5 text-xs font-semibold text-[#0B1220] shadow-lg shadow-black/10 transition duration-200 hover:-translate-y-0.5 hover:bg-[#F6F8FC]"
           >
             <Upload className="h-4 w-4 transition-transform duration-200 group-hover:-translate-y-0.5" />
             Upload document
-          </button>
+          </RoleLink>
         </div>
       </section>
 
@@ -238,9 +238,8 @@ export function DocumentVault() {
           <CardBody className="pt-1">
             <nav className="space-y-1" aria-label="Document categories">
               {categories.map((category, index) => (
-                <button
+                <SoonButton
                   key={category.label}
-                  type="button"
                   className={`group flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left transition-all duration-200 ${
                     index === 0
                       ? 'bg-[#0B1220] text-white shadow-[0_7px_18px_rgba(11,18,32,0.12)]'
@@ -266,7 +265,7 @@ export function DocumentVault() {
                   >
                     {category.count}
                   </span>
-                </button>
+                </SoonButton>
               ))}
             </nav>
 
@@ -308,13 +307,12 @@ export function DocumentVault() {
                   />
                 </div>
 
-                <button
-                  type="button"
+                <SoonButton
                   className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-line bg-white px-4 text-xs font-semibold text-ink/50 transition hover:border-ink/10 hover:bg-[#F6F8FC] hover:text-ink"
                 >
                   <span className="h-1.5 w-1.5 rounded-full bg-[#1657FF]" />
                   Filter
-                </button>
+                </SoonButton>
               </div>
             </CardBody>
           </Card>
@@ -368,13 +366,12 @@ export function DocumentVault() {
             </p>
           </div>
 
-          <button
-            type="button"
+          <RoleLink route="documents" sub="current/history"
             className="group inline-flex w-fit shrink-0 items-center gap-1.5 rounded-lg px-2 py-2 text-xs font-semibold text-ink/45 transition hover:text-[#1657FF]"
           >
             View audit history
             <ChevronRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
-          </button>
+          </RoleLink>
         </div>
       </section>
     </div>
@@ -464,21 +461,19 @@ function DocumentRow({
 
         {/* Actions */}
         <div className="flex items-center gap-2 border-t border-line pt-3 xl:border-0 xl:pt-0">
-          <button
-            type="button"
+          <RoleLink route="documents" sub="current"
             className="inline-flex h-9 flex-1 items-center justify-center gap-1.5 rounded-lg border border-line bg-white px-3 text-[10px] font-semibold text-ink/50 transition hover:border-ink/10 hover:bg-[#F6F8FC] hover:text-ink sm:flex-none"
           >
             View
             <ChevronRight className="h-3 w-3" />
-          </button>
+          </RoleLink>
 
-          <button
-            type="button"
+          <RoleLink route="documents" sub="current"
             aria-label={`Download ${document.name}`}
             className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-line bg-white text-ink/35 transition hover:border-[#1657FF]/15 hover:bg-[#1657FF]/[0.04] hover:text-[#1657FF]"
           >
             <Download className="h-3.5 w-3.5" />
-          </button>
+          </RoleLink>
         </div>
       </div>
 

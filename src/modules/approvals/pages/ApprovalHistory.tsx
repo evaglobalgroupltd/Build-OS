@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 
 import { Card } from '@/components/ui/Card'
+import { RoleLink } from '@/components/ui/ModuleActions'
 
 type ApprovalOutcome =
   | 'Approved'
@@ -290,8 +291,7 @@ function RecordRow({ record }: { record: ApprovalRecord }) {
             </p>
           </div>
 
-          <button
-            type="button"
+          <RoleLink route="decisions" sub="approvals/current"
             className="
               inline-flex
               items-center
@@ -314,7 +314,7 @@ function RecordRow({ record }: { record: ApprovalRecord }) {
           >
             View record
             <ChevronRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
-          </button>
+          </RoleLink>
 
         </div>
 

@@ -10,6 +10,7 @@ import {
   Wallet,
 } from 'lucide-react'
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
+import { RoleLink } from '@/components/ui/ModuleActions'
 
 /**
  * Payments — Digital Property Passport module
@@ -344,14 +345,13 @@ export function Payments() {
                   </div>
 
                   {payment.document ? (
-                    <button
-                      type="button"
+                    <RoleLink route="money" sub="transactions"
                       className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-3.5 py-2 text-xs font-semibold text-ink shadow-[0_5px_18px_rgba(11,18,32,0.035)] transition-all hover:border-[#1657FF]/20 hover:bg-[#1657FF]/[0.035] hover:text-[#1657FF]"
                     >
                       <FileText className="h-3.5 w-3.5" />
                       Receipt
                       <ArrowUpRight className="h-3 w-3 opacity-40" />
-                    </button>
+                    </RoleLink>
                   ) : (
                     <span className="inline-flex items-center gap-1.5 rounded-full border border-dashed border-line px-3.5 py-2 text-[10px] font-medium text-ink/35">
                       No receipt

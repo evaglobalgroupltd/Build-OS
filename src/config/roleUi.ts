@@ -1,6 +1,5 @@
 import {
   Home as HomeIcon,
-  Globe2,
   Users,
   Boxes,
   ClipboardCheck,
@@ -29,11 +28,6 @@ export const roleMeta: Record<
 > = {
   client: {
     icon: HomeIcon,
-    accent: 'brick',
-  },
-
-  diaspora_client: {
-    icon: Globe2,
     accent: 'brick',
   },
 
@@ -91,7 +85,6 @@ export const accentClasses = {
  */
 export const roleOrder: UserRole[] = [
   'client',
-  'diaspora_client',
   'contractor',
   'market_place',
   'project_manager',
@@ -109,8 +102,6 @@ export const roleOrder: UserRole[] = [
  */
 export const roleHomePath: Record<UserRole, string> = {
   client: '/app/client',
-
-  diaspora_client: '/app/diaspora',
 
   contractor: '/app/contractor',
 

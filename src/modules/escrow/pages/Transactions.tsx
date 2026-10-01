@@ -15,6 +15,7 @@ import {
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import type { FundingSource } from '@/modules/escrow/types'
+import { PrintButton, SoonButton } from '@/components/ui/ModuleActions'
 
 type TransactionType =
   | 'funding'
@@ -250,13 +251,12 @@ export function Transactions() {
           </p>
         </div>
 
-        <button
-          type="button"
+        <PrintButton
           className="group inline-flex w-fit items-center gap-2.5 rounded-full border border-ink/[0.08] bg-white px-4 py-2.5 text-xs font-semibold text-ink/65 shadow-[0_5px_18px_rgba(20,30,25,0.035)] transition-all duration-200 hover:-translate-y-0.5 hover:border-ink/[0.12] hover:text-ink hover:shadow-[0_10px_24px_rgba(20,30,25,0.06)]"
         >
           <Download className="h-4 w-4 text-ink/45 transition-transform duration-200 group-hover:-translate-y-0.5" />
           Export ledger
-        </button>
+        </PrintButton>
       </div>
 
       {/* Custody / integrity notice */}
@@ -355,8 +355,7 @@ export function Transactions() {
               />
             </div>
 
-            <button
-              type="button"
+            <SoonButton
               className="inline-flex h-11 items-center justify-between gap-4 rounded-[13px] border border-ink/[0.07] bg-[#F7F8F6] px-3.5 text-xs font-semibold text-ink/55 transition hover:border-ink/[0.12] hover:bg-white hover:text-ink"
             >
               <span className="flex items-center gap-2">
@@ -365,16 +364,15 @@ export function Transactions() {
               </span>
 
               <ChevronDown className="h-3.5 w-3.5 text-ink/30" />
-            </button>
+            </SoonButton>
 
-            <button
-              type="button"
+            <SoonButton
               className="inline-flex h-11 items-center justify-between gap-4 rounded-[13px] border border-ink/[0.07] bg-[#F7F8F6] px-3.5 text-xs font-semibold text-ink/55 transition hover:border-ink/[0.12] hover:bg-white hover:text-ink"
             >
               <span>All statuses</span>
 
               <ChevronDown className="h-3.5 w-3.5 text-ink/30" />
-            </button>
+            </SoonButton>
           </div>
 
           {/* Ledger metadata */}
@@ -558,13 +556,12 @@ function TransactionRow({
           {transaction.date}
         </p>
 
-        <button
-          type="button"
+        <SoonButton
           className="mt-2 inline-flex items-center gap-1 text-[9px] font-semibold text-ink/35 transition hover:text-ink"
         >
           View transaction
           <ExternalLink className="h-3 w-3" />
-        </button>
+        </SoonButton>
       </td>
 
       <td className="relative w-0 p-0">
@@ -692,13 +689,12 @@ function TransactionCard({
         {transaction.description}
       </p>
 
-      <button
-        type="button"
+      <SoonButton
         className="mt-4 inline-flex items-center gap-1.5 text-[10px] font-semibold text-ink/40 transition hover:text-ink"
       >
         View transaction
         <ExternalLink className="h-3 w-3" />
-      </button>
+      </SoonButton>
 
       <span
         className={`absolute bottom-0 left-0 right-0 h-0.5 ${tone.rail}`}

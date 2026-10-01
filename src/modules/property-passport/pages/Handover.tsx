@@ -10,6 +10,7 @@ import {
   ShieldCheck,
 } from 'lucide-react'
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
+import { RoleLink } from '@/components/ui/ModuleActions'
 
 /**
  * Handover — Digital Property Passport module
@@ -581,13 +582,12 @@ export function Handover() {
               </div>
             </div>
 
-            <button
-              type="button"
+            <RoleLink route="documents" sub="current"
               className="group inline-flex w-fit shrink-0 items-center gap-2 rounded-full border border-line bg-white px-4 py-2.5 text-xs font-semibold text-ink shadow-[0_6px_18px_rgba(11,18,32,0.04)] transition-all hover:-translate-y-0.5 hover:border-[#1657FF]/20 hover:bg-[#1657FF]/5 hover:text-[#1657FF]"
             >
               View certificate
               <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-            </button>
+            </RoleLink>
           </div>
         </CardBody>
       </Card>

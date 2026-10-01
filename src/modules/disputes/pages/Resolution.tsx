@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
+import { SoonButton } from '@/components/ui/ModuleActions'
 
 const resolution = {
   disputeId: 'DSP-0042',
@@ -446,20 +447,18 @@ export function Resolution() {
               </div>
 
               <div className="flex shrink-0 flex-wrap gap-2">
-                <button
-                  type="button"
+                <SoonButton
                   className="inline-flex items-center gap-2 rounded-xl border border-ink/[0.08] bg-white px-4 py-2.5 text-xs font-semibold text-ink/60 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-ink/15 hover:bg-ink/[0.025] hover:text-ink"
                 >
                   Request further review
-                </button>
+                </SoonButton>
 
-                <button
-                  type="button"
+                <SoonButton
                   className="inline-flex items-center gap-2 rounded-xl bg-[#173629] px-4 py-2.5 text-xs font-semibold text-white shadow-[0_8px_20px_rgba(23,54,41,0.12)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#204736] hover:shadow-[0_12px_25px_rgba(23,54,41,0.18)]"
                 >
                   Approve resolution
                   <ArrowRight className="h-3.5 w-3.5" />
-                </button>
+                </SoonButton>
               </div>
             </div>
           </div>

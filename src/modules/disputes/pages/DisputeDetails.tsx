@@ -16,6 +16,7 @@ import {
 
 import { Card, CardHeader, CardBody } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
+import { RoleLink } from '@/components/ui/ModuleActions'
 
 type DisputeStatus =
   | 'opened'
@@ -200,8 +201,7 @@ export function DisputeDetails() {
           </div>
         </div>
 
-        <button
-          type="button"
+        <RoleLink route="disputes"
           className="
             group
             inline-flex
@@ -229,7 +229,7 @@ export function DisputeDetails() {
             className="transition group-hover:-translate-x-0.5"
           />
           Back to disputes
-        </button>
+        </RoleLink>
       </div>
 
       {/* ===================================================== */}
@@ -495,8 +495,7 @@ export function DisputeDetails() {
                       </div>
                     </div>
 
-                    <button
-                      type="button"
+                    <RoleLink to="evidence"
                       className="
                         inline-flex
                         shrink-0
@@ -521,7 +520,7 @@ export function DisputeDetails() {
                         size={11}
                         className="transition group-hover:translate-x-0.5"
                       />
-                    </button>
+                    </RoleLink>
                   </div>
                 ))}
               </div>
@@ -706,8 +705,7 @@ export function DisputeDetails() {
                 before administrative review begins.
               </p>
 
-              <button
-                type="button"
+              <RoleLink to="responses"
                 className="
                   mt-5
                   inline-flex
@@ -728,7 +726,7 @@ export function DisputeDetails() {
               >
                 <MessageSquare size={13} />
                 Add case note
-              </button>
+              </RoleLink>
             </div>
           </div>
 

@@ -28,6 +28,7 @@ import {
 } from '@/components/ui/Card'
 
 import { EvidenceTrail } from '@/modules/evidence/components/EvidenceTrail'
+import { PrintButton, RoleLink, SoonButton } from '@/components/ui/ModuleActions'
 
 type EvidenceStatus =
   | 'submitted'
@@ -171,8 +172,7 @@ export function EvidenceDetails() {
       {/* Navigation                                                          */}
       {/* ------------------------------------------------------------------ */}
 
-      <button
-        type="button"
+      <RoleLink route="evidence"
         className="group inline-flex items-center gap-2 text-xs font-semibold text-ink/40 transition-colors hover:text-ink"
       >
         <span className="flex h-7 w-7 items-center justify-center rounded-full border border-ink/[0.07] bg-white transition-all group-hover:-translate-x-0.5 group-hover:border-ink/[0.12]">
@@ -180,7 +180,7 @@ export function EvidenceDetails() {
         </span>
 
         Back to evidence
-      </button>
+      </RoleLink>
 
       {/* ------------------------------------------------------------------ */}
       {/* Header                                                              */}
@@ -218,21 +218,19 @@ export function EvidenceDetails() {
         </div>
 
         <div className="flex shrink-0 flex-wrap items-center gap-2">
-          <button
-            type="button"
+          <PrintButton
             className="group inline-flex items-center gap-2 rounded-full border border-ink/[0.07] bg-white px-4 py-2.5 text-xs font-semibold text-ink/55 shadow-[0_4px_14px_rgba(20,30,25,0.025)] transition-all hover:-translate-y-0.5 hover:border-ink/[0.12] hover:text-ink hover:shadow-[0_8px_22px_rgba(20,30,25,0.05)]"
           >
             <Download className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-0.5" />
             Export evidence
-          </button>
+          </PrintButton>
 
-          <button
-            type="button"
+          <SoonButton
             className="flex h-10 w-10 items-center justify-center rounded-full border border-ink/[0.07] bg-white text-ink/40 shadow-[0_4px_14px_rgba(20,30,25,0.025)] transition-all hover:border-ink/[0.12] hover:text-ink"
             aria-label="More actions"
           >
             <MoreHorizontal className="h-4 w-4" />
-          </button>
+          </SoonButton>
         </div>
       </header>
 
@@ -670,13 +668,12 @@ function EvidenceFileCard({
           {file.size} · {file.uploadedAt}
         </p>
 
-        <button
-          type="button"
+        <SoonButton
           className="group mt-3 inline-flex items-center gap-1.5 text-[10px] font-semibold text-ink/45 transition-colors hover:text-ink"
         >
           <Eye className="h-3.5 w-3.5 transition-transform group-hover:scale-105" />
           View evidence
-        </button>
+        </SoonButton>
       </div>
     </article>
   )
@@ -727,8 +724,7 @@ function EvidenceFileRow({
         </div>
       </div>
 
-      <button
-        type="button"
+      <SoonButton
         className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[9px] border border-ink/[0.07] bg-white text-ink/35 transition-all hover:border-ink/[0.12] hover:text-ink"
         aria-label={`View ${file.name}`}
       >
@@ -737,7 +733,7 @@ function EvidenceFileRow({
         ) : (
           <Eye className="h-3.5 w-3.5" />
         )}
-      </button>
+      </SoonButton>
     </article>
   )
 }

@@ -15,6 +15,7 @@ import {
 
 import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
+import { RoleLink, SoonButton } from '@/components/ui/ModuleActions'
 
 type DocumentCategory =
   | 'land'
@@ -236,8 +237,7 @@ export function ProjectDocuments() {
 
         </div>
 
-        <button
-          type="button"
+        <RoleLink route="documents" sub="upload"
           className="
             group
             inline-flex
@@ -261,7 +261,7 @@ export function ProjectDocuments() {
         >
           <Upload className="h-[14px] w-[14px] text-white/70 transition-transform duration-300 group-hover:-translate-y-0.5" />
           Upload document
-        </button>
+        </RoleLink>
 
       </header>
 
@@ -500,8 +500,7 @@ export function ProjectDocuments() {
 
           </div>
 
-          <button
-            type="button"
+          <RoleLink route="passport"
             className="
               group
               flex
@@ -527,7 +526,7 @@ export function ProjectDocuments() {
             <ArrowUpRight
               className="h-[13px] w-[13px] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
             />
-          </button>
+          </RoleLink>
 
         </div>
 
@@ -665,8 +664,7 @@ function DocumentRow({
 
         <div className="flex items-center gap-1 sm:opacity-40 sm:transition-opacity sm:group-hover:opacity-100">
 
-          <button
-            type="button"
+          <SoonButton
             aria-label={`View ${document.name}`}
             className="
               flex
@@ -683,10 +681,9 @@ function DocumentRow({
             "
           >
             <Eye className="h-[14px] w-[14px]" />
-          </button>
+          </SoonButton>
 
-          <button
-            type="button"
+          <SoonButton
             aria-label={`Download ${document.name}`}
             className="
               flex
@@ -703,7 +700,7 @@ function DocumentRow({
             "
           >
             <Download className="h-[14px] w-[14px]" />
-          </button>
+          </SoonButton>
 
         </div>
 

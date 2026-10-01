@@ -17,6 +17,7 @@ import {
 
 import { Badge } from '@/components/ui/Badge'
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
+import { RoleLink } from '@/components/ui/ModuleActions'
 
 type TimelineEventType =
   | 'project'
@@ -618,8 +619,7 @@ function TimelineEventRow({
               </span>
             )}
 
-            <button
-              type="button"
+            <RoleLink route="updates"
               className="
                 group/action inline-flex items-center gap-1.5
                 text-[9px] font-bold text-ink/45
@@ -631,7 +631,7 @@ function TimelineEventRow({
                 size={11}
                 className="transition-transform duration-200 group-hover/action:translate-x-0.5"
               />
-            </button>
+            </RoleLink>
           </div>
         </div>
       </div>

@@ -18,6 +18,7 @@ import {
 } from 'lucide-react'
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
+import { PrintButton, SoonButton } from '@/components/ui/ModuleActions'
 
 type ReportStatus =
   | 'Draft'
@@ -251,8 +252,7 @@ export function DailyReport() {
             </div>
 
             <div className="flex shrink-0 flex-wrap gap-2">
-              <button
-                type="button"
+              <PrintButton
                 className="
                   inline-flex items-center gap-2 rounded-full
                   border border-ink/[0.09] bg-white px-4 py-2.5
@@ -265,10 +265,9 @@ export function DailyReport() {
               >
                 <FileText className="h-3.5 w-3.5" />
                 Export Report
-              </button>
+              </PrintButton>
 
-              <button
-                type="button"
+              <SoonButton
                 className="
                   inline-flex items-center gap-2 rounded-full
                   bg-ink px-4.5 py-2.5
@@ -280,7 +279,7 @@ export function DailyReport() {
               >
                 <CheckCircle2 className="h-3.5 w-3.5" />
                 Review Report
-              </button>
+              </SoonButton>
             </div>
           </div>
         </div>
@@ -757,8 +756,7 @@ export function DailyReport() {
             </div>
 
             <div className="flex shrink-0 flex-wrap gap-2">
-              <button
-                type="button"
+              <SoonButton
                 className="
                   inline-flex items-center gap-2 rounded-full
                   border border-rose-200 bg-rose-50 px-4 py-2.5
@@ -769,10 +767,9 @@ export function DailyReport() {
               >
                 <X className="h-3.5 w-3.5" />
                 Reject Report
-              </button>
+              </SoonButton>
 
-              <button
-                type="button"
+              <SoonButton
                 className="
                   inline-flex items-center gap-2 rounded-full
                   border border-[#B85C12]/15 bg-[#FBF6F1]
@@ -783,10 +780,9 @@ export function DailyReport() {
               >
                 <AlertTriangle className="h-3.5 w-3.5" />
                 Request Clarification
-              </button>
+              </SoonButton>
 
-              <button
-                type="button"
+              <SoonButton
                 className="
                   inline-flex items-center gap-2 rounded-full
                   bg-ink px-4 py-2.5
@@ -798,7 +794,7 @@ export function DailyReport() {
               >
                 <Check className="h-3.5 w-3.5" />
                 Approve Report
-              </button>
+              </SoonButton>
             </div>
           </div>
         </CardBody>

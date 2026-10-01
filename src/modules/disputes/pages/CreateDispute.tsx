@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 
 import { Card, CardHeader, CardBody } from '@/components/ui/Card'
+import { RoleLink } from '@/components/ui/ModuleActions'
 
 type DisputeCategory =
   | 'payment'
@@ -218,13 +219,12 @@ export function CreateDispute() {
                 </p>
               </div>
 
-              <button
-                type="button"
+              <RoleLink route="disputes"
                 className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-ink px-5 py-2.5 text-xs font-semibold text-white transition hover:-translate-y-0.5 hover:shadow-[0_10px_25px_rgba(20,40,30,0.12)]"
               >
                 View disputes
                 <ArrowRight size={14} />
-              </button>
+              </RoleLink>
             </div>
           </CardBody>
         </Card>
@@ -793,8 +793,7 @@ export function CreateDispute() {
                   ))}
                 </div>
 
-                <button
-                  type="button"
+                <RoleLink to="/terms"
                   className="group mt-4 flex w-full items-center justify-between rounded-xl border border-ink/[0.07] px-3.5 py-3 text-[10px] font-semibold text-ink/60 transition hover:border-ink/15 hover:text-ink"
                 >
                   <span>Dispute policy & guidance</span>
@@ -802,7 +801,7 @@ export function CreateDispute() {
                     size={13}
                     className="text-ink/25 transition group-hover:translate-x-0.5 group-hover:text-ink/50"
                   />
-                </button>
+                </RoleLink>
               </CardBody>
             </Card>
           </div>

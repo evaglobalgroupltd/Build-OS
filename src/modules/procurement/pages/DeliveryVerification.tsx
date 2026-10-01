@@ -16,6 +16,7 @@ import {
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
+import { RoleLink } from '@/components/ui/ModuleActions'
 
 type VerificationStatus = 'pending' | 'accepted' | 'disputed'
 
@@ -774,13 +775,12 @@ function EvidenceCard({
             </span>
           </div>
 
-          <button
-            type="button"
+          <RoleLink route="evidence" sub="current"
             className="mt-3 inline-flex items-center gap-1.5 text-[10px] font-semibold text-ink/45 transition-colors hover:text-ink"
           >
             View evidence
             <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
-          </button>
+          </RoleLink>
         </div>
       </div>
     </div>

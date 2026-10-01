@@ -11,6 +11,7 @@ import {
 
 import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
+import { RoleLink, SoonButton } from '@/components/ui/ModuleActions'
 
 type DeliveryStatus =
   | 'in transit'
@@ -368,8 +369,7 @@ function DeliveryRow({ delivery }: { delivery: Delivery }) {
             }
           />
 
-          <button
-            type="button"
+          <SoonButton
             aria-label={`View delivery for ${delivery.item}`}
             className="
               flex
@@ -395,7 +395,7 @@ function DeliveryRow({ delivery }: { delivery: Delivery }) {
             "
           >
             <ChevronRight className="h-[15px] w-[15px] transition-transform duration-200 group-hover:translate-x-0.5" />
-          </button>
+          </SoonButton>
         </div>
       </div>
 
@@ -429,8 +429,7 @@ function DeliveryRow({ delivery }: { delivery: Delivery }) {
               </div>
             </div>
 
-            <button
-              type="button"
+            <RoleLink route="procurement" sub="verify"
               className="
                 inline-flex
                 shrink-0
@@ -453,7 +452,7 @@ function DeliveryRow({ delivery }: { delivery: Delivery }) {
             >
               Verify delivery
               <ChevronRight className="h-3 w-3" />
-            </button>
+            </RoleLink>
           </div>
         </div>
       )}

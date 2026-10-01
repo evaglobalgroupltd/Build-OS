@@ -15,6 +15,7 @@ import {
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { CustodyNotice } from '@/modules/escrow/components/CustodyNotice'
+import { RoleLink, SoonButton } from '@/components/ui/ModuleActions'
 
 type PaymentStatus =
   | 'pending_review'
@@ -212,8 +213,7 @@ export function PaymentApprovals() {
           </p>
         </div>
 
-        <button
-          type="button"
+        <RoleLink route="money" sub="transactions"
           className="
             group
             inline-flex
@@ -241,7 +241,7 @@ export function PaymentApprovals() {
           View payment history
 
           <ArrowRight className="h-3.5 w-3.5 text-ink/30 transition-transform duration-300 group-hover:translate-x-0.5" />
-        </button>
+        </RoleLink>
       </header>
 
       {/* ===================================================== */}
@@ -581,9 +581,8 @@ function PaymentRequestCard({
 
           <div className="mt-3 grid gap-2 sm:grid-cols-2">
             {payment.evidence.map((file) => (
-              <button
+              <SoonButton
                 key={file}
-                type="button"
                 className="
                   group/file
                   flex
@@ -609,7 +608,7 @@ function PaymentRequestCard({
                 </span>
 
                 <ArrowRight className="h-3 w-3 shrink-0 text-ink/20 transition-transform duration-200 group-hover/file:translate-x-0.5 group-hover/file:text-ink/40" />
-              </button>
+              </SoonButton>
             ))}
           </div>
         </div>
@@ -651,8 +650,7 @@ function PaymentRequestCard({
         {/* =================================================== */}
 
         <div className="mt-5 flex flex-col gap-3 border-t border-ink/[0.06] pt-4 sm:flex-row sm:items-center sm:justify-between">
-          <button
-            type="button"
+          <SoonButton
             className="
               inline-flex
               items-center
@@ -673,7 +671,7 @@ function PaymentRequestCard({
           >
             <MessageSquare className="h-3.5 w-3.5" />
             Add review note
-          </button>
+          </SoonButton>
 
           <div className="flex flex-col gap-2 sm:flex-row">
             <button

@@ -10,6 +10,7 @@ import {
   ShieldCheck,
 } from 'lucide-react'
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
+import { Link } from 'react-router-dom'
 
 /**
  * Property Passport — Digital Property Passport module
@@ -41,7 +42,7 @@ const passportSections = [
     count: '2',
     status: 'Verified',
     icon: KeyRound,
-    href: './ownership',
+    href: '/app/client/passport/ownership',
   },
   {
     title: 'Land Documents',
@@ -49,7 +50,7 @@ const passportSections = [
     count: '3',
     status: 'Verified',
     icon: Map,
-    href: './land-documents',
+    href: '/app/client/passport/land-documents',
   },
   {
     title: 'Designs',
@@ -57,7 +58,7 @@ const passportSections = [
     count: '3',
     status: 'Verified',
     icon: Ruler,
-    href: './designs',
+    href: '/app/client/passport/designs',
   },
   {
     title: 'Inspections',
@@ -65,7 +66,7 @@ const passportSections = [
     count: '3',
     status: 'Review',
     icon: ClipboardCheck,
-    href: './inspections',
+    href: '/app/client/passport/inspections',
   },
   {
     title: 'Contracts',
@@ -73,7 +74,7 @@ const passportSections = [
     count: '4',
     status: 'Verified',
     icon: FileText,
-    href: './contracts',
+    href: '/app/client/passport/contracts',
   },
   {
     title: 'Handover',
@@ -81,7 +82,7 @@ const passportSections = [
     count: '1',
     status: 'Pending',
     icon: FileCheck2,
-    href: './handover',
+    href: '/app/client/passport/handover',
   },
 ]
 
@@ -278,9 +279,9 @@ export function Passport() {
             const Icon = section.icon
 
             return (
-              <a
+              <Link
                 key={section.title}
-                href={section.href}
+                to={section.href}
                 className="group relative overflow-hidden rounded-[20px] border border-line bg-white p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-[#1657FF]/15 hover:shadow-[0_14px_35px_rgba(11,18,32,0.065)]"
               >
                 <div
@@ -354,7 +355,7 @@ export function Passport() {
                     <ArrowUpRight className="h-3.5 w-3.5 text-ink/30 transition-colors group-hover:text-[#1657FF]" />
                   </span>
                 </div>
-              </a>
+              </Link>
             )
           })}
         </div>

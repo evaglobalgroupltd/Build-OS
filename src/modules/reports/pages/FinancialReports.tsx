@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
+import { PrintButton, RoleLink } from '@/components/ui/ModuleActions'
 
 const financialSummary = [
   {
@@ -171,21 +172,19 @@ export function FinancialReports() {
             </div>
 
             <div className="flex shrink-0 items-center gap-2">
-              <button
-                type="button"
+              <RoleLink route="money" sub="transactions"
                 className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-4 py-2.5 text-sm font-medium text-ink transition hover:border-ink/15 hover:bg-paper-2"
               >
                 <Landmark className="h-4 w-4 text-ink/50" />
                 Reconciliation
-              </button>
+              </RoleLink>
 
-              <button
-                type="button"
+              <PrintButton
                 className="inline-flex items-center gap-2 rounded-full bg-ink px-4 py-2.5 text-sm font-medium text-white shadow-[0_8px_24px_rgba(20,40,30,0.14)] transition hover:-translate-y-0.5 hover:bg-[#24372D]"
               >
                 <Download className="h-4 w-4" />
                 Export Report
-              </button>
+              </PrintButton>
             </div>
           </div>
         </CardBody>
@@ -313,13 +312,12 @@ export function FinancialReports() {
                 })}
               </div>
 
-              <button
-                type="button"
+              <RoleLink route="money" sub="transactions"
                 className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-line bg-paper-2 px-4 py-3 text-xs font-semibold text-ink/60 transition hover:border-ink/10 hover:bg-white hover:text-ink"
               >
                 View complete transaction ledger
                 <ChevronRight className="h-3.5 w-3.5" />
-              </button>
+              </RoleLink>
             </CardBody>
           </Card>
         </div>
@@ -597,13 +595,12 @@ function FinancialControlCard({
           })}
         </div>
 
-        <button
-          type="button"
+        <RoleLink route="money"
           className="mt-4 flex w-full items-center justify-between rounded-xl px-1 py-1 text-xs font-semibold text-ink/45 transition hover:text-ink"
         >
           <span>Open detailed controls</span>
           <ChevronRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />
-        </button>
+        </RoleLink>
       </CardBody>
     </Card>
   )

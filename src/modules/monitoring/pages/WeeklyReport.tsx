@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 
 import { Card } from '@/components/ui/Card'
+import { RoleLink, SoonButton } from '@/components/ui/ModuleActions'
 
 interface WeeklyActivity {
   id: string
@@ -392,29 +393,26 @@ export function WeeklyReport() {
           </div>
 
           <div className="flex items-center gap-2">
-            <button
-              type="button"
+            <SoonButton
               className="flex h-9 w-9 items-center justify-center rounded-[10px] border border-ink/[0.07] text-ink/45 transition hover:bg-ink/[0.04] hover:text-ink"
               aria-label="Previous week"
             >
               <ChevronLeft className="h-4 w-4" strokeWidth={1.8} />
-            </button>
+            </SoonButton>
 
-            <button
-              type="button"
+            <SoonButton
               className="flex h-9 items-center gap-2 rounded-[10px] bg-[#18271F] px-4 text-[10px] font-semibold text-white transition hover:bg-[#12613E]"
             >
               <CalendarDays className="h-3.5 w-3.5" strokeWidth={1.8} />
               Current week
-            </button>
+            </SoonButton>
 
-            <button
-              type="button"
+            <SoonButton
               className="flex h-9 w-9 items-center justify-center rounded-[10px] border border-ink/[0.07] text-ink/45 transition hover:bg-ink/[0.04] hover:text-ink"
               aria-label="Next week"
             >
               <ChevronRight className="h-4 w-4" strokeWidth={1.8} />
-            </button>
+            </SoonButton>
           </div>
         </div>
       </Card>
@@ -492,13 +490,12 @@ export function WeeklyReport() {
                 </p>
               </div>
 
-              <button
-                type="button"
+              <RoleLink route="reports" sub="progress"
                 className="inline-flex items-center gap-1.5 text-[10px] font-semibold text-[#12613E] transition hover:text-[#0D4C31]"
               >
                 View progress
                 <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={1.8} />
-              </button>
+              </RoleLink>
             </div>
           </div>
 
@@ -641,8 +638,7 @@ export function WeeklyReport() {
                   </div>
                 </div>
 
-                <button
-                  type="button"
+                <SoonButton
                   className="inline-flex shrink-0 items-center gap-1.5 self-start text-[10px] font-semibold text-ink/35 transition group-hover:text-[#12613E]"
                 >
                   Details
@@ -650,7 +646,7 @@ export function WeeklyReport() {
                     className="h-3.5 w-3.5"
                     strokeWidth={1.8}
                   />
-                </button>
+                </SoonButton>
               </div>
             )
           })}

@@ -22,6 +22,7 @@ import {
 import type { ComponentType } from 'react'
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
+import { RoleLink, SoonButton } from '@/components/ui/ModuleActions'
 
 type MilestoneStatus =
   | 'Pending'
@@ -291,21 +292,19 @@ export function MilestoneDetails() {
             </div>
 
             <div className="flex shrink-0 flex-wrap gap-2">
-              <button
-                type="button"
+              <SoonButton
                 className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.06] px-4 py-2.5 text-xs font-semibold text-white/70 transition-all hover:border-white/20 hover:bg-white/10 hover:text-white"
               >
                 <MessageSquare className="h-4 w-4" />
                 Request Evidence
-              </button>
+              </SoonButton>
 
-              <button
-                type="button"
+              <RoleLink route="decisions" sub="approvals/current"
                 className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-xs font-semibold text-[#0B1220] transition-transform hover:-translate-y-0.5"
               >
                 <CheckCircle2 className="h-4 w-4" />
                 Review Milestone
-              </button>
+              </RoleLink>
             </div>
           </div>
         </div>
@@ -780,29 +779,26 @@ export function MilestoneDetails() {
             </div>
 
             <div className="flex flex-col gap-2 sm:flex-row">
-              <button
-                type="button"
+              <SoonButton
                 className="inline-flex items-center justify-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-xs font-semibold text-rose-700 transition-all hover:border-rose-300 hover:bg-rose-100"
               >
                 <X className="h-4 w-4" />
                 Reject
-              </button>
+              </SoonButton>
 
-              <button
-                type="button"
+              <SoonButton
                 className="inline-flex items-center justify-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2.5 text-xs font-semibold text-amber-700 transition-all hover:border-amber-300 hover:bg-amber-100"
               >
                 <MessageSquare className="h-4 w-4" />
                 Request Evidence
-              </button>
+              </SoonButton>
 
-              <button
-                type="button"
+              <SoonButton
                 className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#0B1220] px-5 py-2.5 text-xs font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-[#1657FF]"
               >
                 <Check className="h-4 w-4" />
                 Approve Milestone
-              </button>
+              </SoonButton>
             </div>
           </div>
         </div>
@@ -1038,13 +1034,12 @@ function EvidenceRow({
           {evidence.status}
         </span>
 
-        <button
-          type="button"
+        <SoonButton
           className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-line text-ink/35 transition-all hover:border-ink/15 hover:bg-paper-2 hover:text-ink"
           aria-label={`View ${evidence.name}`}
         >
           <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-        </button>
+        </SoonButton>
       </div>
     </div>
   )

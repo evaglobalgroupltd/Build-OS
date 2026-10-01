@@ -16,6 +16,7 @@ import {
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
+import { RoleLink, SoonButton } from '@/components/ui/ModuleActions'
 
 type HistoryEventType =
   | 'uploaded'
@@ -220,8 +221,7 @@ export function DocumentHistory() {
             </div>
           </div>
 
-          <button
-            type="button"
+          <RoleLink route="documents" sub="current"
             className="
               inline-flex
               w-fit
@@ -247,7 +247,7 @@ export function DocumentHistory() {
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             Back to document
-          </button>
+          </RoleLink>
         </div>
       </header>
 
@@ -515,8 +515,7 @@ export function DocumentHistory() {
                     </div>
                   </div>
 
-                  <button
-                    type="button"
+                  <SoonButton
                     className="
                       mt-3
                       flex
@@ -540,7 +539,7 @@ export function DocumentHistory() {
                   >
                     <Download className="h-3 w-3" />
                     View version
-                  </button>
+                  </SoonButton>
                 </div>
               ))}
             </CardBody>
@@ -657,8 +656,7 @@ export function DocumentHistory() {
           </Card>
 
           {/* Quick navigation */}
-          <button
-            type="button"
+          <RoleLink route="documents" sub="current"
             className="
               group
               flex
@@ -690,7 +688,7 @@ export function DocumentHistory() {
             </span>
 
             <ArrowUpRight className="h-4 w-4 text-ink/30 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-ink" />
-          </button>
+          </RoleLink>
         </aside>
       </div>
     </div>

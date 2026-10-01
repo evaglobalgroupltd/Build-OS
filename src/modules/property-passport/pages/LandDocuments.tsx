@@ -10,6 +10,7 @@ import {
   ShieldCheck,
 } from 'lucide-react'
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
+import { RoleLink } from '@/components/ui/ModuleActions'
 
 /**
  * Land Documents — Digital Property Passport module
@@ -279,14 +280,13 @@ export function LandDocuments() {
                     </p>
                   </div>
 
-                  <button
-                    type="button"
+                  <RoleLink route="documents" sub="current"
                     className="group/button inline-flex items-center gap-2 rounded-full border border-line bg-white px-3.5 py-2.5 text-[10px] font-semibold text-ink shadow-[0_6px_18px_rgba(11,18,32,0.035)] transition-all hover:-translate-y-0.5 hover:border-[#1657FF]/20 hover:bg-[#1657FF]/5 hover:text-[#1657FF]"
                   >
                     <Download className="h-3.5 w-3.5" />
                     Document
                     <ArrowUpRight className="h-3 w-3 transition-transform group-hover/button:translate-x-0.5 group-hover/button:-translate-y-0.5" />
-                  </button>
+                  </RoleLink>
 
                   <ChevronRight className="hidden h-4 w-4 text-ink/15 transition-transform group-hover:translate-x-0.5 sm:block" />
                 </div>

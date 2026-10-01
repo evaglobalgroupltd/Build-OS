@@ -24,6 +24,7 @@ import {
   CardBody,
   CardHeader,
 } from '@/components/ui/Card'
+import { PrintButton, RoleLink, SoonButton } from '@/components/ui/ModuleActions'
 
 type EvidenceStatus =
   | 'submitted'
@@ -190,8 +191,7 @@ export function EvidenceReview() {
       {/* =========================================================
           BACK NAVIGATION
       ========================================================= */}
-      <button
-        type="button"
+      <RoleLink route="evidence"
         className="group inline-flex items-center gap-2 text-xs font-semibold text-ink/40 transition-colors hover:text-ink"
       >
         <span className="flex h-7 w-7 items-center justify-center rounded-full border border-ink/[0.07] bg-white transition-all group-hover:border-ink/[0.14] group-hover:shadow-sm">
@@ -199,7 +199,7 @@ export function EvidenceReview() {
         </span>
 
         Back to review queue
-      </button>
+      </RoleLink>
 
       {/* =========================================================
           HEADER
@@ -239,13 +239,12 @@ export function EvidenceReview() {
           </p>
         </div>
 
-        <button
-          type="button"
+        <PrintButton
           className="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-full border border-ink/[0.08] bg-white px-4 text-xs font-semibold text-ink/60 shadow-[0_6px_20px_rgba(20,30,25,0.035)] transition-all hover:-translate-y-0.5 hover:border-ink/[0.15] hover:text-ink hover:shadow-[0_10px_28px_rgba(20,30,25,0.05)]"
         >
           <Download className="h-3.5 w-3.5" />
           Export record
-        </button>
+        </PrintButton>
       </header>
 
       {/* =========================================================
@@ -364,13 +363,12 @@ export function EvidenceReview() {
                               Image
                             </span>
 
-                            <button
-                              type="button"
+                            <SoonButton
                               className="absolute bottom-3 right-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/95 text-ink/45 opacity-0 shadow-sm transition-all group-hover:opacity-100 hover:text-ink"
                               aria-label={`View ${file.name}`}
                             >
                               <Eye className="h-3.5 w-3.5" />
-                            </button>
+                            </SoonButton>
                           </div>
 
                           <div className="p-3.5">
@@ -537,13 +535,12 @@ export function EvidenceReview() {
                   Decision will be added to the audit trail.
                 </p>
 
-                <button
-                  type="button"
+                <SoonButton
                   className="inline-flex h-10 items-center justify-center gap-2 rounded-full bg-ink px-5 text-xs font-semibold text-white shadow-[0_6px_18px_rgba(20,30,25,0.10)] transition-all hover:-translate-y-0.5 hover:bg-ink/90 hover:shadow-[0_10px_24px_rgba(20,30,25,0.14)]"
                 >
                   Record review
                   <ChevronRight className="h-3.5 w-3.5" />
-                </button>
+                </SoonButton>
               </div>
             </CardBody>
           </Card>
@@ -774,8 +771,7 @@ function EvidenceFileRow({
         </div>
       </div>
 
-      <button
-        type="button"
+      <SoonButton
         className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] border border-ink/[0.07] text-ink/30 transition-all group-hover:border-ink/[0.13] group-hover:text-ink"
         aria-label={`${isVideo ? 'Play' : 'View'} ${file.name}`}
       >
@@ -784,7 +780,7 @@ function EvidenceFileRow({
         ) : (
           <Eye className="h-3.5 w-3.5" />
         )}
-      </button>
+      </SoonButton>
     </div>
   )
 }

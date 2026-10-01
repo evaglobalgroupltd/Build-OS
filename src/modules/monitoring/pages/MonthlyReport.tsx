@@ -13,6 +13,7 @@ import {
   Wallet,
 } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
+import { PrintButton, RoleLink, SoonButton } from '@/components/ui/ModuleActions'
 
 type MonthlyStat = {
   label: string
@@ -161,21 +162,19 @@ export function MonthlyReport() {
             </div>
 
             <div className="flex shrink-0 flex-wrap gap-2">
-              <button
-                type="button"
+              <SoonButton
                 className="inline-flex h-11 items-center gap-2 rounded-xl border border-ink/10 bg-white px-4 text-xs font-semibold text-ink transition duration-200 hover:border-ink/15 hover:bg-ink/[0.025]"
               >
                 <CalendarDays size={15} className="text-ink/45" />
                 August 2026
-              </button>
+              </SoonButton>
 
-              <button
-                type="button"
+              <PrintButton
                 className="inline-flex h-11 items-center gap-2 rounded-xl bg-[#12613E] px-4.5 text-xs font-semibold text-white shadow-[0_10px_25px_rgba(18,97,62,0.18)] transition duration-200 hover:bg-[#0e5335] hover:shadow-[0_12px_30px_rgba(18,97,62,0.22)]"
               >
                 <Download size={15} />
                 Export Report
-              </button>
+              </PrintButton>
             </div>
           </div>
         </div>
@@ -208,13 +207,12 @@ export function MonthlyReport() {
             </div>
           </div>
 
-          <button
-            type="button"
+          <SoonButton
             className="self-end rounded-lg p-2 text-ink/35 transition hover:bg-ink/[0.04] hover:text-ink sm:self-auto"
             aria-label="More report options"
           >
             <MoreHorizontal size={18} />
-          </button>
+          </SoonButton>
         </div>
       </Card>
 
@@ -403,13 +401,12 @@ export function MonthlyReport() {
             description="Key delivery points during the reporting period."
           />
 
-          <button
-            type="button"
+          <RoleLink route="reports" sub="library"
             className="inline-flex items-center gap-1 self-start text-xs font-semibold text-ink/50 transition hover:text-[#12613E] sm:self-auto"
           >
             View all
             <ChevronRight size={14} />
-          </button>
+          </RoleLink>
         </div>
 
         <div className="divide-y divide-ink/[0.06]">
@@ -448,13 +445,12 @@ export function MonthlyReport() {
           </div>
 
           <div className="border-t border-ink/[0.07] bg-ink/[0.012] px-5 py-3.5 sm:px-6">
-            <button
-              type="button"
+            <RoleLink route="updates"
               className="inline-flex items-center gap-1 text-[10px] font-semibold text-ink/45 transition hover:text-[#12613E]"
             >
               View project activity
               <ArrowUpRight size={12} />
-            </button>
+            </RoleLink>
           </div>
         </Card>
 
@@ -492,14 +488,13 @@ export function MonthlyReport() {
               />
             </div>
 
-            <button
-              type="button"
+            <RoleLink route="reports"
               className="mt-5 flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-ink/10 bg-white text-xs font-semibold text-ink transition hover:border-ink/15 hover:bg-ink/[0.025]"
             >
               <FileText size={14} className="text-ink/45" />
               Open Full Report
               <ChevronRight size={14} className="text-ink/35" />
-            </button>
+            </RoleLink>
           </div>
         </Card>
       </div>

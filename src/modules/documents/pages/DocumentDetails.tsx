@@ -18,6 +18,7 @@ import {
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
+import { RoleLink, SoonButton } from '@/components/ui/ModuleActions'
 
 type DocumentStatus =
   | 'draft'
@@ -168,8 +169,7 @@ export function DocumentDetails() {
             </div>
           </div>
 
-          <button
-            type="button"
+          <RoleLink route="documents"
             className="
               inline-flex
               w-fit
@@ -195,7 +195,7 @@ export function DocumentDetails() {
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             Back to documents
-          </button>
+          </RoleLink>
         </div>
       </header>
 
@@ -285,8 +285,7 @@ export function DocumentDetails() {
                     {document.fileType} · {document.fileSize}
                   </span>
 
-                  <button
-                    type="button"
+                  <SoonButton
                     aria-label="More document actions"
                     className="
                       flex
@@ -305,7 +304,7 @@ export function DocumentDetails() {
                     "
                   >
                     <MoreHorizontal className="h-4 w-4" />
-                  </button>
+                  </SoonButton>
                 </div>
               </div>
             </div>
@@ -349,8 +348,7 @@ export function DocumentDetails() {
                   </p>
 
                   <div className="mt-5 flex flex-wrap justify-center gap-2">
-                    <button
-                      type="button"
+                    <SoonButton
                       className="
                         inline-flex
                         items-center
@@ -370,10 +368,9 @@ export function DocumentDetails() {
                     >
                       <FileText className="h-3.5 w-3.5" />
                       View document
-                    </button>
+                    </SoonButton>
 
-                    <button
-                      type="button"
+                    <SoonButton
                       className="
                         inline-flex
                         items-center
@@ -395,7 +392,7 @@ export function DocumentDetails() {
                     >
                       <Download className="h-3.5 w-3.5" />
                       Download
-                    </button>
+                    </SoonButton>
                   </div>
                 </div>
               </div>
@@ -632,8 +629,7 @@ export function DocumentDetails() {
               </div>
             </div>
 
-            <button
-              type="button"
+            <RoleLink route="projects"
               className="
                 group
                 mt-5
@@ -661,7 +657,7 @@ export function DocumentDetails() {
               </span>
 
               <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-            </button>
+            </RoleLink>
           </Card>
 
           {/* Ownership & access */}
@@ -727,8 +723,7 @@ export function DocumentDetails() {
             </div>
 
             <div className="space-y-2 p-4">
-              <button
-                type="button"
+              <SoonButton
                 className="
                   flex
                   h-10
@@ -747,10 +742,9 @@ export function DocumentDetails() {
               >
                 <FileText className="h-3.5 w-3.5" />
                 View document
-              </button>
+              </SoonButton>
 
-              <button
-                type="button"
+              <SoonButton
                 className="
                   flex
                   h-10
@@ -772,7 +766,7 @@ export function DocumentDetails() {
               >
                 <Download className="h-3.5 w-3.5" />
                 Download copy
-              </button>
+              </SoonButton>
             </div>
           </Card>
         </aside>

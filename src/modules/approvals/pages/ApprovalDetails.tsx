@@ -20,6 +20,7 @@ import {
 } from 'lucide-react'
 
 import { Card } from '@/components/ui/Card'
+import { RoleLink, SoonButton } from '@/components/ui/ModuleActions'
 
 type ApprovalStatus =
   | 'Pending Review'
@@ -252,8 +253,7 @@ export function ApprovalDetails() {
       {/* ===================================================== */}
 
       <header>
-        <button
-          type="button"
+        <RoleLink route="decisions" sub="approvals"
           className="group mb-5 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.12em] text-ink/35 transition-colors hover:text-ink"
         >
           <ArrowLeft
@@ -261,7 +261,7 @@ export function ApprovalDetails() {
             size={13}
           />
           Back to approvals
-        </button>
+        </RoleLink>
 
         <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
           <div className="min-w-0">
@@ -634,8 +634,7 @@ export function ApprovalDetails() {
               </div>
 
               <div className="mt-5 grid gap-2.5 sm:grid-cols-[1.4fr_1fr_0.8fr]">
-                <button
-                  type="button"
+                <SoonButton
                   className="
                     group
                     inline-flex
@@ -665,10 +664,9 @@ export function ApprovalDetails() {
                     size={13}
                     className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                   />
-                </button>
+                </SoonButton>
 
-                <button
-                  type="button"
+                <SoonButton
                   className="
                     inline-flex
                     min-h-12
@@ -692,10 +690,9 @@ export function ApprovalDetails() {
                 >
                   <MessageSquare size={14} />
                   Correction
-                </button>
+                </SoonButton>
 
-                <button
-                  type="button"
+                <SoonButton
                   className="
                     inline-flex
                     min-h-12
@@ -719,7 +716,7 @@ export function ApprovalDetails() {
                 >
                   <XCircle size={14} />
                   Reject
-                </button>
+                </SoonButton>
               </div>
             </div>
           </Card>
@@ -965,8 +962,7 @@ export function ApprovalDetails() {
                 ))}
               </div>
 
-              <button
-                type="button"
+              <RoleLink route="updates"
                 className="
                   mt-6
                   flex
@@ -991,7 +987,7 @@ export function ApprovalDetails() {
               >
                 View complete audit log
                 <ChevronRight size={13} />
-              </button>
+              </RoleLink>
             </div>
           </Card>
         </aside>

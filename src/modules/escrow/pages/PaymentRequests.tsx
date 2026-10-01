@@ -14,6 +14,7 @@ import {
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { CustodyNotice } from '@/modules/escrow/components/CustodyNotice'
+import { RoleLink, SoonButton } from '@/components/ui/ModuleActions'
 
 type RequestStatus =
   | 'draft'
@@ -207,13 +208,12 @@ export function PaymentRequests() {
           </p>
         </div>
 
-        <button
-          type="button"
+        <SoonButton
           className="group inline-flex w-fit shrink-0 items-center gap-2 rounded-full border border-ink/[0.08] bg-white px-4 py-2.5 text-[11px] font-semibold text-ink/60 shadow-[0_5px_18px_rgba(20,30,25,0.035)] transition duration-200 hover:-translate-y-0.5 hover:border-ink/[0.12] hover:text-ink hover:shadow-[0_8px_24px_rgba(20,30,25,0.06)]"
         >
           <Plus className="h-3.5 w-3.5 transition-transform duration-200 group-hover:rotate-90" />
           New payment request
-        </button>
+        </SoonButton>
       </div>
 
       {/* ─────────────────────────────────────────────
@@ -557,13 +557,12 @@ function RequestCard({
               </div>
             </div>
 
-            <button
-              type="button"
+            <RoleLink route="evidence" sub="current"
               className="group/evidence inline-flex items-center justify-center gap-1.5 rounded-full border border-ink/[0.07] bg-white px-3 py-2 text-[10px] font-semibold text-ink/50 transition hover:border-ink/[0.12] hover:text-ink"
             >
               View evidence
               <ArrowRight className="h-3 w-3 transition-transform group-hover/evidence:translate-x-0.5" />
-            </button>
+            </RoleLink>
           </div>
         </div>
 
@@ -575,12 +574,11 @@ function RequestCard({
           </div>
 
           <div className="flex flex-col gap-2 sm:flex-row">
-            <button
-              type="button"
+            <SoonButton
               className="inline-flex items-center justify-center gap-2 rounded-full border border-ink/[0.08] bg-white px-4 py-2.5 text-[11px] font-semibold text-ink/55 transition hover:border-ink/[0.13] hover:text-ink"
             >
               View request
-            </button>
+            </SoonButton>
 
             <button
               type="button"

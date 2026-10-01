@@ -14,6 +14,7 @@ import { Card, CardBody } from '@/components/ui/Card'
 import { ProjectCard } from '@/modules/projects/components/ProjectCard'
 import type { Project, ProjectStage } from '@/modules/projects/types'
 import { projects } from '@/data/mockData'
+import { RoleLink, SoonButton } from '@/components/ui/ModuleActions'
 
 type ProjectFilter = 'all' | ProjectStage
 
@@ -102,8 +103,7 @@ export function ProjectList() {
           </p>
         </div>
 
-        <button
-          type="button"
+        <RoleLink route="projects" sub="new"
           className="
             group
             flex
@@ -132,7 +132,7 @@ export function ProjectList() {
             size={14}
             className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
           />
-        </button>
+        </RoleLink>
       </div>
 
       {/* ===================================================== */}
@@ -287,8 +287,7 @@ export function ProjectList() {
                 />
               </div>
 
-              <button
-                type="button"
+              <SoonButton
                 className="
                   inline-flex
                   h-11
@@ -311,7 +310,7 @@ export function ProjectList() {
               >
                 <SlidersHorizontal size={14} />
                 Filters
-              </button>
+              </SoonButton>
 
             </div>
 

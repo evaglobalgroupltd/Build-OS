@@ -15,6 +15,7 @@ import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import type { FundingSource } from '@/modules/escrow/types'
 import { CustodyNotice } from '@/modules/escrow/components/CustodyNotice'
+import { RoleLink } from '@/components/ui/ModuleActions'
 
 interface FrozenPayment {
   id: string
@@ -152,8 +153,7 @@ export function FrozenPayments() {
           </p>
         </div>
 
-        <button
-          type="button"
+        <RoleLink route="money" sub="transactions"
           className="
             group
             inline-flex
@@ -189,7 +189,7 @@ export function FrozenPayments() {
               group-hover:translate-x-0.5
             "
           />
-        </button>
+        </RoleLink>
 
       </header>
 
@@ -556,8 +556,7 @@ function FrozenPaymentCard({
           </div>
 
           {/* Action */}
-          <button
-            type="button"
+          <RoleLink route="disputes" sub="current"
             className="
               group/action
               inline-flex
@@ -590,7 +589,7 @@ function FrozenPaymentCard({
                 group-hover/action:translate-x-0.5
               "
             />
-          </button>
+          </RoleLink>
 
         </div>
 

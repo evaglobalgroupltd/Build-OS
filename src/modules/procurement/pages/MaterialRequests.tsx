@@ -13,6 +13,7 @@ import { type ComponentType } from 'react'
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 import { MaterialRequestList } from '@/modules/procurement/components/MaterialRequestList'
 import { materialRequests } from '@/data/mockData'
+import { RoleLink } from '@/components/ui/ModuleActions'
 
 export function MaterialRequests() {
   const requested = materialRequests.filter(
@@ -64,14 +65,13 @@ export function MaterialRequests() {
           </p>
         </div>
 
-        <button
-          type="button"
+        <RoleLink route="procurement" sub="new"
           className="group inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-full bg-ink px-5 text-xs font-semibold text-white shadow-[0_8px_20px_rgba(20,40,30,0.14)] transition-all hover:-translate-y-0.5 hover:bg-ink/90 focus:outline-none focus:ring-4 focus:ring-ink/[0.08]"
         >
           <Plus className="h-3.5 w-3.5" />
           Create request
           <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-        </button>
+        </RoleLink>
       </div>
 
       {/* ---------------------------------------------------------------- */}
@@ -154,14 +154,13 @@ export function MaterialRequests() {
                 {totalRequests} total
               </span>
 
-              <button
-                type="button"
+              <RoleLink route="procurement" sub="new"
                 className="group inline-flex items-center gap-2 rounded-full bg-ink px-3.5 py-2 text-[11px] font-semibold text-white shadow-[0_5px_14px_rgba(20,40,30,0.1)] transition-all hover:-translate-y-0.5 hover:bg-ink/90 focus:outline-none focus:ring-4 focus:ring-ink/[0.05]"
               >
                 <Plus className="h-3 w-3" />
                 New request
                 <ChevronRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
-              </button>
+              </RoleLink>
             </div>
           }
         />

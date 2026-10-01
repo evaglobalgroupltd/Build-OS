@@ -11,6 +11,7 @@ import {
 
 import { Badge } from '@/components/ui/Badge'
 import { Card, CardBody } from '@/components/ui/Card'
+import { SoonButton } from '@/components/ui/ModuleActions'
 
 interface DisputeResponse {
   id: string
@@ -384,21 +385,19 @@ export function Responses() {
               />
 
               <div className="flex flex-col gap-3 border-t border-ink/[0.06] px-2 pt-3 sm:flex-row sm:items-center sm:justify-between">
-                <button
-                  type="button"
+                <SoonButton
                   className="inline-flex w-fit items-center gap-2 rounded-xl border border-ink/[0.08] bg-paper-2 px-4 py-2.5 text-xs font-semibold text-ink/60 transition-all hover:-translate-y-0.5 hover:bg-white hover:text-ink hover:shadow-sm"
                 >
                   <Paperclip className="h-3.5 w-3.5" />
                   Attach evidence
-                </button>
+                </SoonButton>
 
-                <button
-                  type="button"
+                <SoonButton
                   className="inline-flex w-fit items-center justify-center gap-2 rounded-xl bg-ink px-5 py-2.5 text-xs font-semibold text-white shadow-[0_8px_20px_rgba(23,54,41,0.12)] transition-all hover:-translate-y-0.5 hover:bg-ink/90 hover:shadow-[0_12px_24px_rgba(23,54,41,0.16)]"
                 >
                   Submit response
                   <Send className="h-3.5 w-3.5" />
-                </button>
+                </SoonButton>
               </div>
             </div>
 

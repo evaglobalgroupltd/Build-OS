@@ -9,6 +9,7 @@ import {
   ShieldCheck,
 } from 'lucide-react'
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
+import { RoleLink } from '@/components/ui/ModuleActions'
 
 /**
  * Designs — Digital Property Passport module
@@ -354,8 +355,7 @@ export function Designs() {
 
                   <div className="col-span-2 sm:col-span-1">
 
-                    <button
-                      type="button"
+                    <RoleLink route="documents" sub="current"
                       aria-label={`Open ${design.title}`}
                       className="
                         flex
@@ -393,7 +393,7 @@ export function Designs() {
                         className="text-ink/25 transition group-hover:text-[#1657FF]"
                       />
 
-                    </button>
+                    </RoleLink>
 
                   </div>
 
@@ -454,8 +454,7 @@ export function Designs() {
 
             </div>
 
-            <button
-              type="button"
+            <RoleLink route="passport"
               className="
                 flex
                 shrink-0
@@ -478,7 +477,7 @@ export function Designs() {
             >
               View passport
               <ChevronRight size={13} />
-            </button>
+            </RoleLink>
 
           </div>
 

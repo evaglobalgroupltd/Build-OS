@@ -13,6 +13,7 @@ import { type ReactNode } from 'react'
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
+import { RoleLink, SoonButton } from '@/components/ui/ModuleActions'
 
 type Quote = {
   id: string
@@ -125,21 +126,19 @@ export function QuoteComparison() {
         </div>
 
         <div className="flex flex-col gap-2 sm:flex-row">
-          <button
-            type="button"
+          <RoleLink route="procurement" sub="quotations"
             className="inline-flex h-10 items-center justify-center gap-2 rounded-full border border-ink/[0.08] bg-white px-4 text-[11px] font-semibold text-ink/60 shadow-[0_4px_14px_rgba(20,40,30,0.03)] transition-all hover:border-ink/15 hover:bg-ink/[0.025] hover:text-ink"
           >
             <ArrowRight className="h-3.5 w-3.5 rotate-180 opacity-50" />
             Back to quotations
-          </button>
+          </RoleLink>
 
-          <button
-            type="button"
+          <SoonButton
             className="group inline-flex h-10 items-center justify-center gap-2 rounded-full bg-ink px-5 text-[11px] font-semibold text-white shadow-[0_8px_20px_rgba(20,40,30,0.11)] transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_25px_rgba(20,40,30,0.15)]"
           >
             Select supplier
             <ArrowRight className="h-3.5 w-3.5 opacity-55 transition-transform group-hover:translate-x-0.5" />
-          </button>
+          </SoonButton>
         </div>
       </section>
 
@@ -478,8 +477,7 @@ export function QuoteComparison() {
                         : '',
                     ].join(' ')}
                   >
-                    <button
-                      type="button"
+                    <SoonButton
                       className={
                         quote.status === 'recommended'
                           ? 'group inline-flex w-full items-center justify-center gap-2 rounded-full bg-ink px-3.5 py-2.5 text-[10px] font-semibold text-white shadow-[0_6px_16px_rgba(20,40,30,0.10)] transition-all hover:-translate-y-0.5 hover:shadow-[0_9px_20px_rgba(20,40,30,0.14)]'
@@ -491,7 +489,7 @@ export function QuoteComparison() {
                         : 'Select this quote'}
 
                       <ArrowRight className="h-3 w-3 opacity-50 transition-transform group-hover:translate-x-0.5" />
-                    </button>
+                    </SoonButton>
                   </td>
                 ))}
               </tr>
@@ -532,20 +530,18 @@ export function QuoteComparison() {
             </div>
 
             <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
-              <button
-                type="button"
+              <RoleLink route="procurement" sub="quotations"
                 className="inline-flex h-10 items-center justify-center rounded-full border border-ink/[0.08] px-4 text-[10px] font-semibold text-ink/55 transition-colors hover:bg-ink/[0.025] hover:text-ink"
               >
                 Keep reviewing
-              </button>
+              </RoleLink>
 
-              <button
-                type="button"
+              <SoonButton
                 className="group inline-flex h-10 items-center justify-center gap-2 rounded-full bg-ink px-5 text-[10px] font-semibold text-white shadow-[0_7px_18px_rgba(20,40,30,0.10)] transition-all hover:-translate-y-0.5"
               >
                 Select {recommendedQuote.supplier}
                 <ArrowRight className="h-3 w-3 opacity-55 transition-transform group-hover:translate-x-0.5" />
-              </button>
+              </SoonButton>
             </div>
           </div>
         </CardBody>

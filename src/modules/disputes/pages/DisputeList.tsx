@@ -15,6 +15,7 @@ import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { disputes, projects } from '@/data/mockData'
+import { RoleLink } from '@/components/ui/ModuleActions'
 
 const statusTone = {
   open: 'brick',
@@ -302,13 +303,12 @@ export function DisputeList() {
                       {dispute.id}
                     </span>
 
-                    <button
-                      type="button"
+                    <RoleLink route="disputes" sub="current"
                       className="flex h-9 w-9 items-center justify-center rounded-xl border border-ink/[0.07] bg-white text-ink/40 transition-all duration-200 hover:-translate-y-0.5 hover:border-ink/15 hover:bg-ink hover:text-white hover:shadow-md"
                       aria-label={`View dispute ${dispute.id}`}
                     >
                       <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
-                    </button>
+                    </RoleLink>
                   </div>
                 </div>
 

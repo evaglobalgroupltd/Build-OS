@@ -20,6 +20,7 @@ import type {
   ReactNode,
   SetStateAction,
 } from 'react'
+import { SoonButton } from '@/components/ui/ModuleActions'
 
 
 const sections = [
@@ -1258,12 +1259,11 @@ function DocumentUpload({
           project's document service.
         </p>
 
-        <button
-          type="button"
+        <SoonButton
           className="mt-4 rounded-full border border-ink/[0.09] bg-white px-4 py-2 text-[10px] font-bold text-ink shadow-sm transition hover:border-ink/20"
         >
           Choose files
-        </button>
+        </SoonButton>
       </div>
 
       <div className="mt-5 grid gap-3 sm:grid-cols-2">

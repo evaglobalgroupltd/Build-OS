@@ -22,6 +22,7 @@ import type { Project } from '@/modules/projects/types'
 import { StagePill } from '../components/StagePill'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { Badge } from '@/components/ui/Badge'
+import { RoleLink, SoonButton } from '@/components/ui/ModuleActions'
 
 type ProjectDetailsProps = {
   project?: Project
@@ -216,8 +217,7 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
             </div>
 
             <div className="flex shrink-0 flex-wrap gap-2">
-              <button
-                type="button"
+              <RoleLink to="../edit" relative="path"
                 className="
                   rounded-full
                   border border-ink/[0.09]
@@ -231,10 +231,9 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
                 "
               >
                 Edit Project
-              </button>
+              </RoleLink>
 
-              <button
-                type="button"
+              <SoonButton
                 className="
                   flex items-center gap-2
                   rounded-full
@@ -250,7 +249,7 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
               >
                 Project Actions
                 <ArrowUpRight className="h-3.5 w-3.5" />
-              </button>
+              </SoonButton>
             </div>
           </div>
 
@@ -658,8 +657,7 @@ function MilestonesTab() {
 
             {milestone.status === 'in_progress' && (
               <div className="mt-4 flex flex-wrap gap-2 border-t border-ink/[0.07] pt-3">
-                <button
-                  type="button"
+                <RoleLink route="evidence" sub="current/review"
                   className="
                     rounded-full
                     bg-ink
@@ -671,10 +669,9 @@ function MilestonesTab() {
                   "
                 >
                   Review evidence
-                </button>
+                </RoleLink>
 
-                <button
-                  type="button"
+                <SoonButton
                   className="
                     rounded-full
                     border border-ink/[0.08]
@@ -687,7 +684,7 @@ function MilestonesTab() {
                   "
                 >
                   Request more evidence
-                </button>
+                </SoonButton>
               </div>
             )}
           </div>
@@ -1065,8 +1062,7 @@ function DocumentsTab() {
             </div>
           </div>
 
-          <button
-            type="button"
+          <RoleLink route="passport"
             className="
               flex shrink-0 items-center gap-2
               rounded-full
@@ -1080,7 +1076,7 @@ function DocumentsTab() {
           >
             View Passport
             <ArrowUpRight className="h-3.5 w-3.5" />
-          </button>
+          </RoleLink>
         </div>
       </section>
 
@@ -1523,8 +1519,7 @@ function InlineAction({
 
 function PremiumButton({ children }: { children: ReactNode }) {
   return (
-    <button
-      type="button"
+    <SoonButton
       className="
         rounded-full
         bg-ink
@@ -1538,14 +1533,13 @@ function PremiumButton({ children }: { children: ReactNode }) {
       "
     >
       {children}
-    </button>
+    </SoonButton>
   )
 }
 
 function PremiumOutlineButton({ children }: { children: ReactNode }) {
   return (
-    <button
-      type="button"
+    <SoonButton
       className="
         rounded-full
         border border-ink/[0.09]
@@ -1559,7 +1553,7 @@ function PremiumOutlineButton({ children }: { children: ReactNode }) {
       "
     >
       {children}
-    </button>
+    </SoonButton>
   )
 }
 

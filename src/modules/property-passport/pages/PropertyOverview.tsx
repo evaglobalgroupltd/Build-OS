@@ -12,6 +12,7 @@ import {
   Tag,
 } from 'lucide-react'
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
+import { RoleLink } from '@/components/ui/ModuleActions'
 
 /**
  * Property Overview — Digital Property Passport module
@@ -461,13 +462,12 @@ export function PropertyOverview() {
               </div>
             </div>
 
-            <button
-              type="button"
+            <RoleLink route="passport"
               className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-full border border-line bg-white px-3.5 py-2.5 text-xs font-semibold text-ink shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#1657FF]/20 hover:bg-[#1657FF]/[0.03] hover:text-[#1657FF]"
             >
               Passport record
               <ArrowUpRight className="h-3.5 w-3.5" />
-            </button>
+            </RoleLink>
           </div>
         </CardBody>
       </Card>

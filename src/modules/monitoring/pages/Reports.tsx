@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 
 import { Card } from '@/components/ui/Card'
+import { PrintButton, RoleLink, SoonButton } from '@/components/ui/ModuleActions'
 
 const reports = [
   {
@@ -108,8 +109,7 @@ function ReportTypeCard({
 
   return (
     <Card className="group overflow-hidden">
-      <button
-        type="button"
+      <SoonButton
         className="relative w-full p-5 text-left transition duration-300 hover:bg-ink/[0.015] sm:p-6"
       >
         <div className="flex items-start justify-between gap-4">
@@ -148,7 +148,7 @@ function ReportTypeCard({
             className={`h-px w-8 transition-all duration-500 group-hover:w-16 ${styles.line}`}
           />
         </div>
-      </button>
+      </SoonButton>
     </Card>
   )
 }
@@ -218,22 +218,20 @@ function ReportRow({
         </div>
 
         <div className="flex items-center gap-2">
-          <button
-            type="button"
+          <SoonButton
             className="inline-flex h-9 items-center justify-center gap-2 rounded-[10px] border border-ink/[0.08] bg-white px-3 text-[11px] font-semibold text-ink/60 transition hover:border-[#12613E]/20 hover:bg-[#12613E]/[0.03] hover:text-[#12613E]"
             title="Download report"
           >
             <Download className="h-3.5 w-3.5" strokeWidth={1.8} />
             <span className="hidden sm:inline">Download</span>
-          </button>
+          </SoonButton>
 
-          <button
-            type="button"
+          <SoonButton
             className="flex h-9 w-9 items-center justify-center rounded-[10px] text-ink/25 transition hover:bg-ink/[0.04] hover:text-ink"
             aria-label={`Open ${title}`}
           >
             <ChevronRight className="h-4 w-4" strokeWidth={1.8} />
-          </button>
+          </SoonButton>
         </div>
       </div>
     </div>
@@ -279,13 +277,12 @@ export function Reports() {
             </div>
           </div>
 
-          <button
-            type="button"
+          <PrintButton
             className="inline-flex shrink-0 items-center justify-center gap-2.5 rounded-[12px] bg-[#18271F] px-5 py-3 text-xs font-semibold text-white shadow-[0_12px_28px_rgba(24,39,31,0.16)] transition hover:-translate-y-0.5 hover:bg-[#12613E]"
           >
             <Download className="h-3.5 w-3.5" strokeWidth={1.8} />
             Export library
-          </button>
+          </PrintButton>
         </div>
       </section>
 
@@ -410,13 +407,12 @@ export function Reports() {
             Showing 5 of 196 reports
           </p>
 
-          <button
-            type="button"
+          <RoleLink route="reports"
             className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#12613E] transition hover:text-[#0D4C31]"
           >
             View all reports
             <ChevronRight className="h-3.5 w-3.5" strokeWidth={1.8} />
-          </button>
+          </RoleLink>
         </div>
       </Card>
 

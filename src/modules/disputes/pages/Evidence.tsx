@@ -14,6 +14,7 @@ import {
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
+import { SoonButton } from '@/components/ui/ModuleActions'
 
 interface EvidenceItem {
   id: string
@@ -269,13 +270,12 @@ export function Evidence() {
                 </p>
               </div>
 
-              <button
-                type="button"
+              <SoonButton
                 className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[#173629] px-5 py-3 text-xs font-semibold text-white shadow-[0_8px_20px_rgba(23,54,41,0.12)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#204736] hover:shadow-[0_12px_25px_rgba(23,54,41,0.18)]"
               >
                 <Plus className="h-4 w-4" />
                 Upload evidence
-              </button>
+              </SoonButton>
 
               <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
                 {['Documents', 'Images', 'Videos', 'Delivery records', 'Reports'].map(
@@ -373,13 +373,12 @@ export function Evidence() {
                     </p>
                   </div>
 
-                  <button
-                    type="button"
+                  <SoonButton
                     className="inline-flex items-center gap-2 rounded-xl border border-ink/[0.08] bg-white px-3.5 py-2.5 text-xs font-semibold text-ink/55 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-ink/15 hover:bg-ink hover:text-white hover:shadow-md"
                   >
                     View
                     <span className="text-[10px] opacity-50">↗</span>
-                  </button>
+                  </SoonButton>
                 </div>
               </div>
 

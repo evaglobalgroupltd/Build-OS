@@ -16,6 +16,7 @@ import { type ComponentType } from 'react'
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
+import { RoleLink, SoonButton } from '@/components/ui/ModuleActions'
 
 type QuoteStatus =
   | 'received'
@@ -185,14 +186,13 @@ export function Quotations() {
           </p>
         </div>
 
-        <button
-          type="button"
+        <RoleLink route="procurement" sub="new"
           className="group inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-full bg-ink px-5 text-xs font-semibold text-white shadow-[0_10px_24px_rgba(20,40,30,0.12)] transition-all hover:-translate-y-0.5 hover:shadow-[0_14px_30px_rgba(20,40,30,0.16)]"
         >
           <Plus className="h-3.5 w-3.5" />
           Request quotation
           <ArrowRight className="h-3.5 w-3.5 opacity-50 transition-transform group-hover:translate-x-0.5" />
-        </button>
+        </RoleLink>
       </section>
 
       {/* Executive overview */}
@@ -509,13 +509,12 @@ function QuotationRow({
             value={quote.validUntil}
           />
 
-          <button
-            type="button"
+          <SoonButton
             aria-label={`View quotation ${quote.id}`}
             className="col-span-2 flex h-9 w-9 items-center justify-center rounded-full border border-ink/[0.07] text-ink/30 transition-all hover:border-ink/15 hover:bg-ink/[0.04] hover:text-ink sm:col-span-1"
           >
             <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-          </button>
+          </SoonButton>
         </div>
       </div>
 
@@ -552,13 +551,12 @@ function QuotationRow({
             </div>
           </div>
 
-          <button
-            type="button"
+          <RoleLink route="procurement" sub="compare"
             className="group inline-flex shrink-0 items-center justify-center gap-1.5 rounded-full bg-ink px-3.5 py-2 text-[10px] font-semibold text-white shadow-[0_6px_16px_rgba(20,40,30,0.10)] transition-all hover:-translate-y-0.5 hover:shadow-[0_9px_20px_rgba(20,40,30,0.14)]"
           >
             Select supplier
             <ArrowRight className="h-3 w-3 opacity-60 transition-transform group-hover:translate-x-0.5" />
-          </button>
+          </RoleLink>
         </div>
       )}
     </div>

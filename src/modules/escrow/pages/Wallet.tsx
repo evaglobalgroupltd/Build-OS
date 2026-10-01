@@ -18,6 +18,7 @@ import {
   escrowTransactions,
   projects,
 } from '@/data/mockData'
+import { RoleLink } from '@/components/ui/ModuleActions'
 
 type TransactionType = 'deposit' | 'release' | 'freeze' | 'refund'
 
@@ -354,13 +355,12 @@ export function Wallet() {
           title="Recent transactions"
           subtitle="Deposits, releases, freezes and refunds recorded against your projects"
           action={
-            <button
-              type="button"
+            <RoleLink route="money" sub="transactions"
               className="group hidden items-center gap-1.5 rounded-full border border-ink/[0.07] bg-white px-3.5 py-2 text-[10px] font-semibold text-ink/50 transition hover:border-ink/[0.12] hover:text-ink sm:inline-flex"
             >
               View all
               <ChevronRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
-            </button>
+            </RoleLink>
           }
         />
 
@@ -381,13 +381,12 @@ export function Wallet() {
           </div>
 
           <div className="border-t border-ink/[0.06] px-5 py-3.5 sm:hidden">
-            <button
-              type="button"
+            <RoleLink route="money" sub="transactions"
               className="flex w-full items-center justify-center gap-1.5 rounded-[12px] border border-ink/[0.07] bg-[#F7F8F6] py-2.5 text-[10px] font-semibold text-ink/50 transition hover:bg-white hover:text-ink"
             >
               View all transactions
               <ChevronRight className="h-3.5 w-3.5" />
-            </button>
+            </RoleLink>
           </div>
         </CardBody>
       </Card>
@@ -597,13 +596,12 @@ function ProjectWalletRow({
           </p>
         </div>
 
-        <button
-          type="button"
+        <RoleLink route="money" sub="transactions"
           aria-label={`View wallet for ${project.name}`}
           className="group/button flex h-9 w-9 shrink-0 items-center justify-center rounded-[11px] border border-ink/[0.07] bg-white text-ink/35 transition-all duration-200 hover:border-ink/[0.13] hover:text-ink hover:shadow-[0_5px_15px_rgba(20,30,25,0.05)]"
         >
           <ChevronRight className="h-4 w-4 transition-transform duration-200 group-hover/button:translate-x-0.5" />
-        </button>
+        </RoleLink>
       </div>
     </div>
   )
@@ -687,13 +685,12 @@ function TransactionRow({
 
         <Badge tone={meta.tone}>{meta.label}</Badge>
 
-        <button
-          type="button"
+        <RoleLink route="money" sub="transactions"
           aria-label={`View transaction ${transaction.id}`}
           className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] border border-ink/[0.07] bg-white text-ink/30 transition hover:border-ink/[0.12] hover:text-ink"
         >
           <Eye className="h-3.5 w-3.5" />
-        </button>
+        </RoleLink>
       </div>
     </div>
   )

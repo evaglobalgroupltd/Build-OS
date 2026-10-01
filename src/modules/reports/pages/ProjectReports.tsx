@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
+import { PrintButton, RoleLink } from '@/components/ui/ModuleActions'
 
 const projectMetrics = [
   {
@@ -186,13 +187,12 @@ export function ProjectReports() {
                 <ChevronRight className="pointer-events-none absolute right-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 rotate-90 text-ink/40" />
               </div>
 
-              <button
-                type="button"
+              <PrintButton
                 className="inline-flex items-center gap-2 rounded-full bg-ink px-4 py-2.5 text-sm font-medium text-white shadow-[0_8px_24px_rgba(20,40,30,0.14)] transition hover:-translate-y-0.5 hover:bg-[#24372D]"
               >
                 <Download className="h-4 w-4" />
                 Export Report
-              </button>
+              </PrintButton>
             </div>
           </div>
 
@@ -583,13 +583,12 @@ export function ProjectReports() {
             })}
           </div>
 
-          <button
-            type="button"
+          <RoleLink route="updates"
             className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl border border-line bg-paper-2 px-4 py-3 text-xs font-semibold text-ink/55 transition hover:border-ink/10 hover:bg-white hover:text-ink"
           >
             View complete project activity
             <ChevronRight className="h-3.5 w-3.5" />
-          </button>
+          </RoleLink>
         </CardBody>
       </Card>
     </div>
