@@ -9,7 +9,19 @@ interface AuthContextValue {
   setRole: (role: UserRole) => void
   logout: () => void
   login: (role: UserRole, professionalType?: ProfessionalType) => void
+  /** Saves edits from the Profile page. Replace with an API call when the backend exists. */
+  updateProfile: (patch: ProfilePatch) => void
 }
+
+export type ProfilePatch = Partial<Pick<User, 'fullName' | 'phone' | 'country' | 'company'>>
+
+const initialsOf = (name: string) =>
+  name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]!.toUpperCase())
+    .join('')
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined)
 
@@ -19,6 +31,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     undefined
   )
   const [isAuthenticated, setIsAuthenticated] = useState(true)
+  const [edits, setEdits] = useState<Partial<Record<UserRole, ProfilePatch>>>({})
 
   const value = useMemo<AuthContextValue>(() => {
     const baseUser = demoUsers[role]
@@ -26,10 +39,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Only 'professional' carries a professionalType — every other role
     // (contractor, project_manager, client, market_place, admin) already
     // is its own specific UserRole, so there's nothing to attach.
+    const merged: User = { ...baseUser, ...edits[role] }
+    if (edits[role]?.fullName) merged.avatarInitials = initialsOf(merged.fullName) || baseUser.avatarInitials
+
     const user: User =
-      role === 'professional' && professionalType
-        ? { ...baseUser, professionalType }
-        : baseUser
+      role === 'professional' && professionalType ? { ...merged, professionalType } : merged
 
     return {
       user,
@@ -42,13 +56,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       },
       logout: () => setIsAuthenticated(false),
+      updateProfile: (patch: ProfilePatch) =>
+        setEdits((current) => ({ ...current, [role]: { ...current[role], ...patch } })),
       login: (nextRole: UserRole, nextProfessionalType?: ProfessionalType) => {
         setRoleState(nextRole)
         setProfessionalType(nextRole === 'professional' ? nextProfessionalType : undefined)
         setIsAuthenticated(true)
       },
     }
-  }, [role, professionalType, isAuthenticated])
+  }, [role, professionalType, isAuthenticated, edits])
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

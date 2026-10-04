@@ -95,6 +95,11 @@ export const navByRole: Record<UserRole, NavItem[]> = {
     },
   ],
 
+  // Diaspora clients use the client workspace (same /app/client routes).
+  get diaspora_client() {
+    return this.client
+  },
+
   /* =========================================================================
    * CONTRACTOR
    * ========================================================================= */
@@ -107,9 +112,15 @@ export const navByRole: Record<UserRole, NavItem[]> = {
     },
 
     {
-      label: 'Available Projects',
+      label: 'Marketplace',
       path: '/app/contractor/available',
-      icon: 'Search',
+      icon: 'Store',
+    },
+
+    {
+      label: 'Build Team',
+      path: '/app/contractor/team',
+      icon: 'Users',
     },
 
     {
@@ -147,6 +158,25 @@ export const navByRole: Record<UserRole, NavItem[]> = {
       path: '/app/contractor/disputes',
       icon: 'Scale',
     },
+
+    {
+      label: 'Decisions',
+      path: '/app/contractor/decisions',
+      icon: 'GitPullRequestArrow',
+    },
+
+    {
+      label: 'Messages',
+      path: '/app/contractor/messages',
+      icon: 'MessagesSquare',
+    },
+
+    {
+      label: 'Updates',
+      path: '/app/contractor/updates',
+      icon: 'BellRing',
+    },
+
   ],
 
   /* =========================================================================
@@ -195,6 +225,25 @@ export const navByRole: Record<UserRole, NavItem[]> = {
       path: '/app/market/disputes',
       icon: 'Scale',
     },
+
+    {
+      label: 'Decisions',
+      path: '/app/market/decisions',
+      icon: 'GitPullRequestArrow',
+    },
+
+    {
+      label: 'Messages',
+      path: '/app/market/messages',
+      icon: 'MessagesSquare',
+    },
+
+    {
+      label: 'Updates',
+      path: '/app/market/updates',
+      icon: 'BellRing',
+    },
+
   ],
 
   /* =========================================================================
@@ -243,6 +292,19 @@ export const navByRole: Record<UserRole, NavItem[]> = {
       path: '/app/pm/reports',
       icon: 'FileBarChart',
     },
+
+    {
+      label: 'Messages',
+      path: '/app/pm/messages',
+      icon: 'MessagesSquare',
+    },
+
+    {
+      label: 'Updates',
+      path: '/app/pm/updates',
+      icon: 'BellRing',
+    },
+
   ],
 
   /* =========================================================================
@@ -279,6 +341,25 @@ export const navByRole: Record<UserRole, NavItem[]> = {
       path: '/app/professional/payments',
       icon: 'Wallet',
     },
+
+    {
+      label: 'Decisions',
+      path: '/app/professional/decisions',
+      icon: 'GitPullRequestArrow',
+    },
+
+    {
+      label: 'Messages',
+      path: '/app/professional/messages',
+      icon: 'MessagesSquare',
+    },
+
+    {
+      label: 'Updates',
+      path: '/app/professional/updates',
+      icon: 'BellRing',
+    },
+
   ],
 
   /* =========================================================================
@@ -351,6 +432,24 @@ export const navByRole: Record<UserRole, NavItem[]> = {
       path: '/app/admin/analytics',
       icon: 'ChartColumn',
     },
+
+    {
+      label: 'Decisions',
+      path: '/app/admin/decisions',
+      icon: 'GitPullRequestArrow',
+    },
+
+    {
+      label: 'Messages',
+      path: '/app/admin/messages',
+      icon: 'MessagesSquare',
+    },
+
+    {
+      label: 'Updates',
+      path: '/app/admin/updates',
+      icon: 'BellRing',
+    },
   ],
 }
 
@@ -360,6 +459,7 @@ export const navByRole: Record<UserRole, NavItem[]> = {
 
 export const roleLabels: Record<UserRole, string> = {
   client: 'Client',
+  diaspora_client: 'Diaspora Client',
   contractor: 'Contractor',
   market_place: 'Market Place',
   project_manager: 'Project Manager',

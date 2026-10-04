@@ -25,10 +25,19 @@ import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { PopoverMenu, type MenuItem } from '@/components/ui/PopoverMenu'
 import { SectionTabs } from '@/components/ui/HubLayout'
 import { decisionTabs } from '@/pages/client/clientTabs'
-import { CLIENT_ROUTES, useProjectHref } from '@/pages/client/clientRoutes'
+import { useWorkspace, type RoleCopy } from '@/hooks/useWorkspace'
+import type {
+  Decision,
+  DecisionAction,
+  DecisionPriority,
+  DecisionStatus,
+} from '@/data/workspaceData'
 
 /* =============================================================================
- * Build OS: Client Decisions   (route: /app/client/decisions)
+ * Build OS: Decisions   (routes: /app/{client,contractor,market,professional}/decisions)
+ *
+ * One page for every actor that has decisions to make. Links, wording and data
+ * come from useWorkspace(); the records live in src/data/workspaceData.ts.
  *
  * Every card, summary tile, menu and button here leads somewhere:
  *   - summary tiles      -> filter the list
@@ -41,143 +50,6 @@ import { CLIENT_ROUTES, useProjectHref } from '@/pages/client/clientRoutes'
 /* Types                                                                       */
 /* -------------------------------------------------------------------------- */
 
-type DecisionStatus = 'pending' | 'approved' | 'rejected' | 'clarification'
-type DecisionPriority = 'high' | 'medium' | 'low'
-type DecisionAction = 'approve' | 'reject' | 'clarify'
-
-interface Decision {
-  id: string
-  title: string
-  description: string
-  project: string
-  projectId: string
-  category: string
-  status: DecisionStatus
-  priority: DecisionPriority
-  requestedBy: string
-  requestedDate: string
-  deadline?: string
-  financialImpact?: string
-  financialValue?: number
-  recommendation?: string
-  requiresPayment?: boolean
-}
-
-/* -------------------------------------------------------------------------- */
-/* Mock data                                                                   */
-/* -------------------------------------------------------------------------- */
-
-const INITIAL_DECISIONS: Decision[] = [
-  {
-    id: 'DEC-2026-015',
-    title: 'Approve roofing milestone',
-    description:
-      'The contractor has submitted completion evidence for the roofing milestone. Review the evidence before approving the release.',
-    project: 'Lekki Residence',
-    projectId: '1',
-    category: 'Milestone',
-    status: 'pending',
-    priority: 'high',
-    requestedBy: 'Build Team',
-    requestedDate: '29 Sep 2026',
-    deadline: '01 Oct 2026',
-    financialImpact: '₦4,500,000 held in escrow',
-    financialValue: 4500000,
-    recommendation:
-      'The supervisor has verified the evidence. Approving releases the milestone payment and starts electrical and plumbing.',
-    requiresPayment: true,
-  },
-  {
-    id: 'DEC-2026-014',
-    title: 'Approve revised foundation reinforcement',
-    description:
-      'The project team has recommended additional reinforcement following the latest structural inspection.',
-    project: 'Gwarinpa Residence',
-    projectId: 'gwarinpa-residence',
-    category: 'Structural',
-    status: 'pending',
-    priority: 'high',
-    requestedBy: 'Project Management',
-    requestedDate: '28 Sep 2026',
-    deadline: '02 Oct 2026',
-    financialImpact: '+₦1,850,000',
-    financialValue: 1850000,
-    recommendation:
-      'Approve the reinforcement to maintain the structural specification and avoid downstream delays.',
-    requiresPayment: true,
-  },
-  {
-    id: 'DEC-2026-013',
-    title: 'Select imported bathroom fixtures',
-    description:
-      'Three fixture packages have been reviewed against the approved bathroom specification and supplier quotations.',
-    project: 'Maitama Executive Residence',
-    projectId: 'maitama-executive-residence',
-    category: 'Procurement',
-    status: 'pending',
-    priority: 'medium',
-    requestedBy: 'Procurement Team',
-    requestedDate: '27 Sep 2026',
-    deadline: '04 Oct 2026',
-    financialImpact: '+₦920,000',
-    financialValue: 920000,
-    recommendation:
-      'Package B offers the closest match to the approved specification within the current procurement allowance.',
-    requiresPayment: true,
-  },
-  {
-    id: 'DEC-2026-012',
-    title: 'Approve electrical layout revision',
-    description:
-      'The electrical consultant has submitted a revised layout to accommodate the updated kitchen and home-office requirements.',
-    project: 'Asokoro Smart Home',
-    projectId: 'asokoro-smart-home',
-    category: 'Design',
-    status: 'clarification',
-    priority: 'medium',
-    requestedBy: 'Design Consultant',
-    requestedDate: '25 Sep 2026',
-    deadline: '03 Oct 2026',
-    financialImpact: 'No immediate impact',
-    financialValue: 0,
-    recommendation:
-      'Clarification has been requested regarding the additional circuits before approval.',
-  },
-  {
-    id: 'DEC-2026-011',
-    title: 'Approve milestone 03 completion',
-    description:
-      'The project manager has submitted evidence and verification documents for the completed blockwork milestone.',
-    project: 'Gwarinpa Residence',
-    projectId: 'gwarinpa-residence',
-    category: 'Milestone',
-    status: 'approved',
-    priority: 'high',
-    requestedBy: 'Project Management',
-    requestedDate: '21 Sep 2026',
-    financialImpact: '₦4,200,000 released',
-    financialValue: 4200000,
-    recommendation:
-      'Verification was completed and the milestone was approved for escrow release.',
-  },
-  {
-    id: 'DEC-2026-010',
-    title: 'Approve external landscaping package',
-    description:
-      'The landscaping supplier submitted a final package covering hardscape, planting and irrigation.',
-    project: 'Maitama Executive Residence',
-    projectId: 'maitama-executive-residence',
-    category: 'External Works',
-    status: 'rejected',
-    priority: 'low',
-    requestedBy: 'Project Manager',
-    requestedDate: '18 Sep 2026',
-    financialImpact: '+₦1,400,000',
-    financialValue: 1400000,
-    recommendation:
-      'The proposal was returned for revision because the irrigation scope exceeded the approved allowance.',
-  },
-]
 
 /* -------------------------------------------------------------------------- */
 /* Helpers                                                                     */
@@ -373,13 +245,14 @@ function DecisionCard({
   projectHref: string
   onSelect: (id: string) => void
 }) {
+  const { routes, copy } = useWorkspace()
   const canAct = decision.status === 'pending' || decision.status === 'clarification'
 
   const menu: MenuItem[] = [
     { label: 'View project', to: projectHref, icon: Building2 },
-    { label: 'Ask about this decision', to: CLIENT_ROUTES.messages, icon: MessageSquare },
+    { label: 'Ask about this decision', to: routes.messages, icon: MessageSquare },
     ...((decision.financialValue ?? 0) > 0
-      ? [{ label: 'View in escrow', to: CLIENT_ROUTES.escrow, icon: Wallet }]
+      ? [{ label: `View in ${copy.money}`, to: routes.escrow, icon: Wallet }]
       : []),
   ]
 
@@ -451,7 +324,7 @@ function DecisionCard({
 
         {decision.financialImpact && (
           <Link
-            to={CLIENT_ROUTES.escrow}
+            to={routes.escrow}
             className={`mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-line/70 bg-ink/[0.018] px-4 py-3 transition hover:border-ink/15 ${focusRing}`}
           >
             <div className="flex items-center gap-2.5">
@@ -471,7 +344,7 @@ function DecisionCard({
             <span className="inline-flex items-center gap-1 text-[10px] font-medium text-ink/40">
               {(decision.financialValue ?? 0) > 0
                 ? formatNaira(decision.financialValue)
-                : 'View escrow'}
+                : `View ${copy.money}`}
               <ArrowRight size={12} aria-hidden="true" />
             </span>
           </Link>
@@ -536,34 +409,32 @@ function DecisionCard({
 /* Review / detail modal                                                       */
 /* -------------------------------------------------------------------------- */
 
-const RESULT_COPY: Record<
+const buildResultCopy = (
+  copy: RoleCopy,
+): Record<
   DecisionAction,
   { title: string; body: (d: Decision) => string; icon: typeof CheckCircle2; tone: string }
-> = {
+> => ({
   approve: {
     title: 'Decision approved',
     body: (d) =>
-      d.requiresPayment
-        ? 'Your approval has been recorded. Any related payment follows the escrow release rules.'
-        : 'Your approval has been recorded against the project.',
+      d.requiresPayment ? copy.approveNote : 'Your response has been recorded against the project.',
     icon: CheckCircle2,
     tone: 'bg-emerald-50 text-emerald-700',
   },
   reject: {
     title: 'Decision rejected',
-    body: () =>
-      'Your rejection has been recorded. The project team will be asked to revise and resubmit.',
+    body: () => copy.rejectNote,
     icon: XCircle,
     tone: 'bg-red-50 text-red-700',
   },
   clarify: {
     title: 'Clarification requested',
-    body: () =>
-      'The project team has been asked for more context. You can follow up in Messages.',
+    body: () => copy.clarifyNote,
     icon: MessageSquare,
     tone: 'bg-blue-50 text-blue-700',
   },
-}
+})
 
 function DecisionReviewModal({
   decision,
@@ -576,6 +447,7 @@ function DecisionReviewModal({
   onResolve: (id: string, action: DecisionAction) => void
   onClose: () => void
 }) {
+  const { routes, copy } = useWorkspace()
   const [processing, setProcessing] = useState<DecisionAction | null>(null)
   const [result, setResult] = useState<DecisionAction | null>(null)
 
@@ -609,7 +481,7 @@ function DecisionReviewModal({
     }, 650)
   }
 
-  const outcome = result ? RESULT_COPY[result] : null
+  const outcome = result ? buildResultCopy(copy)[result] : null
   const OutcomeIcon = outcome?.icon
 
   return (
@@ -683,17 +555,17 @@ function DecisionReviewModal({
               <div className="flex flex-wrap gap-2.5 border-t border-line pt-5">
                 {result === 'approve' && decision.requiresPayment && (
                   <Link
-                    to={CLIENT_ROUTES.escrow}
+                    to={routes.escrow}
                     className="inline-flex h-11 items-center gap-2 rounded-xl bg-ink px-4 text-[11px] font-semibold text-white hover:bg-[#151d2d]"
                   >
                     <Wallet size={15} aria-hidden="true" />
-                    View in escrow
+                    View in {copy.money}
                   </Link>
                 )}
 
                 {result !== 'approve' && (
                   <Link
-                    to={CLIENT_ROUTES.messages}
+                    to={routes.messages}
                     className="inline-flex h-11 items-center gap-2 rounded-xl bg-ink px-4 text-[11px] font-semibold text-white hover:bg-[#151d2d]"
                   >
                     <MessageSquare size={15} aria-hidden="true" />
@@ -740,7 +612,7 @@ function DecisionReviewModal({
                 </Link>
 
                 <Link
-                  to={CLIENT_ROUTES.escrow}
+                  to={routes.escrow}
                   className="group rounded-xl border border-line bg-ink/[0.02] p-4 transition hover:border-ink/15"
                 >
                   <p className="text-[9px] font-semibold uppercase tracking-[0.12em] text-ink/30">
@@ -809,7 +681,7 @@ function DecisionReviewModal({
                       <ArrowRight size={13} aria-hidden="true" />
                     </Link>
                     <Link
-                      to={CLIENT_ROUTES.messages}
+                      to={routes.messages}
                       className="inline-flex h-11 items-center gap-2 rounded-xl border border-line px-4 text-[11px] font-semibold text-ink/60 hover:bg-ink/[0.025]"
                     >
                       <MessageSquare size={14} aria-hidden="true" />
@@ -924,10 +796,16 @@ function FilterSelect({
 /* Main page                                                                   */
 /* -------------------------------------------------------------------------- */
 
-export function ClientDecisionsPage() {
-  const projectHref = useProjectHref()
+/** Keyed by role so switching actors never carries one role's decisions into another. */
+export function DecisionsPage() {
+  const { role } = useWorkspace()
+  return <DecisionsView key={role} />
+}
 
-  const [decisions, setDecisions] = useState<Decision[]>(INITIAL_DECISIONS)
+function DecisionsView() {
+  const { projectHref, routes, copy, data, hasDecisionApprovals } = useWorkspace()
+
+  const [decisions, setDecisions] = useState<Decision[]>(data.decisions)
   const [query, setQuery] = useState('')
   const [status, setStatus] = useState<'all' | DecisionStatus>('all')
   const [project, setProject] = useState('all')
@@ -1007,31 +885,29 @@ export function ClientDecisionsPage() {
               </div>
 
               <h1 className="font-display text-[32px] font-medium tracking-[-0.04em] text-ink sm:text-[40px] lg:text-[46px]">
-                Decisions that move
+                {copy.decisionsHeadline[0]}
                 <br className="hidden sm:block" />
-                your projects forward.
+                {copy.decisionsHeadline[1]}
               </h1>
 
               <p className="mt-4 max-w-2xl text-[13px] leading-6 text-ink/50 sm:text-[14px]">
-                Review project decisions, understand their financial and operational
-                impact, and provide approvals without losing visibility across your
-                Build OS workspace.
+                {copy.decisionsIntro}
               </p>
 
               <div className="mt-6 flex flex-wrap gap-2.5">
                 <Link
-                  to={CLIENT_ROUTES.escrow}
+                  to={routes.escrow}
                   className={`inline-flex h-10 items-center gap-2 rounded-xl border border-line bg-white px-4 text-[11px] font-semibold text-ink/65 transition hover:border-ink/15 hover:text-ink ${focusRing}`}
                 >
                   <Wallet size={14} aria-hidden="true" />
-                  Open escrow
+                  Open {copy.money}
                 </Link>
                 <Link
-                  to={CLIENT_ROUTES.messages}
+                  to={routes.messages}
                   className={`inline-flex h-10 items-center gap-2 rounded-xl border border-line bg-white px-4 text-[11px] font-semibold text-ink/65 transition hover:border-ink/15 hover:text-ink ${focusRing}`}
                 >
                   <MessageSquare size={14} aria-hidden="true" />
-                  Message project team
+                  Message {copy.counterpart}
                 </Link>
               </div>
             </div>
@@ -1039,7 +915,7 @@ export function ClientDecisionsPage() {
         </section>
 
         <main className="mx-auto max-w-[1680px] px-4 py-6 sm:px-6 sm:py-8 lg:px-10">
-          <SectionTabs tabs={decisionTabs} label="Decision sections" />
+          {hasDecisionApprovals && <SectionTabs tabs={decisionTabs} label="Decision sections" />}
 
           {/* Summary (click to filter) */}
           <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -1211,7 +1087,7 @@ export function ClientDecisionsPage() {
               </div>
 
               <Link
-                to={CLIENT_ROUTES.reports}
+                to={routes.reports}
                 className="inline-flex shrink-0 items-center gap-2 text-[11px] font-semibold text-ink/60 transition-colors hover:text-ink"
               >
                 View reports
@@ -1235,4 +1111,4 @@ export function ClientDecisionsPage() {
   )
 }
 
-export default ClientDecisionsPage
+export default DecisionsPage

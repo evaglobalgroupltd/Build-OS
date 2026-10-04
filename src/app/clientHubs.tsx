@@ -1,14 +1,12 @@
 import type { ReactNode } from 'react'
-import { Navigate, Outlet, Route, useLocation, useParams } from 'react-router-dom'
+import { Navigate, Route, useParams } from 'react-router-dom'
 
-import { DashboardLayout } from '@/layouts/DashboardLayout'
-import { HubLayout, PageBoundary, SectionTabs, type SectionTab } from '@/components/ui/HubLayout'
+import { CaseLayout, HubLayout, ModulePage } from '@/components/ui/HubLayout'
 import { projects } from '@/data/mockData'
 import type { Project } from '@/modules/projects/types'
 
 import {
   decisionTabs,
-  disputeCaseTabs,
   disputeTabs,
   documentTabs,
   escrowTabs,
@@ -21,9 +19,10 @@ import {
 
 /* ---- Pages that carry their own DashboardLayout (hand-built client pages) ---- */
 import { ClientDashboard, ClientProjectPage } from '@/pages/client/Dashboard'
-import { ClientDecisionsPage } from '@/pages/client/Decisions'
-import { MessagesPage } from '@/pages/client/Messages'
-import { UpdatesPage } from '@/pages/client/Updates'
+import { DecisionsPage as ClientDecisionsPage } from '@/pages/workspace/Decisions'
+import { ProfilePage } from '@/pages/Profile'
+import { MessagesPage } from '@/pages/workspace/Messages'
+import { UpdatesPage } from '@/pages/workspace/Updates'
 import { ProjectsPage as ClientProjectsPage, CreateProjectPage, EditProjectPage } from '@/pages/client/Projects'
 
 /* ---- Module pages (layout-less: rendered inside a hub or ModulePage) ---- */
@@ -98,38 +97,6 @@ import { NotificationSettings } from '@/modules/notifications/pages/Notification
  * Small layout helpers
  * ========================================================================== */
 
-/** Flat page: dashboard layout + optional tab bar + error boundary. */
-function ModulePage({
-  title,
-  tabs = [],
-  children,
-}: {
-  title: string
-  tabs?: SectionTab[]
-  children: ReactNode
-}) {
-  const { pathname } = useLocation()
-
-  return (
-    <DashboardLayout title={title}>
-      {tabs.length > 0 && <SectionTabs tabs={tabs} label={`${title} sections`} />}
-      <PageBoundary key={pathname}>{children}</PageBoundary>
-    </DashboardLayout>
-  )
-}
-
-/** Second-level tabs for one dispute (Case / Evidence / Responses / Resolution). */
-function CaseLayout() {
-  const { disputeId = '' } = useParams()
-
-  return (
-    <>
-      <SectionTabs tabs={disputeCaseTabs(disputeId)} label="Case sections" />
-      <Outlet />
-    </>
-  )
-}
-
 /** Project sub-pages that need the project from the URL. */
 function useRouteProject() {
   const { projectId = '' } = useParams<{ projectId: string }>()
@@ -158,6 +125,14 @@ export const clientHubRoutes = (
   <>
     {/* ---------------- Overview ---------------- */}
     <Route path="/app/client" element={<ClientDashboard />} />
+    <Route
+      path="/app/client/profile"
+      element={
+        <ModulePage title="Profile">
+          <ProfilePage />
+        </ModulePage>
+      }
+    />
 
     {/* ---------------- Projects ---------------- */}
     <Route path="/app/client/projects" element={<ClientProjectsPage />} />
@@ -249,7 +224,7 @@ export const clientHubRoutes = (
     <Route path="/app/client/disputes" element={<HubLayout title="Disputes" tabs={disputeTabs} />}>
       <Route index element={<DisputeList />} />
       <Route path="new" element={<CreateDispute />} />
-      <Route path=":disputeId" element={<CaseLayout />}>
+      <Route path=":disputeId" element={<CaseLayout base="/app/client" />}>
         <Route index element={<DisputeDetails />} />
         <Route path="evidence" element={<DisputeEvidence />} />
         <Route path="responses" element={<DisputeResponses />} />

@@ -7,7 +7,7 @@ import {
   useState,
   type ReactNode,
 } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import {
   ArrowUpRight,
   CheckCircle2,
@@ -23,6 +23,7 @@ import {
 import { roleLabels } from '@/config/navigation'
 import type { AppRole } from '@/config/roles'
 import { useAuth } from '@/context/AuthContext'
+import { useAppRoutes } from '@/config/appRoutes'
 
 /* =============================================================================
  * Build OS — Premium Topbar
@@ -282,6 +283,8 @@ const menuItem =
 
 function AccountMenu() {
   const { user, role, logout } = useAuth()
+  const navigate = useNavigate()
+  const app = useAppRoutes()
 
   const [open, setOpen] = useState(false)
 
@@ -442,7 +445,7 @@ function AccountMenu() {
         {/* Menu */}
         <div className="p-2">
           <Link
-            to="/profile"
+            to={app.to('profile')}
             role="menuitem"
             onClick={() => setOpen(false)}
             className={menuItem}
@@ -480,6 +483,7 @@ function AccountMenu() {
             onClick={() => {
               setOpen(false)
               logout()
+              navigate('/login', { replace: true })
             }}
             className={`${menuItem} hover:bg-red-50 hover:text-red-700`}
           >

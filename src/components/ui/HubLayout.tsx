@@ -1,5 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react'
-import { NavLink, Outlet, useLocation } from 'react-router-dom'
+import { NavLink, Outlet, useLocation, useParams } from 'react-router-dom'
 import { AlertTriangle } from 'lucide-react'
 
 import { DashboardLayout } from '@/layouts/DashboardLayout'
@@ -105,5 +105,45 @@ export function HubLayout({ title, tabs, label }: { title: string; tabs: Section
         <Outlet />
       </PageBoundary>
     </DashboardLayout>
+  )
+}
+
+/** Flat page: dashboard layout + optional tab bar + error boundary. */
+export function ModulePage({
+  title,
+  tabs = [],
+  children,
+}: {
+  title: string
+  tabs?: SectionTab[]
+  children: ReactNode
+}) {
+  const { pathname } = useLocation()
+
+  return (
+    <DashboardLayout title={title}>
+      {tabs.length > 0 && <SectionTabs tabs={tabs} label={`${title} sections`} />}
+      <PageBoundary key={pathname}>{children}</PageBoundary>
+    </DashboardLayout>
+  )
+}
+
+/** Second-level tabs for one dispute (Case / Evidence / Responses / Resolution), for any role. */
+export function CaseLayout({ base }: { base: string }) {
+  const { disputeId = '' } = useParams()
+
+  return (
+    <>
+      <SectionTabs
+        label="Case sections"
+        tabs={[
+          { label: 'Case', to: `${base}/disputes/${disputeId}`, end: true },
+          { label: 'Evidence', to: `${base}/disputes/${disputeId}/evidence` },
+          { label: 'Responses', to: `${base}/disputes/${disputeId}/responses` },
+          { label: 'Resolution', to: `${base}/disputes/${disputeId}/resolution` },
+        ]}
+      />
+      <Outlet />
+    </>
   )
 }

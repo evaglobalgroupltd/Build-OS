@@ -54,13 +54,6 @@ export const disputeTabs: SectionTab[] = [
   { label: 'Raise a dispute', to: `${B}/disputes/new` },
 ]
 
-export const disputeCaseTabs = (id: string): SectionTab[] => [
-  { label: 'Case', to: `${B}/disputes/${id}`, end: true },
-  { label: 'Evidence', to: `${B}/disputes/${id}/evidence` },
-  { label: 'Responses', to: `${B}/disputes/${id}/responses` },
-  { label: 'Resolution', to: `${B}/disputes/${id}/resolution` },
-]
-
 export const passportTabs: SectionTab[] = [
   { label: 'Passport', to: `${B}/passport`, end: true },
   { label: 'Property', to: `${B}/passport/property` },

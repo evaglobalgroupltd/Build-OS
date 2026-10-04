@@ -40,6 +40,9 @@ export interface User {
   verificationStatus: VerificationStatus
   trustScore: number // 0-100, see Section 15.4
   country: string
+  // Editable on the Profile page.
+  phone?: string
+  company?: string
 }
 
 export interface NavItem {

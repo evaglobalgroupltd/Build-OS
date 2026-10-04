@@ -28,10 +28,14 @@ import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { Card, CardBody } from '@/components/ui/Card'
 import { PopoverMenu, type MenuItem } from '@/components/ui/PopoverMenu'
 import { useAuth } from '@/context/AuthContext'
-import { CLIENT_ROUTES, useProjectHref } from '@/pages/client/clientRoutes'
+import { useWorkspace } from '@/hooks/useWorkspace'
+import type { Conversation, Message } from '@/data/workspaceData'
 
 /* =============================================================================
- * Client Messages   (route: /app/client/messages)
+ * Messages   (routes: /app/{client,contractor,market,pm,professional}/messages)
+ *
+ * One page for every actor. Role-specific links, wording and data come from
+ * useWorkspace(); the conversation data lives in src/data/workspaceData.ts.
  *
  * Fixes vs. the previous version:
  *  - Breadcrumb pointed at /app/client/dashboard (not a route -> sent people to
@@ -47,141 +51,6 @@ import { CLIENT_ROUTES, useProjectHref } from '@/pages/client/clientRoutes'
 /* Types                                                                      */
 /* -------------------------------------------------------------------------- */
 
-type MessageSender = 'client' | 'contractor'
-
-type Message = {
-  id: number
-  sender: MessageSender
-  text: string
-  time: string
-  read?: boolean
-  attachment?: {
-    name: string
-    type: 'document' | 'image'
-    /** Object URL for files you just attached. */
-    url?: string
-  }
-}
-
-type Conversation = {
-  id: string
-  name: string
-  role: string
-  initials: string
-  project: string
-  projectId: string
-  online: boolean
-  unread: number
-  lastMessage: string
-  lastTime: string
-  accent: string
-  messages: Message[]
-}
-
-/* -------------------------------------------------------------------------- */
-/* Mock conversations                                                         */
-/* -------------------------------------------------------------------------- */
-
-const INITIAL_CONVERSATIONS: Conversation[] = [
-  {
-    id: 'conv-001',
-    name: 'Build Team',
-    role: 'Project Contractor',
-    initials: 'BT',
-    project: 'Lekki Residence',
-    projectId: '1',
-    online: true,
-    unread: 2,
-    lastMessage: 'The roofing evidence has been uploaded for your review.',
-    lastTime: '10:42 PM',
-    accent: 'from-blue-600 to-cyan-500',
-    messages: [
-      {
-        id: 1,
-        sender: 'contractor',
-        text: 'Good evening. The roofing phase is progressing well and we have completed the main roof structure.',
-        time: '8:31 PM',
-        read: true,
-      },
-      {
-        id: 2,
-        sender: 'client',
-        text: 'Great. Please make sure the supporting evidence is uploaded before the milestone is submitted.',
-        time: '8:37 PM',
-        read: true,
-      },
-      {
-        id: 3,
-        sender: 'contractor',
-        text: 'Absolutely. We have uploaded the latest site photographs and inspection evidence.',
-        time: '10:21 PM',
-        read: true,
-      },
-      {
-        id: 4,
-        sender: 'contractor',
-        text: 'The roofing evidence has been uploaded for your review.',
-        time: '10:42 PM',
-        read: false,
-      },
-    ],
-  },
-  {
-    id: 'conv-002',
-    name: 'Amina Yusuf',
-    role: 'Project Manager',
-    initials: 'AY',
-    project: 'Lekki Residence',
-    projectId: '1',
-    online: true,
-    unread: 0,
-    lastMessage: 'I have added the inspection notes to the project.',
-    lastTime: 'Yesterday',
-    accent: 'from-violet-600 to-fuchsia-500',
-    messages: [
-      {
-        id: 1,
-        sender: 'contractor',
-        text: 'I have completed the inspection notes for the latest site visit.',
-        time: 'Yesterday',
-        read: true,
-      },
-      {
-        id: 2,
-        sender: 'client',
-        text: 'Thank you. I will review them together with the milestone evidence.',
-        time: 'Yesterday',
-        read: true,
-      },
-    ],
-  },
-  {
-    id: 'conv-003',
-    name: 'Kola Architects',
-    role: 'Professional Expert',
-    initials: 'KA',
-    project: 'Lekki Residence',
-    projectId: '1',
-    online: false,
-    unread: 0,
-    lastMessage: 'The revised drawings are ready.',
-    lastTime: 'Mon',
-    accent: 'from-amber-500 to-orange-500',
-    messages: [
-      {
-        id: 1,
-        sender: 'contractor',
-        text: 'The revised architectural drawings are now ready for review.',
-        time: 'Mon',
-        read: true,
-        attachment: {
-          name: 'Revised Architectural Drawings.pdf',
-          type: 'document',
-        },
-      },
-    ],
-  },
-]
 
 /* -------------------------------------------------------------------------- */
 /* Small components                                                           */
@@ -216,6 +85,7 @@ function AttachmentCard({
   attachment: NonNullable<Message['attachment']>
   mine: boolean
 }) {
+  const { routes } = useWorkspace()
   const className = [
     'mt-3 flex items-center gap-3 rounded-xl border p-3 transition',
     mine
@@ -269,7 +139,7 @@ function AttachmentCard({
       {body}
     </a>
   ) : (
-    <Link to={CLIENT_ROUTES.passport} className={className}>
+    <Link to={routes.passport} className={className}>
       {body}
     </Link>
   )
@@ -431,12 +301,18 @@ function ConversationList({
 /* Main page                                                                  */
 /* -------------------------------------------------------------------------- */
 
+/** Keyed by role so switching actors never carries one role's conversations into another. */
 export function MessagesPage() {
-  const { user } = useAuth()
-  const projectHref = useProjectHref()
+  const { role } = useWorkspace()
+  return <MessagesView key={role} />
+}
 
-  const [conversations, setConversations] = useState(INITIAL_CONVERSATIONS)
-  const [activeId, setActiveId] = useState(INITIAL_CONVERSATIONS[0]?.id ?? '')
+function MessagesView() {
+  const { user } = useAuth()
+  const { projectHref, routes, copy, data, hasDecisions } = useWorkspace()
+
+  const [conversations, setConversations] = useState(data.conversations)
+  const [activeId, setActiveId] = useState(data.conversations[0]?.id ?? '')
   const [search, setSearch] = useState('')
   const [message, setMessage] = useState('')
 
@@ -488,7 +364,7 @@ export function MessagesPage() {
 
     const newMessage: Message = {
       id: Date.now(),
-      sender: 'client',
+      sender: 'me',
       text,
       time: 'Just now',
       read: true,
@@ -533,7 +409,7 @@ export function MessagesPage() {
     event.target.value = ''
   }
 
-  const displayName = user?.fullName?.split(' ')[0] || 'Client'
+  const displayName = user?.fullName?.split(' ')[0] || 'there'
 
   const newMessageItems: MenuItem[] = conversations.map((c) => ({
     label: `${c.name} · ${c.role}`,
@@ -547,14 +423,18 @@ export function MessagesPage() {
           to: projectHref(activeConversation.projectId),
           icon: Building2,
         },
-        {
-          label: 'Review decisions',
-          to: CLIENT_ROUTES.decisions,
-          icon: ClipboardCheck,
-        },
+        ...(hasDecisions
+          ? [
+              {
+                label: 'Review decisions',
+                to: routes.decisions,
+                icon: ClipboardCheck,
+              },
+            ]
+          : []),
         {
           label: 'Project updates',
-          to: CLIENT_ROUTES.updates,
+          to: routes.updates,
           icon: Bell,
         },
         {
@@ -573,10 +453,10 @@ export function MessagesPage() {
           <div>
             <div className="mb-2 flex items-center gap-2 text-xs font-medium text-slate-400">
               <Link
-                to={CLIENT_ROUTES.overview}
+                to={routes.overview}
                 className="transition hover:text-blue-600"
               >
-                Client Portal
+                {copy.portal}
               </Link>
               <ChevronRight className="h-3.5 w-3.5" />
               <span className="text-slate-600">Messages</span>
@@ -591,19 +471,20 @@ export function MessagesPage() {
             </h1>
 
             <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-              Communicate directly with the people responsible for your projects,
-              while keeping project conversations connected to the Build OS record.
+              {copy.messagesIntro}
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2 self-start lg:self-auto">
-            <Link
-              to={CLIENT_ROUTES.decisions}
-              className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
-            >
-              <ClipboardCheck className="h-4 w-4" />
-              Review decisions
-            </Link>
+            {hasDecisions && (
+              <Link
+                to={routes.decisions}
+                className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+              >
+                <ClipboardCheck className="h-4 w-4" />
+                Review decisions
+              </Link>
+            )}
 
             <div className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 shadow-sm">
               <ShieldCheck className="h-4 w-4 text-blue-600" />
@@ -707,7 +588,7 @@ export function MessagesPage() {
                       </div>
 
                       {activeConversation.messages.map((item) => {
-                        const mine = item.sender === 'client'
+                        const mine = item.sender === 'me'
 
                         return (
                           <div

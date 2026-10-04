@@ -11,7 +11,7 @@ import {
   type ReactNode,
   type RefObject,
 } from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import * as Icons from 'lucide-react'
 import {
   Check,
@@ -25,7 +25,7 @@ import {
 } from 'lucide-react'
 
 import { navByRole, roleLabels } from '@/config/navigation'
-import { roleMeta, accentClasses, roleOrder } from '@/config/roleUi'
+import { roleMeta, accentClasses, roleOrder, roleHomePath } from '@/config/roleUi'
 import type { AppRole } from '@/config/roles'
 import { useAuth } from '@/context/AuthContext'
 
@@ -403,6 +403,7 @@ function WorkspaceSwitcher({
   tip: TipApi
 }) {
   const { role, setRole } = useAuth()
+  const navigate = useNavigate()
   const [open, setOpen] = useState(false)
 
   const panelId = useId()
@@ -564,6 +565,7 @@ function WorkspaceSwitcher({
                 }
                 onClick={() => {
                   setRole(roleItem)
+                  navigate(roleHomePath[roleItem])
                   setOpen(false)
                   triggerRef.current?.focus()
                 }}

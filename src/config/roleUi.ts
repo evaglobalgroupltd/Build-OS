@@ -31,6 +31,11 @@ export const roleMeta: Record<
     accent: 'brick',
   },
 
+  diaspora_client: {
+    icon: HomeIcon,
+    accent: 'brick',
+  },
+
   contractor: {
     icon: Users,
     accent: 'teal',
@@ -102,6 +107,8 @@ export const roleOrder: UserRole[] = [
  */
 export const roleHomePath: Record<UserRole, string> = {
   client: '/app/client',
+
+  diaspora_client: '/app/client',
 
   contractor: '/app/contractor',
 

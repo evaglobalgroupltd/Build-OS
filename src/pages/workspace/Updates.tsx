@@ -20,14 +20,17 @@ import {
 } from 'lucide-react'
 
 import { DashboardLayout } from '@/layouts/DashboardLayout'
-import { Card, CardBody, CardHeader } from '@/components/ui/Card'
+import { Card, CardBody } from '@/components/ui/Card'
 import { DetailPanel, DetailRow } from '@/components/ui/DetailPanel'
 import { SectionTabs } from '@/components/ui/HubLayout'
-import { updatesTabs } from '@/pages/client/clientTabs'
-import { CLIENT_ROUTES, useProjectHref } from '@/pages/client/clientRoutes'
+import { useWorkspace } from '@/hooks/useWorkspace'
+import type { UpdateItem, UpdateType, UpdateStatus } from '@/data/workspaceData'
 
 /* =============================================================================
- * Client Updates   (route: /app/client/updates)
+ * Updates   (routes: /app/{client,contractor,market,pm,professional}/updates)
+ *
+ * One page for every actor. Links, wording and data come from useWorkspace();
+ * the update records live in src/data/workspaceData.ts.
  *
  * Fixes vs. the previous version:
  *  - Breadcrumb pointed at /app/client/dashboard (not a route -> home page).
@@ -41,180 +44,6 @@ import { CLIENT_ROUTES, useProjectHref } from '@/pages/client/clientRoutes'
 /* Types                                                                      */
 /* -------------------------------------------------------------------------- */
 
-type UpdateType =
-  | 'evidence'
-  | 'approval'
-  | 'document'
-  | 'payment'
-  | 'message'
-  | 'inspection'
-  | 'project'
-
-type UpdateStatus = 'new' | 'action_required' | 'completed' | 'informational'
-
-/** Where the primary button for an update should go. */
-type UpdateAction = 'decisions' | 'project' | 'escrow' | 'passport' | 'messages'
-
-type UpdateItem = {
-  id: string
-  type: UpdateType
-  status: UpdateStatus
-  title: string
-  description: string
-  project: string
-  projectId: string
-  actor: string
-  timestamp: string
-  dateGroup: 'Today' | 'Yesterday' | 'Earlier'
-  amount?: number
-  attachments?: number
-  action: UpdateAction
-  actionLabel: string
-  priority?: 'high' | 'normal'
-}
-
-/* -------------------------------------------------------------------------- */
-/* Data                                                                       */
-/* -------------------------------------------------------------------------- */
-
-const UPDATES: UpdateItem[] = [
-  {
-    id: 'update-001',
-    type: 'approval',
-    status: 'action_required',
-    title: 'Roofing milestone requires your approval',
-    description:
-      'The contractor has submitted completion evidence for the roofing milestone. Review the evidence before approving the milestone and associated release.',
-    project: 'Lekki Residence',
-    projectId: '1',
-    actor: 'Build Team',
-    timestamp: '10:42 PM',
-    dateGroup: 'Today',
-    amount: 4500000,
-    attachments: 6,
-    action: 'decisions',
-    actionLabel: 'Review milestone',
-    priority: 'high',
-  },
-  {
-    id: 'update-002',
-    type: 'evidence',
-    status: 'new',
-    title: 'New site evidence uploaded',
-    description:
-      'Six new photographs and supporting evidence have been added to the roofing milestone record.',
-    project: 'Lekki Residence',
-    projectId: '1',
-    actor: 'Build Team',
-    timestamp: '10:21 PM',
-    dateGroup: 'Today',
-    attachments: 6,
-    action: 'decisions',
-    actionLabel: 'View evidence',
-    priority: 'normal',
-  },
-  {
-    id: 'update-003',
-    type: 'inspection',
-    status: 'completed',
-    title: 'Site inspection completed',
-    description:
-      'The latest site inspection has been completed and the inspection notes have been added to the project record.',
-    project: 'Lekki Residence',
-    projectId: '1',
-    actor: 'Amina Yusuf · Project Manager',
-    timestamp: '6:18 PM',
-    dateGroup: 'Today',
-    attachments: 3,
-    action: 'project',
-    actionLabel: 'View project',
-    priority: 'normal',
-  },
-  {
-    id: 'update-004',
-    type: 'payment',
-    status: 'completed',
-    title: 'Structure milestone payment released',
-    description:
-      'The structure milestone was approved and the corresponding escrow release was recorded.',
-    project: 'Lekki Residence',
-    projectId: '1',
-    actor: 'Build OS',
-    timestamp: 'Yesterday',
-    dateGroup: 'Yesterday',
-    amount: 6750000,
-    action: 'escrow',
-    actionLabel: 'View escrow',
-    priority: 'normal',
-  },
-  {
-    id: 'update-005',
-    type: 'document',
-    status: 'new',
-    title: 'Revised architectural drawings added',
-    description:
-      'The latest architectural drawing package has been added to the project documentation.',
-    project: 'Lekki Residence',
-    projectId: '1',
-    actor: 'Kola Architects',
-    timestamp: 'Yesterday',
-    dateGroup: 'Yesterday',
-    attachments: 1,
-    action: 'passport',
-    actionLabel: 'Open Property Passport',
-    priority: 'normal',
-  },
-  {
-    id: 'update-006',
-    type: 'message',
-    status: 'informational',
-    title: 'New message from the project team',
-    description:
-      'The project contractor has sent an update regarding the roofing evidence submission.',
-    project: 'Lekki Residence',
-    projectId: '1',
-    actor: 'Build Team',
-    timestamp: 'Yesterday',
-    dateGroup: 'Yesterday',
-    action: 'messages',
-    actionLabel: 'Open messages',
-    priority: 'normal',
-  },
-  {
-    id: 'update-007',
-    type: 'project',
-    status: 'completed',
-    title: 'Foundation milestone completed',
-    description:
-      'The foundation milestone was approved after the required evidence and verification were completed.',
-    project: 'Lekki Residence',
-    projectId: '1',
-    actor: 'Build OS',
-    timestamp: '18 Sep',
-    dateGroup: 'Earlier',
-    amount: 4500000,
-    action: 'project',
-    actionLabel: 'View project',
-    priority: 'normal',
-  },
-  {
-    id: 'update-008',
-    type: 'document',
-    status: 'completed',
-    title: 'Site survey documentation completed',
-    description:
-      'The completed site survey documentation has been added to the project record.',
-    project: 'Lekki Residence',
-    projectId: '1',
-    actor: 'Professional Team',
-    timestamp: '16 Sep',
-    dateGroup: 'Earlier',
-    attachments: 4,
-    action: 'passport',
-    actionLabel: 'View passport',
-    priority: 'normal',
-  },
-]
 
 /* -------------------------------------------------------------------------- */
 /* Helpers                                                                    */
@@ -284,18 +113,18 @@ function StatusBadge({ status }: { status: UpdateStatus }) {
 
 /** Resolves an update's primary action to a real route. */
 function useActionTo() {
-  const projectHref = useProjectHref()
+  const { projectHref, routes } = useWorkspace()
 
   return (update: UpdateItem): string => {
     switch (update.action) {
       case 'decisions':
-        return CLIENT_ROUTES.decisions
+        return routes.decisions
       case 'escrow':
-        return CLIENT_ROUTES.escrow
+        return routes.escrow
       case 'passport':
-        return CLIENT_ROUTES.passport
+        return routes.passport
       case 'messages':
-        return CLIENT_ROUTES.messages
+        return routes.messages
       default:
         return projectHref(update.projectId)
     }
@@ -507,12 +336,18 @@ function SummaryTile({
 /* Main page                                                                  */
 /* -------------------------------------------------------------------------- */
 
+/** Keyed by role so switching actors never carries one role's feed into another. */
 export function UpdatesPage() {
-  const projectHref = useProjectHref()
+  const { role } = useWorkspace()
+  return <UpdatesView key={role} />
+}
+
+function UpdatesView() {
+  const { projectHref, routes, copy, data, hasDecisions, isClient, updatesTabs } = useWorkspace()
   const actionTo = useActionTo()
 
   const [activeFilter, setActiveFilter] = useState<FilterKey>('all')
-  const [updates, setUpdates] = useState(UPDATES)
+  const [updates, setUpdates] = useState(data.updates)
   const [selected, setSelected] = useState<UpdateItem | null>(null)
 
   const actionCount = updates.filter((u) => u.status === 'action_required').length
@@ -560,10 +395,10 @@ export function UpdatesPage() {
           <div>
             <div className="mb-2 flex items-center gap-2 text-xs font-medium text-slate-400">
               <Link
-                to={CLIENT_ROUTES.overview}
+                to={routes.overview}
                 className="transition hover:text-blue-600"
               >
-                Client Portal
+                {copy.portal}
               </Link>
               <ChevronRight className="h-3.5 w-3.5" />
               <span className="text-slate-600">Updates</span>
@@ -578,14 +413,12 @@ export function UpdatesPage() {
             </h1>
 
             <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-              Stay informed about project progress, evidence, inspections, documents,
-              payments and items requiring your attention. Select any update to see
-              the full details.
+              {copy.updatesIntro} Select any update to see the full details.
             </p>
           </div>
 
           <Link
-            to={CLIENT_ROUTES.projects}
+            to={routes.projects}
             className="inline-flex items-center justify-center gap-2 self-start rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 lg:self-auto"
           >
             View projects
@@ -633,7 +466,7 @@ export function UpdatesPage() {
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
           <section>
             <Card className="overflow-hidden border-slate-200/80 shadow-sm">
-              <CardHeader className="border-b border-slate-200/80 bg-white px-5 py-4">
+              <div className="border-b border-slate-200/80 bg-white px-5 py-4">
                 <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
                   <div>
                     <div className="flex items-center gap-2">
@@ -673,7 +506,7 @@ export function UpdatesPage() {
                     </div>
                   </div>
                 </div>
-              </CardHeader>
+              </div>
 
               <CardBody className="bg-[#F7F9FC] p-4 sm:p-5">
                 {groupedUpdates.length === 0 ? (
@@ -745,8 +578,8 @@ export function UpdatesPage() {
                 </h3>
 
                 <p className="mt-2 text-xs leading-5 text-white/55">
-                  Approval requests and other client actions appear here as part of
-                  the project activity stream.
+                  Approval requests and other actions appear here as part of the
+                  project activity stream.
                 </p>
 
                 <div className="mt-5 flex flex-wrap gap-2">
@@ -761,32 +594,38 @@ export function UpdatesPage() {
                     </button>
                   )}
 
-                  <Link
-                    to={CLIENT_ROUTES.decisions}
-                    className="inline-flex items-center gap-2 rounded-xl border border-white/20 px-3.5 py-2.5 text-[10px] font-bold text-white transition hover:bg-white/10"
-                  >
-                    Go to decisions
-                    <ArrowRight className="h-3.5 w-3.5" />
-                  </Link>
+                  {hasDecisions && (
+                    <Link
+                      to={routes.decisions}
+                      className="inline-flex items-center gap-2 rounded-xl border border-white/20 px-3.5 py-2.5 text-[10px] font-bold text-white transition hover:bg-white/10"
+                    >
+                      Go to decisions
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </Link>
+                  )}
                 </div>
               </CardBody>
             </Card>
 
             <Card className="border-slate-200/80 shadow-sm">
-              <CardHeader className="px-5 pb-2 pt-5">
+              <div className="px-5 pb-2 pt-5">
                 <h3 className="text-sm font-bold text-[#0B1220]">Quick access</h3>
                 <p className="mt-1 text-[11px] text-slate-400">
                   Continue where you need to go.
                 </p>
-              </CardHeader>
+              </div>
 
               <CardBody className="space-y-1 p-3">
                 {[
-                  { label: 'My projects', description: 'Portfolio & progress', href: CLIENT_ROUTES.projects, icon: FileText },
-                  { label: 'Decisions', description: 'Approvals waiting', href: CLIENT_ROUTES.decisions, icon: Gavel },
-                  { label: 'Escrow', description: 'Funds & releases', href: CLIENT_ROUTES.escrow, icon: WalletCards },
-                  { label: 'Messages', description: 'Project communication', href: CLIENT_ROUTES.messages, icon: MessageSquare },
-                  { label: 'Property passport', description: 'Verified records', href: CLIENT_ROUTES.passport, icon: ShieldCheck },
+                  { label: isClient ? 'My projects' : 'Projects', description: 'Portfolio & progress', href: routes.projects, icon: FileText },
+                  ...(hasDecisions
+                    ? [{ label: 'Decisions', description: 'Responses waiting', href: routes.decisions, icon: Gavel }]
+                    : []),
+                  { label: isClient ? 'Escrow' : 'Payments', description: 'Funds & releases', href: routes.escrow, icon: WalletCards },
+                  { label: 'Messages', description: 'Project communication', href: routes.messages, icon: MessageSquare },
+                  ...(isClient
+                    ? [{ label: 'Property passport', description: 'Verified records', href: routes.passport, icon: ShieldCheck }]
+                    : []),
                 ].map((item) => {
                   const Icon = item.icon
 
@@ -850,7 +689,7 @@ export function UpdatesPage() {
               </Link>
 
               <Link
-                to={CLIENT_ROUTES.messages}
+                to={routes.messages}
                 className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-[11px] font-bold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50"
               >
                 <MessageSquare className="h-3.5 w-3.5" />
@@ -899,12 +738,12 @@ export function UpdatesPage() {
 
           {selected.attachments !== undefined && (
             <Link
-              to={CLIENT_ROUTES.passport}
+              to={routes.passport}
               className="mt-5 flex items-center justify-between rounded-2xl bg-[#F7F9FC] p-4 transition hover:bg-slate-100"
             >
               <span className="flex items-center gap-2.5 text-[12px] font-semibold text-slate-700">
                 <FileText className="h-4 w-4 text-slate-400" />
-                View files in Property Passport
+                {isClient ? 'View files in Property Passport' : 'View project files'}
               </span>
               <ChevronRight className="h-4 w-4 text-slate-300" />
             </Link>

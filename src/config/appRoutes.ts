@@ -39,9 +39,12 @@ export type RouteKey =
   | 'updates'
   | 'passport'
   | 'decisions'
+  | 'profile'
+  | 'team' //         contractor's build team
 
 const BASE: Record<UserRole, string> = {
   client: '/app/client',
+  diaspora_client: '/app/client',
   contractor: '/app/contractor',
   market_place: '/app/market',
   project_manager: '/app/pm',
@@ -50,59 +53,150 @@ const BASE: Record<UserRole, string> = {
 }
 
 const ROLE_BY_BASE: Record<string, UserRole> = Object.fromEntries(
-  (Object.entries(BASE) as [UserRole, string][]).map(([role, base]) => [base, role]),
+  (Object.entries(BASE) as [UserRole, string][])
+    .filter(([role]) => role !== 'diaspora_client') // shares /app/client with 'client'
+    .map(([role, base]) => [base, role]),
 )
 
 /** Section path per role, relative to BASE. Omitted = that role has no such section. */
+const CLIENT_SECTIONS: Partial<Record<RouteKey, string>> = {
+  profile: 'profile',
+  projects: 'projects',
+  money: 'escrow',
+  procurement: 'procurement',
+  reports: 'reports',
+  disputes: 'disputes',
+  milestones: 'milestones',
+  evidence: 'evidence',
+  documents: 'documents',
+  messages: 'messages',
+  updates: 'updates',
+  passport: 'passport',
+  decisions: 'decisions',
+}
+
 const SECTIONS: Record<UserRole, Partial<Record<RouteKey, string>>> = {
-  client: {
-    projects: 'projects',
-    money: 'escrow',
-    procurement: 'procurement',
-    reports: 'reports',
-    disputes: 'disputes',
-    milestones: 'milestones',
-    evidence: 'evidence',
-    documents: 'documents',
-    messages: 'messages',
-    updates: 'updates',
-    passport: 'passport',
-    decisions: 'decisions',
-  },
+  client: CLIENT_SECTIONS,
+  diaspora_client: CLIENT_SECTIONS,
   contractor: {
+    profile: 'profile',
     projects: 'available',
+    team: 'team',
     money: 'payments',
     procurement: 'materials',
     reports: 'reports',
     disputes: 'disputes',
     milestones: 'milestones',
+    messages: 'messages',
+    updates: 'updates',
+    decisions: 'decisions',
+    documents: 'documents',
+    evidence: 'evidence',
   },
   market_place: {
+    profile: 'profile',
+    projects: 'orders',
     money: 'payments',
     procurement: 'orders',
     disputes: 'disputes',
+    messages: 'messages',
+    updates: 'updates',
+    decisions: 'decisions',
+    documents: 'documents',
   },
   project_manager: {
+    profile: 'profile',
     projects: 'projects',
     reports: 'reports',
     milestones: 'milestones',
     evidence: 'evidence',
     inspections: 'inspections',
+    messages: 'messages',
+    updates: 'updates',
+    documents: 'documents',
   },
   professional: {
+    profile: 'profile',
+    projects: 'invitations',
     money: 'payments',
+    messages: 'messages',
+    updates: 'updates',
+    decisions: 'decisions',
+    documents: 'documents',
   },
   admin: {
+    profile: 'profile',
     projects: 'projects',
     money: 'escrow',
     procurement: 'procurement',
     reports: 'reports',
     disputes: 'disputes',
+    evidence: 'compliance',
+    documents: 'documents',
+    messages: 'messages',
+    updates: 'updates',
+    decisions: 'decisions',
   },
 }
 
-/** Roles that have nested hub routes (so sub-paths resolve). Add a role when its hubs exist. */
-const SUB_ROLES = new Set<UserRole>(['client'])
+/**
+ * Sub-pages each role really has, per concept. Module pages ask for things like
+ * routes.to('disputes', 'current/evidence'); a sub-path only gets appended when it is
+ * listed here, otherwise the link lands on the section's main page instead of a dead
+ * route. ":id" matches any single segment (the demo pages use "current" as a stand-in id).
+ * Client has every sub-page, so it is unrestricted.
+ *
+ * Adding a nested <Route> for a role? Add its sub-path here too.
+ */
+const COMMON_SUBS: Partial<Record<RouteKey, string[]>> = {
+  updates: ['notifications', 'preferences'],
+  documents: ['upload', ':id', ':id/history'],
+  disputes: ['new', ':id', ':id/evidence', ':id/responses', ':id/resolution'],
+}
+
+const SUBS: Partial<Record<UserRole, Partial<Record<RouteKey, string[]>>>> = {
+  contractor: {
+    ...COMMON_SUBS,
+    money: ['transactions', 'requests'],
+    procurement: ['new'],
+    milestones: [':id'],
+    evidence: [':id'],
+  },
+  market_place: {
+    ...COMMON_SUBS,
+    money: ['transactions', 'requests'],
+  },
+  project_manager: {
+    ...COMMON_SUBS,
+    evidence: [':id', ':id/review'],
+  },
+  professional: {
+    ...COMMON_SUBS,
+    money: ['transactions', 'requests'],
+  },
+  admin: {
+    ...COMMON_SUBS,
+    money: ['transactions', 'approvals', 'requests', 'frozen', 'refunds'],
+    reports: ['financial', 'audit', 'compliance', 'projects'],
+    evidence: ['audit-logs', 'settings'],
+  },
+}
+
+const CLIENT_ROLES = new Set<UserRole>(['client', 'diaspora_client'])
+
+function subAllowed(role: UserRole, key: RouteKey, sub: string): boolean {
+  if (CLIENT_ROLES.has(role)) return true
+  const normalized = sub
+    .replace(/^\/+|\/+$/g, '')
+    .split('/')
+    .map((seg) => (seg === 'current' ? ':id' : seg))
+    .join('/')
+  return (SUBS[role]?.[key] ?? []).some((pattern) => {
+    const p = pattern.split('/')
+    const n = normalized.split('/')
+    return p.length === n.length && p.every((seg, i) => seg === ':id' ? n[i] !== '' : seg === n[i])
+  })
+}
 
 const isDev = Boolean((import.meta as unknown as { env?: { DEV?: boolean } }).env?.DEV)
 
@@ -129,8 +223,8 @@ export function routeFor(role: UserRole, key: RouteKey, sub?: string): string {
 
   const parts = [base, section]
   if (sub) {
-    if (SUB_ROLES.has(role)) parts.push(sub.replace(/^\/+|\/+$/g, ''))
-    else warn(`Role "${role}" has no sub-pages yet, so "${key}/${sub}" links to "${key}" instead.`)
+    if (subAllowed(role, key, sub)) parts.push(sub.replace(/^\/+|\/+$/g, ''))
+    else warn(`Role "${role}" has no "${key}/${sub}" page, so the link goes to "${key}" instead.`)
   }
 
   return parts.join('/')

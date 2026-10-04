@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Users, BadgeCheck, Wallet, Gavel, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react'
-import { AdminLayout } from '@/layouts/AdminLayout'
+import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { StatCard } from '@/components/ui/StatCard'
 import { Card, CardHeader, CardBody } from '@/components/ui/Card'
 import { StagePill } from '@/modules/projects/components/StagePill'
@@ -46,7 +46,7 @@ export function AdminDashboard() {
   }, [sortKey, sortDirection])
 
   return (
-    <AdminLayout title="Platform Overview">
+    <DashboardLayout title="Platform Overview">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label="Total users" value="1,204" icon={Users} tone="ink" />
         <StatCard label="Verification queue" value="18" icon={BadgeCheck} tone="amber" />
@@ -132,6 +132,6 @@ export function AdminDashboard() {
           </CardBody>
         </Card>
       </div>
-    </AdminLayout>
+    </DashboardLayout>
   )
 }

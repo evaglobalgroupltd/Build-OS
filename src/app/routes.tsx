@@ -1,4 +1,7 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom'
+
+import { useAuth } from '@/context/AuthContext'
+import { ProfileRedirect } from '@/pages/Profile'
 
 import {
   Home,
@@ -23,67 +26,22 @@ import { ProjectQuestionnaire } from '@/components/ProjectQuestionnaire'
 import { clientHubRoutes } from './clientHubs'
 
 /* -------------------------------------------------------------------------- */
-/* Contractor                                                                 */
+/* Contractor, Marketplace, Professional, Project Manager, Admin: roleHubs.tsx */
 /* -------------------------------------------------------------------------- */
 
-import { ContractorDashboard } from '@/pages/contractor/Dashboard'
-import { ProjectsPage as ContractorAvailableProjectsPage } from '@/pages/contractor/Projects'
-import { BidsPage } from '@/pages/contractor/Bids'
-import { MilestonesPage as ContractorMilestonesPage } from '@/pages/contractor/Milestones'
-import { MaterialsPage } from '@/pages/contractor/Materials'
-import { ReportsPage as ContractorReportsPage } from '@/pages/contractor/Reports'
-import { PaymentsPage as ContractorPaymentsPage } from '@/pages/contractor/Payments'
-import { DisputesPage as ContractorDisputesPage } from '@/pages/contractor/Disputes'
+import { adminRoutes, contractorRoutes, marketRoutes, pmRoutes, professionalRoutes } from './roleHubs'
 
 /* -------------------------------------------------------------------------- */
-/* Marketplace                                                                */
+/* Signed-in guard: logged-out visitors are sent to /login                     */
 /* -------------------------------------------------------------------------- */
 
-import { MarketDashboard } from '@/pages/market-place/Dashboard'
-import { CataloguePage } from '@/pages/market-place/Catalogue'
-import { QuotationsPage } from '@/pages/market-place/Quotations'
-import { OrdersPage } from '@/pages/market-place/Orders'
-import { DeliveriesPage } from '@/pages/market-place/Deliveries'
-import { PaymentsPage as MarketPaymentsPage } from '@/pages/market-place/Payments'
-import { DisputesPage as MarketDisputesPage } from '@/pages/market-place/Disputes'
+function RequireAuth() {
+  const { isAuthenticated } = useAuth()
+  const { pathname } = useLocation()
 
-/* -------------------------------------------------------------------------- */
-/* Project Manager                                                            */
-/* -------------------------------------------------------------------------- */
-
-import { ProjectManagerDashboard } from '@/pages/project-manager/Dashboard'
-import { ProjectsPage as PMProjectsPage } from '@/pages/project-manager/Projects'
-import { InspectionsPage } from '@/pages/project-manager/Inspections'
-import { MilestonesPage as PMMilestonesPage } from '@/pages/project-manager/Milestones'
-import { EvidencePage } from '@/pages/project-manager/Evidence'
-import { ReportsPage as PMReportsPage } from '@/pages/project-manager/Reports'
-import { RisksPage } from '@/pages/project-manager/Risks'
-
-/* -------------------------------------------------------------------------- */
-/* Professional                                                               */
-/* -------------------------------------------------------------------------- */
-
-import { ProfessionalDashboard } from '@/pages/professional/Dashboard'
-import { AssignmentsPage } from '@/pages/professional/Assignments'
-import { ProposalsPage } from '@/pages/professional/Proposals'
-import { DeliverablesPage } from '@/pages/professional/Deliverables'
-import { PaymentsPage as ProfessionalPaymentsPage } from '@/pages/professional/Payments'
-
-/* -------------------------------------------------------------------------- */
-/* Admin                                                                      */
-/* -------------------------------------------------------------------------- */
-
-import { AdminDashboard } from '@/pages/admin/Dashboard'
-import { UsersPage } from '@/pages/admin/Users'
-import { VerificationPage } from '@/pages/admin/Verification'
-import { ProjectsPage as AdminProjectsPage } from '@/pages/admin/Projects'
-import { MarketplacePage } from '@/pages/admin/Marketplace'
-import { ProcurementPage as AdminProcurementPage } from '@/pages/admin/Procurement'
-import { EscrowPage as AdminEscrowPage } from '@/pages/admin/Escrow'
-import { DisputesPage as AdminDisputesPage } from '@/pages/admin/Disputes'
-import { CompliancePage } from '@/pages/admin/Compliance'
-import { ReportsPage as AdminReportsPage } from '@/pages/admin/Reports'
-import { AnalyticsPage } from '@/pages/admin/Analytics'
+  if (!isAuthenticated) return <Navigate to="/login" replace state={{ from: pathname }} />
+  return <Outlet />
+}
 
 /* =============================================================================
  * APP ROUTES
@@ -111,63 +69,36 @@ export function AppRoutes() {
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/terms" element={<Terms />} />
 
-        {/* ======================== ONBOARDING / PROJECT STUDIO =================== */}
-        {/* Canonical Project Studio route (CLIENT_ROUTES.studio = '/onboarding'). */}
-        <Route path="/onboarding" element={<ProjectQuestionnaire />} />
+        {/* Everything below needs a signed-in user. */}
+        <Route element={<RequireAuth />}>
+          {/* ======================== ONBOARDING / PROJECT STUDIO =================== */}
+          {/* Canonical Project Studio route (CLIENT_ROUTES.studio = '/onboarding'). */}
+          <Route path="/onboarding" element={<ProjectQuestionnaire />} />
 
-        {/* ================================ CLIENT ================================ */}
-        {/* Overview, projects, decisions, escrow, procurement, reports, disputes,
-            passport, documents, evidence, milestones, updates, messages, and the
-            legacy /vault + /questionnaire redirects. */}
-        {clientHubRoutes}
+          {/* ================================ CLIENT ================================ */}
+          {/* Overview, projects, decisions, escrow, procurement, reports, disputes,
+              passport, documents, evidence, milestones, updates, messages, and the
+              legacy /vault + /questionnaire redirects. */}
+          {clientHubRoutes}
 
-        {/* ============================== CONTRACTOR ============================== */}
-        <Route path="/app/contractor" element={<ContractorDashboard />} />
-        <Route path="/app/contractor/available" element={<ContractorAvailableProjectsPage />} />
-        <Route path="/app/contractor/bids" element={<BidsPage />} />
-        <Route path="/app/contractor/milestones" element={<ContractorMilestonesPage />} />
-        <Route path="/app/contractor/materials" element={<MaterialsPage />} />
-        <Route path="/app/contractor/reports" element={<ContractorReportsPage />} />
-        <Route path="/app/contractor/payments" element={<ContractorPaymentsPage />} />
-        <Route path="/app/contractor/disputes" element={<ContractorDisputesPage />} />
+          {/* ============================== CONTRACTOR ============================== */}
+          {contractorRoutes}
 
-        {/* ============================== MARKETPLACE ============================= */}
-        <Route path="/app/market" element={<MarketDashboard />} />
-        <Route path="/app/market/catalogue" element={<CataloguePage />} />
-        <Route path="/app/market/quotations" element={<QuotationsPage />} />
-        <Route path="/app/market/orders" element={<OrdersPage />} />
-        <Route path="/app/market/deliveries" element={<DeliveriesPage />} />
-        <Route path="/app/market/payments" element={<MarketPaymentsPage />} />
-        <Route path="/app/market/disputes" element={<MarketDisputesPage />} />
+          {/* ============================== MARKETPLACE ============================= */}
+          {marketRoutes}
 
-        {/* ============================ PROJECT MANAGER =========================== */}
-        <Route path="/app/pm" element={<ProjectManagerDashboard />} />
-        <Route path="/app/pm/projects" element={<PMProjectsPage />} />
-        <Route path="/app/pm/inspections" element={<InspectionsPage />} />
-        <Route path="/app/pm/milestones" element={<PMMilestonesPage />} />
-        <Route path="/app/pm/evidence" element={<EvidencePage />} />
-        <Route path="/app/pm/reports" element={<PMReportsPage />} />
-        <Route path="/app/pm/risks" element={<RisksPage />} />
+          {/* ============================ PROJECT MANAGER =========================== */}
+          {pmRoutes}
 
-        {/* ============================== PROFESSIONAL ============================ */}
-        <Route path="/app/professional" element={<ProfessionalDashboard />} />
-        <Route path="/app/professional/invitations" element={<AssignmentsPage />} />
-        <Route path="/app/professional/proposals" element={<ProposalsPage />} />
-        <Route path="/app/professional/deliverables" element={<DeliverablesPage />} />
-        <Route path="/app/professional/payments" element={<ProfessionalPaymentsPage />} />
+          {/* ============================== PROFESSIONAL ============================ */}
+          {professionalRoutes}
 
-        {/* ================================= ADMIN ================================ */}
-        <Route path="/app/admin" element={<AdminDashboard />} />
-        <Route path="/app/admin/users" element={<UsersPage />} />
-        <Route path="/app/admin/verification" element={<VerificationPage />} />
-        <Route path="/app/admin/projects" element={<AdminProjectsPage />} />
-        <Route path="/app/admin/marketplace" element={<MarketplacePage />} />
-        <Route path="/app/admin/procurement" element={<AdminProcurementPage />} />
-        <Route path="/app/admin/escrow" element={<AdminEscrowPage />} />
-        <Route path="/app/admin/disputes" element={<AdminDisputesPage />} />
-        <Route path="/app/admin/compliance" element={<CompliancePage />} />
-        <Route path="/app/admin/reports" element={<AdminReportsPage />} />
-        <Route path="/app/admin/analytics" element={<AnalyticsPage />} />
+          {/* ================================= ADMIN ================================ */}
+          {adminRoutes}
+        </Route>
+
+        {/* Legacy /profile link from older account menus */}
+        <Route path="/profile" element={<ProfileRedirect />} />
 
         {/* ============================ APPLICATION FALLBACKS ===================== */}
         <Route path="/app" element={<Navigate to="/app/client" replace />} />
