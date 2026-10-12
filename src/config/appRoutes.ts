@@ -42,6 +42,7 @@ export type RouteKey =
 
 const BASE: Record<UserRole, string> = {
   client: '/app/client',
+  diaspora_client: '/app/client', // same workspace as a client
   contractor: '/app/contractor',
   market_place: '/app/market',
   project_manager: '/app/pm',
@@ -50,25 +51,30 @@ const BASE: Record<UserRole, string> = {
 }
 
 const ROLE_BY_BASE: Record<string, UserRole> = Object.fromEntries(
-  (Object.entries(BASE) as [UserRole, string][]).map(([role, base]) => [base, role]),
+  (Object.entries(BASE) as [UserRole, string][])
+    .filter(([role]) => role !== 'diaspora_client') // shares /app/client with 'client'
+    .map(([role, base]) => [base, role]),
 )
 
 /** Section path per role, relative to BASE. Omitted = that role has no such section. */
+const CLIENT_SECTIONS: Partial<Record<RouteKey, string>> = {
+  projects: 'projects',
+  money: 'escrow',
+  procurement: 'procurement',
+  reports: 'reports',
+  disputes: 'disputes',
+  milestones: 'milestones',
+  evidence: 'evidence',
+  documents: 'documents',
+  messages: 'messages',
+  updates: 'updates',
+  passport: 'passport',
+  decisions: 'decisions',
+}
+
 const SECTIONS: Record<UserRole, Partial<Record<RouteKey, string>>> = {
-  client: {
-    projects: 'projects',
-    money: 'escrow',
-    procurement: 'procurement',
-    reports: 'reports',
-    disputes: 'disputes',
-    milestones: 'milestones',
-    evidence: 'evidence',
-    documents: 'documents',
-    messages: 'messages',
-    updates: 'updates',
-    passport: 'passport',
-    decisions: 'decisions',
-  },
+  client: CLIENT_SECTIONS,
+  diaspora_client: CLIENT_SECTIONS,
   contractor: {
     projects: 'available',
     money: 'payments',
@@ -102,7 +108,7 @@ const SECTIONS: Record<UserRole, Partial<Record<RouteKey, string>>> = {
 }
 
 /** Roles that have nested hub routes (so sub-paths resolve). Add a role when its hubs exist. */
-const SUB_ROLES = new Set<UserRole>(['client'])
+const SUB_ROLES = new Set<UserRole>(['client', 'diaspora_client'])
 
 const isDev = Boolean((import.meta as unknown as { env?: { DEV?: boolean } }).env?.DEV)
 

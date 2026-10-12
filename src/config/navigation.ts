@@ -29,6 +29,11 @@ import type { UserRole, NavItem } from '@/types'
  */
 
 export const navByRole: Record<UserRole, NavItem[]> = {
+  // Diaspora clients use the client menu (same /app/client routes).
+  get diaspora_client() {
+    return this.client
+  },
+
   /* =========================================================================
    * CLIENT
    * ========================================================================= */
@@ -360,6 +365,7 @@ export const navByRole: Record<UserRole, NavItem[]> = {
 
 export const roleLabels: Record<UserRole, string> = {
   client: 'Client',
+  diaspora_client: 'Diaspora Client',
   contractor: 'Contractor',
   market_place: 'Market Place',
   project_manager: 'Project Manager',

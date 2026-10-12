@@ -20,7 +20,7 @@ import {
 } from 'lucide-react'
 
 import { DashboardLayout } from '@/layouts/DashboardLayout'
-import { Card, CardBody, CardHeader } from '@/components/ui/Card'
+import { Card, CardBody } from '@/components/ui/Card'
 import { DetailPanel, DetailRow } from '@/components/ui/DetailPanel'
 import { SectionTabs } from '@/components/ui/HubLayout'
 import { updatesTabs } from '@/pages/client/clientTabs'
@@ -633,7 +633,7 @@ export function UpdatesPage() {
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
           <section>
             <Card className="overflow-hidden border-slate-200/80 shadow-sm">
-              <CardHeader className="border-b border-slate-200/80 bg-white px-5 py-4">
+              <div className="border-b border-slate-200/80 bg-white px-5 py-4">
                 <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
                   <div>
                     <div className="flex items-center gap-2">
@@ -673,7 +673,7 @@ export function UpdatesPage() {
                     </div>
                   </div>
                 </div>
-              </CardHeader>
+              </div>
 
               <CardBody className="bg-[#F7F9FC] p-4 sm:p-5">
                 {groupedUpdates.length === 0 ? (
@@ -773,12 +773,12 @@ export function UpdatesPage() {
             </Card>
 
             <Card className="border-slate-200/80 shadow-sm">
-              <CardHeader className="px-5 pb-2 pt-5">
+              <div className="px-5 pb-2 pt-5">
                 <h3 className="text-sm font-bold text-[#0B1220]">Quick access</h3>
                 <p className="mt-1 text-[11px] text-slate-400">
                   Continue where you need to go.
                 </p>
-              </CardHeader>
+              </div>
 
               <CardBody className="space-y-1 p-3">
                 {[
