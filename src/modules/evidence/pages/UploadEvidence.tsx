@@ -16,6 +16,8 @@ import {
   User,
   Video,
 } from 'lucide-react'
+
+import { toast } from '@/context/ToastContext'
 import type { LucideIcon } from 'lucide-react'
 
 import { Badge } from '@/components/ui/Badge'
@@ -25,6 +27,7 @@ import {
   CardHeader,
 } from '@/components/ui/Card'
 
+import { ActionButton, RoleLink } from '@/components/ui/ModuleActions'
 type EvidenceFileType = 'image' | 'video' | 'document'
 
 interface EvidenceFile {
@@ -388,13 +391,13 @@ export function EvidenceReview() {
                     </span>
                   </div>
 
-                  <button
+                  <ActionButton message="Review decision recorded" description="The decision is now part of the evidence audit trail"
                     type="button"
                     className="inline-flex items-center justify-center gap-2 rounded-full bg-ink px-4 py-2.5 text-xs font-semibold text-white shadow-[0_5px_16px_rgba(20,30,25,0.10)] transition hover:-translate-y-0.5 hover:bg-ink/90 hover:shadow-[0_8px_20px_rgba(20,30,25,0.14)]"
                   >
                     Record review decision
                     <ChevronRight className="h-3.5 w-3.5" />
-                  </button>
+                  </ActionButton>
                 </div>
               </div>
             </CardBody>
@@ -609,13 +612,12 @@ function ReviewFileCard({
           Image
         </span>
 
-        <button
-          type="button"
-          className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-ink/40 opacity-0 shadow-sm backdrop-blur-sm transition group-hover:opacity-100 hover:text-ink"
+        <RoleLink route="evidence" sub="current"
+          className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-ink/40 opacity-0 [@media(hover:none)]:opacity-100 shadow-sm backdrop-blur-sm transition group-hover:opacity-100 hover:text-ink"
           aria-label={`Inspect ${file.name}`}
         >
           <Eye className="h-3.5 w-3.5" />
-        </button>
+        </RoleLink>
       </div>
 
       <div className="p-3.5">
@@ -627,13 +629,12 @@ function ReviewFileCard({
           {file.size} · {file.uploadedAt}
         </p>
 
-        <button
-          type="button"
+        <RoleLink route="evidence" sub="current"
           className="mt-3 inline-flex items-center gap-1.5 text-[10px] font-semibold text-ink/45 transition hover:text-ink"
         >
           <Eye className="h-3.5 w-3.5" />
           Inspect evidence
-        </button>
+        </RoleLink>
       </div>
     </article>
   )
@@ -682,8 +683,7 @@ function ReviewFileRow({
         </div>
       </div>
 
-      <button
-        type="button"
+      <RoleLink route="evidence" sub="current"
         className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-ink/[0.07] bg-white text-ink/35 transition hover:border-ink/[0.14] hover:text-ink"
         aria-label={`Inspect ${file.name}`}
       >
@@ -692,7 +692,7 @@ function ReviewFileRow({
         ) : (
           <Eye className="h-3.5 w-3.5" />
         )}
-      </button>
+      </RoleLink>
     </article>
   )
 }
@@ -747,6 +747,12 @@ function ReviewContext({
   )
 }
 
+const REVIEW_OUTCOME = {
+  teal: { tone: 'success', title: 'Evidence verified', description: 'The decision is recorded in the audit trail' },
+  amber: { tone: 'info', title: 'More evidence requested', description: 'The submitter has been notified' },
+  brick: { tone: 'error', title: 'Issue flagged', description: 'The case was escalated for review' },
+} as const
+
 function DecisionButton({
   icon: Icon,
   title,
@@ -786,6 +792,7 @@ function DecisionButton({
   return (
     <button
       type="button"
+      onClick={() => toast[REVIEW_OUTCOME[tone].tone](REVIEW_OUTCOME[tone].title, REVIEW_OUTCOME[tone].description)}
       disabled={disabled}
       className={`group relative overflow-hidden rounded-[17px] border bg-white p-4 text-left transition duration-200 ${
         styles.border

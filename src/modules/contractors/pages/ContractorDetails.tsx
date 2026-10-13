@@ -19,6 +19,7 @@ import {
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 
+import { ActionButton, RoleLink } from '@/components/ui/ModuleActions'
 const contractor = {
   name: 'Apex Build & Engineering Ltd.',
   registration: 'RC 1847291',
@@ -129,21 +130,20 @@ export function ContractorDetails() {
             </div>
 
             <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
+              <RoleLink route="messages"
                 className="inline-flex items-center gap-2 rounded-xl border border-line bg-white px-4 py-2.5 text-xs font-semibold text-ink transition-colors hover:bg-ink/[0.03]"
               >
                 <Mail className="h-3.5 w-3.5" />
                 Contact
-              </button>
+              </RoleLink>
 
-              <button
+              <ActionButton message="Invitation sent" description="They can accept or decline from their phone"
                 type="button"
                 className="inline-flex items-center gap-2 rounded-xl bg-ink px-4 py-2.5 text-xs font-semibold text-white transition-opacity hover:opacity-90"
               >
                 Invite to project
                 <ChevronRight className="h-3.5 w-3.5" />
-              </button>
+              </ActionButton>
             </div>
           </div>
         </div>

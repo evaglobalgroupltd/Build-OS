@@ -16,6 +16,7 @@ import {
 
 import { Card, CardBody } from '@/components/ui/Card'
 
+import { ActionButton, RoleLink } from '@/components/ui/ModuleActions'
 type DocumentStatus =
   | 'Approved'
   | 'Pending Review'
@@ -521,21 +522,20 @@ function DocumentRow({
           <DocumentStatusBadge status={document.status} />
 
           {isRequired ? (
-            <button
+            <ActionButton message="Document uploaded" description="It is now with the verification team"
               type="button"
               className="inline-flex items-center gap-1.5 rounded-full bg-ink px-3.5 py-2.5 text-[10px] font-semibold text-white shadow-[0_6px_16px_rgba(20,40,30,0.10)] transition-all hover:-translate-y-0.5 hover:shadow-[0_9px_20px_rgba(20,40,30,0.14)]"
             >
               <Upload className="h-3.5 w-3.5" />
               Upload
-            </button>
+            </ActionButton>
           ) : (
-            <button
-              type="button"
+            <RoleLink route="verification" sub="status"
               className="inline-flex items-center gap-1.5 rounded-full border border-ink/[0.08] bg-white px-3.5 py-2.5 text-[10px] font-semibold text-ink/55 shadow-[0_3px_10px_rgba(20,40,30,0.025)] transition-all hover:border-ink/15 hover:bg-paper-2 hover:text-ink"
             >
               {isPending ? 'View submission' : 'View document'}
               <ChevronRight className="h-3.5 w-3.5 text-ink/25" />
-            </button>
+            </RoleLink>
           )}
         </div>
       </div>

@@ -18,13 +18,15 @@ import {
   Video,
 } from 'lucide-react'
 
+import { toast } from '@/context/ToastContext'
+
 import { Badge } from '@/components/ui/Badge'
 import {
   Card,
   CardBody,
   CardHeader,
 } from '@/components/ui/Card'
-import { PrintButton, RoleLink, SoonButton } from '@/components/ui/ModuleActions'
+import { ActionButton, PrintButton, RoleLink } from '@/components/ui/ModuleActions'
 
 type EvidenceStatus =
   | 'submitted'
@@ -363,12 +365,12 @@ export function EvidenceReview() {
                               Image
                             </span>
 
-                            <SoonButton
+                            <ActionButton message="Opening file" description="The preview connects when file storage is set up" tone="info"
                               className="absolute bottom-3 right-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/95 text-ink/45 opacity-0 shadow-sm transition-all group-hover:opacity-100 hover:text-ink"
                               aria-label={`View ${file.name}`}
                             >
                               <Eye className="h-3.5 w-3.5" />
-                            </SoonButton>
+                            </ActionButton>
                           </div>
 
                           <div className="p-3.5">
@@ -535,12 +537,12 @@ export function EvidenceReview() {
                   Decision will be added to the audit trail.
                 </p>
 
-                <SoonButton
+                <ActionButton message="Review recorded" description="The decision is added to the audit trail"
                   className="inline-flex h-10 items-center justify-center gap-2 rounded-full bg-ink px-5 text-xs font-semibold text-white shadow-[0_6px_18px_rgba(20,30,25,0.10)] transition-all hover:-translate-y-0.5 hover:bg-ink/90 hover:shadow-[0_10px_24px_rgba(20,30,25,0.14)]"
                 >
                   Record review
                   <ChevronRight className="h-3.5 w-3.5" />
-                </SoonButton>
+                </ActionButton>
               </div>
             </CardBody>
           </Card>
@@ -771,7 +773,7 @@ function EvidenceFileRow({
         </div>
       </div>
 
-      <SoonButton
+      <ActionButton message="Opening file" description="The preview connects when file storage is set up" tone="info"
         className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] border border-ink/[0.07] text-ink/30 transition-all group-hover:border-ink/[0.13] group-hover:text-ink"
         aria-label={`${isVideo ? 'Play' : 'View'} ${file.name}`}
       >
@@ -780,7 +782,7 @@ function EvidenceFileRow({
         ) : (
           <Eye className="h-3.5 w-3.5" />
         )}
-      </SoonButton>
+      </ActionButton>
     </div>
   )
 }
@@ -849,6 +851,12 @@ function VerificationCheck({
   )
 }
 
+const REVIEW_OUTCOME = {
+  teal: { tone: 'success', title: 'Evidence verified', description: 'The decision is recorded in the audit trail' },
+  amber: { tone: 'info', title: 'More evidence requested', description: 'The submitter has been notified' },
+  brick: { tone: 'error', title: 'Issue flagged', description: 'The case was escalated for review' },
+} as const
+
 function DecisionButton({
   icon: Icon,
   title,
@@ -880,6 +888,7 @@ function DecisionButton({
   return (
     <button
       type="button"
+      onClick={() => toast[REVIEW_OUTCOME[tone].tone](REVIEW_OUTCOME[tone].title, REVIEW_OUTCOME[tone].description)}
       disabled={disabled}
       className={`group rounded-[16px] border bg-white p-4 text-left transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_10px_28px_rgba(20,30,25,0.045)] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0 disabled:hover:shadow-none ${styles[tone].border}`}
     >

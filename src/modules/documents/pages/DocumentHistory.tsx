@@ -16,7 +16,7 @@ import {
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
-import { RoleLink, SoonButton } from '@/components/ui/ModuleActions'
+import { ActionButton, RoleLink } from '@/components/ui/ModuleActions'
 
 type HistoryEventType =
   | 'uploaded'
@@ -515,7 +515,7 @@ export function DocumentHistory() {
                     </div>
                   </div>
 
-                  <SoonButton
+                  <ActionButton message="Opening version" description="Older versions open when file storage is connected" tone="info"
                     className="
                       mt-3
                       flex
@@ -539,7 +539,7 @@ export function DocumentHistory() {
                   >
                     <Download className="h-3 w-3" />
                     View version
-                  </SoonButton>
+                  </ActionButton>
                 </div>
               ))}
             </CardBody>

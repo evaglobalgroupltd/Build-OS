@@ -924,7 +924,7 @@ function StudioHeader({ title, onExit }: { title: string; onExit: () => void }) 
       </div>
       <span className="hidden text-[13px] font-medium text-[var(--studio-muted)] lg:block">Your project, shaped your way.</span>
       <div className="flex items-center gap-4">
-        <button type="button" onClick={onExit} className="hidden text-[13px] font-semibold text-[var(--studio-muted)] transition hover:text-[var(--studio-ink)] sm:block">
+        <button type="button" onClick={onExit} className="block text-[13px] font-semibold text-[var(--studio-muted)] transition hover:text-[var(--studio-ink)]">
           Save &amp; exit
         </button>
         <button
@@ -972,14 +972,14 @@ function StudioControls({
         <ArrowLeft size={16} />
         Back
       </button>
-      <div className="flex items-center gap-5">
+      <div className="flex flex-wrap items-center justify-end gap-x-4 gap-y-2 sm:gap-x-5">
         {onReturnToReview && (
-          <button type="button" onClick={onReturnToReview} className="hidden text-[13.5px] font-semibold text-[var(--studio-muted)] underline-offset-4 transition hover:text-[var(--studio-ink)] hover:underline sm:block">
+          <button type="button" onClick={onReturnToReview} className="block text-[13.5px] font-semibold text-[var(--studio-muted)] underline-offset-4 transition hover:text-[var(--studio-ink)] hover:underline">
             Back to review
           </button>
         )}
         {skippable && onSkip && (
-          <button type="button" onClick={onSkip} className="hidden text-[13.5px] font-semibold text-[var(--studio-muted)] underline-offset-4 transition hover:text-[var(--studio-ink)] hover:underline sm:block">
+          <button type="button" onClick={onSkip} className="block text-[13.5px] font-semibold text-[var(--studio-muted)] underline-offset-4 transition hover:text-[var(--studio-ink)] hover:underline">
             Skip for now
           </button>
         )}

@@ -93,6 +93,36 @@ export const navByRole: Record<UserRole, NavItem[]> = {
       path: '/app/client/disputes',
       icon: 'Scale',
     },
+
+    {
+      label: 'Contractors',
+      path: '/app/client/contractors',
+      icon: 'HardHat',
+    },
+
+    {
+      label: 'Professionals',
+      path: '/app/client/professionals',
+      icon: 'Briefcase',
+    },
+
+    {
+      label: 'Suppliers',
+      path: '/app/client/suppliers',
+      icon: 'Store',
+    },
+
+    {
+      label: 'Bids',
+      path: '/app/client/bids',
+      icon: 'Gavel',
+    },
+
+    {
+      label: 'Verification',
+      path: '/app/client/verification',
+      icon: 'ShieldCheck',
+    },
   ],
 
   // Diaspora clients use the client workspace (same /app/client routes).
@@ -177,6 +207,36 @@ export const navByRole: Record<UserRole, NavItem[]> = {
       icon: 'BellRing',
     },
 
+
+    {
+      label: 'Suppliers',
+      path: '/app/contractor/suppliers',
+      icon: 'Store',
+    },
+
+    {
+      label: 'Site Monitoring',
+      path: '/app/contractor/monitoring',
+      icon: 'Activity',
+    },
+
+    {
+      label: 'Company Profile',
+      path: '/app/contractor/company',
+      icon: 'Building2',
+    },
+
+    {
+      label: 'Organisation',
+      path: '/app/contractor/organization',
+      icon: 'Network',
+    },
+
+    {
+      label: 'Verification',
+      path: '/app/contractor/verification',
+      icon: 'ShieldCheck',
+    },
   ],
 
   /* =========================================================================
@@ -244,6 +304,24 @@ export const navByRole: Record<UserRole, NavItem[]> = {
       icon: 'BellRing',
     },
 
+
+    {
+      label: 'Storefront',
+      path: '/app/market/storefront',
+      icon: 'Store',
+    },
+
+    {
+      label: 'Organisation',
+      path: '/app/market/organization',
+      icon: 'Network',
+    },
+
+    {
+      label: 'Verification',
+      path: '/app/market/verification',
+      icon: 'ShieldCheck',
+    },
   ],
 
   /* =========================================================================
@@ -305,6 +383,18 @@ export const navByRole: Record<UserRole, NavItem[]> = {
       icon: 'BellRing',
     },
 
+
+    {
+      label: 'Site Monitoring',
+      path: '/app/pm/monitoring',
+      icon: 'Activity',
+    },
+
+    {
+      label: 'Verification',
+      path: '/app/pm/verification',
+      icon: 'ShieldCheck',
+    },
   ],
 
   /* =========================================================================
@@ -360,6 +450,24 @@ export const navByRole: Record<UserRole, NavItem[]> = {
       icon: 'BellRing',
     },
 
+
+    {
+      label: 'Expert Profile',
+      path: '/app/professional/expert-profile',
+      icon: 'UserSquare',
+    },
+
+    {
+      label: 'Organisation',
+      path: '/app/professional/organization',
+      icon: 'Network',
+    },
+
+    {
+      label: 'Verification',
+      path: '/app/professional/verification',
+      icon: 'ShieldCheck',
+    },
   ],
 
   /* =========================================================================
@@ -449,6 +557,30 @@ export const navByRole: Record<UserRole, NavItem[]> = {
       label: 'Updates',
       path: '/app/admin/updates',
       icon: 'BellRing',
+    },
+
+    {
+      label: 'Contractors',
+      path: '/app/admin/contractors',
+      icon: 'HardHat',
+    },
+
+    {
+      label: 'Professionals',
+      path: '/app/admin/professionals',
+      icon: 'Briefcase',
+    },
+
+    {
+      label: 'Site Monitoring',
+      path: '/app/admin/monitoring',
+      icon: 'Activity',
+    },
+
+    {
+      label: 'Organisations',
+      path: '/app/admin/organizations',
+      icon: 'Network',
     },
   ],
 }

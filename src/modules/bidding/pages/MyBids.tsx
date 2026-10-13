@@ -11,11 +11,18 @@ import {
   TrendingUp,
 } from 'lucide-react'
 
+import { useState } from 'react'
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 import { BidList } from '@/modules/bidding/components/BidList'
 import { bids } from '@/data/mockData'
 
+import { RoleLink } from '@/components/ui/ModuleActions'
+const BID_FILTERS = ['all', 'submitted', 'shortlisted', 'awarded', 'rejected'] as const
+
 export function MyBids() {
+  const [bidFilter, setBidFilter] = useState<(typeof BID_FILTERS)[number]>('all')
+  const visibleBids = bidFilter === 'all' ? bids : bids.filter((bid) => bid.status === bidFilter)
+
   const submittedCount = bids.filter(
     (bid) => bid.status === 'submitted',
   ).length
@@ -73,13 +80,12 @@ export function MyBids() {
             </p>
           </div>
 
-          <button
-            type="button"
+          <RoleLink route="projects"
             className="group inline-flex w-fit shrink-0 items-center justify-center gap-2 rounded-full bg-white px-5 py-3 text-[10px] font-bold uppercase tracking-[0.08em] text-[#173629] shadow-[0_10px_25px_rgba(0,0,0,0.12)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#F8FAF7] hover:shadow-[0_14px_30px_rgba(0,0,0,0.16)]"
           >
             Find projects
             <ArrowUpRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-          </button>
+          </RoleLink>
         </div>
 
         {/* Hero intelligence strip */}
@@ -178,17 +184,18 @@ export function MyBids() {
           action={
             <button
               type="button"
+              onClick={() => setBidFilter((current) => BID_FILTERS[(BID_FILTERS.indexOf(current) + 1) % BID_FILTERS.length]!)}
               className="group inline-flex items-center gap-2 rounded-full border border-ink/[0.08] bg-white px-3.5 py-2 text-[9px] font-bold uppercase tracking-[0.08em] text-ink/45 transition-all duration-200 hover:border-ink/[0.14] hover:bg-[#F6F8F5] hover:text-ink"
             >
               <Filter className="h-3 w-3 transition-transform duration-200 group-hover:rotate-12" />
-              Filter
+              <span className="capitalize">{bidFilter === 'all' ? 'Filter' : bidFilter}</span>
             </button>
           }
         />
 
         <CardBody>
           {bids.length > 0 ? (
-            <BidList bids={bids} />
+            <BidList bids={visibleBids} />
           ) : (
             <EmptyBidsState />
           )}
@@ -221,13 +228,12 @@ export function MyBids() {
               </div>
             </div>
 
-            <button
-              type="button"
+            <RoleLink route="company"
               className="group inline-flex w-fit shrink-0 items-center gap-2 text-[9px] font-bold uppercase tracking-[0.08em] text-[#173629] transition-colors hover:text-[#B85C12]"
             >
               View profile
               <ArrowUpRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-            </button>
+            </RoleLink>
           </div>
         </section>
       )}
@@ -368,14 +374,13 @@ function EmptyBidsState() {
           building your contractor record.
         </p>
 
-        <button
-          type="button"
+        <RoleLink route="projects"
           className="group mt-6 inline-flex items-center gap-2 rounded-full bg-[#173629] px-5 py-3 text-[10px] font-bold uppercase tracking-[0.08em] text-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#214838] hover:shadow-[0_10px_25px_rgba(23,54,41,0.14)]"
         >
           <Send className="h-3.5 w-3.5" />
           Browse projects
           <ArrowUpRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-        </button>
+        </RoleLink>
       </div>
     </div>
   )

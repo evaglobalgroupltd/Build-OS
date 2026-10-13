@@ -11,6 +11,7 @@ import {
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 
+import { ActionButton, RoleLink } from '@/components/ui/ModuleActions'
 const roles = [
   {
     name: 'Organization Owner',
@@ -152,13 +153,13 @@ export function Roles() {
               </div>
             </div>
 
-            <button
+            <ActionButton message="Role created" description="Set its permissions next"
               type="button"
               className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#18271F] px-4 py-2.5 text-xs font-semibold text-white shadow-[0_10px_24px_rgba(24,39,31,0.16)] transition-all hover:-translate-y-0.5 hover:bg-[#12613E]"
             >
               <Plus className="h-3.5 w-3.5" />
               Create role
-            </button>
+            </ActionButton>
           </div>
         </div>
       </section>
@@ -403,13 +404,12 @@ function RoleRow({
             />
           </div>
 
-          <button
-            type="button"
+          <RoleLink route="organization" sub="permissions"
             aria-label={`Manage ${role.name}`}
             className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-ink/[0.08] bg-white text-ink/40 transition-all hover:border-ink/[0.14] hover:bg-ink/[0.03] hover:text-ink"
           >
             <MoreHorizontal className="h-4 w-4" />
-          </button>
+          </RoleLink>
 
           <ChevronRight className="hidden h-4 w-4 shrink-0 text-ink/20 transition-transform group-hover:translate-x-0.5 group-hover:text-ink/40 sm:block" />
         </div>

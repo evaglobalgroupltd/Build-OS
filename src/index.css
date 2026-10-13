@@ -20,6 +20,40 @@
    shade in this project.
    ========================================================= */
 
+/* -----------------------------------------------------------------------------
+ * Touch devices
+ *
+ * - touch-action: manipulation removes the double-tap-zoom delay, so taps respond at once.
+ * - Small text links and buttons get an invisible hit area ~6px larger on every side.
+ *   Nothing moves or resizes; a tap just no longer has to land on 12px of text.
+ *
+ * Lives in @layer base so any utility class (absolute, fixed, sticky, after:...) still wins.
+ * -------------------------------------------------------------------------- */
+@layer base {
+  a[href],
+  button,
+  [role='button'],
+  [role='tab'],
+  [role='menuitem'],
+  summary,
+  label[for],
+  select {
+    touch-action: manipulation;
+  }
+
+  @media (pointer: coarse) {
+    :where(a[href], button, [role='button'], [role='tab'], [role='menuitem']) {
+      position: relative;
+    }
+
+    :where(a[href], button, [role='button'], [role='tab'], [role='menuitem'])::after {
+      content: '';
+      position: absolute;
+      inset: -6px -4px;
+    }
+  }
+}
+
 @theme {
   /* Core brand — "verified" blue */
   --color-teal: #1657ff;

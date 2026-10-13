@@ -244,6 +244,21 @@ export function NotificationSettings() {
           description="Choose where each category of Build OS activity should be delivered."
         />
 
+        {/* Phone: bulk switches (the desktop header below is hidden under md) */}
+        <div className="flex flex-wrap items-center gap-2 border-y border-ink/[0.06] bg-[#F8FAF8] px-5 py-3 md:hidden">
+          <span className="mr-auto text-[11px] font-medium text-ink/45">Switch all on or off</span>
+          {(['email', 'push', 'sms'] as const).map((channel) => (
+            <button
+              key={channel}
+              type="button"
+              onClick={() => toggleAll(channel)}
+              className="rounded-full border border-ink/[0.1] bg-white px-3.5 py-2 text-[11px] font-semibold capitalize text-ink/70 transition hover:bg-ink/[0.03]"
+            >
+              {channel === 'sms' ? 'SMS' : channel}
+            </button>
+          ))}
+        </div>
+
         {/* Desktop matrix header */}
         <div className="hidden border-y border-ink/[0.06] bg-[#F8FAF8] px-6 py-3.5 md:grid md:grid-cols-[minmax(0,1fr)_96px_96px_96px] md:items-center">
           <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.17em] text-ink/30">

@@ -15,12 +15,14 @@ import {
   Upload,
   X,
 } from 'lucide-react'
+
+import { toast } from '@/context/ToastContext'
 import type {
   Dispatch,
   ReactNode,
   SetStateAction,
 } from 'react'
-import { SoonButton } from '@/components/ui/ModuleActions'
+
 
 
 const sections = [
@@ -1259,11 +1261,20 @@ function DocumentUpload({
           project's document service.
         </p>
 
-        <SoonButton
-          className="mt-4 rounded-full border border-ink/[0.09] bg-white px-4 py-2 text-[10px] font-bold text-ink shadow-sm transition hover:border-ink/20"
+        <label
+          className="mt-4 inline-block cursor-pointer rounded-full border border-ink/[0.09] bg-white px-4 py-2 text-[10px] font-bold text-ink shadow-sm transition hover:border-ink/20"
         >
           Choose files
-        </SoonButton>
+          <input
+            type="file"
+            multiple
+            className="sr-only"
+            onChange={(e) => {
+              const n = e.target.files?.length ?? 0
+              if (n) toast.success(`${n} file${n === 1 ? '' : 's'} selected`, 'They upload when you save the project')
+            }}
+          />
+        </label>
       </div>
 
       <div className="mt-5 grid gap-3 sm:grid-cols-2">

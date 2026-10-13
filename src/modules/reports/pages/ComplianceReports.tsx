@@ -13,6 +13,7 @@ import {
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 
+import { PrintButton, RoleLink } from '@/components/ui/ModuleActions'
 const complianceOverview = [
   {
     label: 'Verified Users',
@@ -145,7 +146,7 @@ export function ComplianceReports() {
             </p>
           </div>
 
-          <button
+          <PrintButton
             type="button"
             className="
               inline-flex
@@ -168,7 +169,7 @@ export function ComplianceReports() {
           >
             <Download className="h-3.5 w-3.5" />
             Export compliance report
-          </button>
+          </PrintButton>
 
         </div>
       </section>
@@ -455,8 +456,7 @@ export function ComplianceReports() {
 
           <div className="mt-3 flex justify-end border-t border-ink/[0.06] pt-4">
 
-            <button
-              type="button"
+            <RoleLink route="risks"
               className="
                 inline-flex
                 items-center
@@ -470,7 +470,7 @@ export function ComplianceReports() {
             >
               Review all alerts
               <ArrowUpRight className="h-3.5 w-3.5" />
-            </button>
+            </RoleLink>
 
           </div>
 
@@ -658,8 +658,7 @@ function ComplianceDomainCard({
 
         </div>
 
-        <button
-          type="button"
+        <RoleLink route="organization" sub="permissions"
           className="
             mt-4
             flex
@@ -682,7 +681,7 @@ function ComplianceDomainCard({
         >
           <span>Open detailed controls</span>
           <ArrowUpRight className="h-3.5 w-3.5 text-ink/30" />
-        </button>
+        </RoleLink>
 
       </CardBody>
     </Card>

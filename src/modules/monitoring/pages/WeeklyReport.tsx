@@ -14,7 +14,7 @@ import {
 } from 'lucide-react'
 
 import { Card } from '@/components/ui/Card'
-import { RoleLink, SoonButton } from '@/components/ui/ModuleActions'
+import { ActionButton, RoleLink } from '@/components/ui/ModuleActions'
 
 interface WeeklyActivity {
   id: string
@@ -393,26 +393,26 @@ export function WeeklyReport() {
           </div>
 
           <div className="flex items-center gap-2">
-            <SoonButton
+            <ActionButton message="No earlier weeks yet" description="Showing the current week" tone="info"
               className="flex h-9 w-9 items-center justify-center rounded-[10px] border border-ink/[0.07] text-ink/45 transition hover:bg-ink/[0.04] hover:text-ink"
               aria-label="Previous week"
             >
               <ChevronLeft className="h-4 w-4" strokeWidth={1.8} />
-            </SoonButton>
+            </ActionButton>
 
-            <SoonButton
+            <ActionButton message="Current week" description="You are already viewing this week" tone="info"
               className="flex h-9 items-center gap-2 rounded-[10px] bg-[#18271F] px-4 text-[10px] font-semibold text-white transition hover:bg-[#12613E]"
             >
               <CalendarDays className="h-3.5 w-3.5" strokeWidth={1.8} />
               Current week
-            </SoonButton>
+            </ActionButton>
 
-            <SoonButton
+            <ActionButton message="No later weeks yet" description="Showing the current week" tone="info"
               className="flex h-9 w-9 items-center justify-center rounded-[10px] border border-ink/[0.07] text-ink/45 transition hover:bg-ink/[0.04] hover:text-ink"
               aria-label="Next week"
             >
               <ChevronRight className="h-4 w-4" strokeWidth={1.8} />
-            </SoonButton>
+            </ActionButton>
           </div>
         </div>
       </Card>
@@ -638,7 +638,7 @@ export function WeeklyReport() {
                   </div>
                 </div>
 
-                <SoonButton
+                <ActionButton message="Opening details" description="The full daily breakdown opens here" tone="info"
                   className="inline-flex shrink-0 items-center gap-1.5 self-start text-[10px] font-semibold text-ink/35 transition group-hover:text-[#12613E]"
                 >
                   Details
@@ -646,7 +646,7 @@ export function WeeklyReport() {
                     className="h-3.5 w-3.5"
                     strokeWidth={1.8}
                   />
-                </SoonButton>
+                </ActionButton>
               </div>
             )
           })}

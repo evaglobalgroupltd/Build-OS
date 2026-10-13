@@ -14,7 +14,7 @@ import {
 
 import { Badge } from '@/components/ui/Badge'
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
-import { SoonButton } from '@/components/ui/ModuleActions'
+import { ActionButton, RoleLink } from '@/components/ui/ModuleActions'
 
 type ProjectSettingsProps = {
   projectId?: string
@@ -395,7 +395,7 @@ export function ProjectSettings({
                   </div>
                 </div>
 
-                <SoonButton
+                <RoleLink route="decisions"
                   className="
                     group mt-4 inline-flex items-center gap-1.5
                     text-[10px] font-bold text-ink/55
@@ -407,7 +407,7 @@ export function ProjectSettings({
                     size={12}
                     className="transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                   />
-                </SoonButton>
+                </RoleLink>
               </div>
             </CardBody>
           </Card>
@@ -549,7 +549,7 @@ function AccessRow({
   value: string
 }) {
   return (
-    <SoonButton
+    <ActionButton tone="info" message={title} description="Access settings open here once roles are connected"
       className="
         group flex w-full items-center gap-3
         rounded-[17px] border border-ink/[0.06]
@@ -597,7 +597,7 @@ function AccessRow({
           className="transition-transform duration-200 group-hover:translate-x-0.5"
         />
       </div>
-    </SoonButton>
+    </ActionButton>
   )
 }
 

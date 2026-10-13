@@ -19,6 +19,7 @@
  * section to config/appRoutes.ts. Paths in all three must match.
  * ========================================================================== */
 
+import type { ReactNode } from 'react'
 import { Route } from 'react-router-dom'
 
 import { CaseLayout, HubLayout, ModulePage, type SectionTab } from '@/components/ui/HubLayout'
@@ -73,6 +74,33 @@ import { DeliveryVerification } from '@/modules/procurement/pages/DeliveryVerifi
 import { ServiceInvitations } from '@/modules/professionals/pages/ServiceInvitations'
 import { Proposals } from '@/modules/professionals/pages/Proposals'
 import { Deliverables } from '@/modules/professionals/pages/Deliverables'
+
+/* ---- directories, verification, settings, organisation, monitoring ---- */
+import { ContractorList } from '@/modules/contractors/pages/ContractorList'
+import { ContractorProfile } from '@/modules/contractors/pages/ContractorProfile'
+import { ContractorDetails } from '@/modules/contractors/pages/ContractorDetails'
+import { ContractorPortfolio } from '@/modules/contractors/pages/ContractorPortfolio'
+import { ContractorVerification } from '@/modules/contractors/pages/ContractorVerification'
+import { ProfessionalList } from '@/modules/professionals/pages/ProfessionalList'
+import { ProfessionalProfile } from '@/modules/professionals/pages/ProfessionalProfile'
+import { MarketDetails } from '@/modules/market/pages/MarketDetails'
+import { Market_PlaceProfile as MarketStorefront } from '@/modules/market/pages/MarketProfile'
+import { BidComparison } from '@/modules/bidding/pages/BidComparison'
+import { AwardContract } from '@/modules/bidding/pages/AwardContract'
+import { Verification } from '@/modules/verification/pages/Verification'
+import { VerificationStatus } from '@/modules/verification/pages/VerificationStatus'
+import { DocumentSubmission } from '@/modules/verification/pages/DocumentSubmission'
+import { AccountSettings } from '@/modules/users/pages/AccountSettings'
+import { Security } from '@/modules/users/pages/Security'
+import { OrganizationDashboard } from '@/modules/organizations/pages/OrganizationDashboard'
+import { OrganizationProfile } from '@/modules/organizations/pages/OrganizationProfile'
+import { Members } from '@/modules/organizations/pages/Members'
+import { Roles } from '@/modules/organizations/pages/Roles'
+import { Permissions } from '@/modules/organizations/pages/Permissions'
+import { DailyReport } from '@/modules/monitoring/pages/MonitoringDashboard'
+import { CreateMilestone } from '@/modules/milestones/pages/CreateMilestone'
+import { ProjectOverview } from '@/modules/projects/pages/ProjectOverview'
+import { CreateProject } from '@/modules/projects/pages/CreateProject'
 
 /* ---- admin ---- */
 import { Users } from '@/modules/admin/pages/Users'
@@ -204,6 +232,95 @@ const disputesRoutes = (base: string) => {
   )
 }
 
+/** Tabs for a hub whose first tab is the hub root. */
+const tabsOf = (base: string, items: Array<[label: string, sub: string]>): SectionTab[] =>
+  items.map(([label, sub], i) => ({ label, to: sub ? `${base}/${sub}` : base, end: i === 0 }))
+
+const page = (title: string, node: ReactNode) => <ModulePage title={title}>{node}</ModulePage>
+
+/** Contractor directory: list, public profile, details, portfolio, verification. */
+export const contractorsRoutes = (base: string) => (
+  <Route path={`${base}/contractors`}>
+    <Route index element={page('Contractors', <ContractorList />)} />
+    <Route path=":contractorId" element={page('Contractor profile', <ContractorProfile />)} />
+    <Route path=":contractorId/details" element={page('Contractor details', <ContractorDetails />)} />
+    <Route path=":contractorId/portfolio" element={page('Portfolio', <ContractorPortfolio />)} />
+    <Route path=":contractorId/verification" element={page('Contractor verification', <ContractorVerification />)} />
+  </Route>
+)
+
+/** Professional directory. */
+export const professionalsRoutes = (base: string) => (
+  <Route path={`${base}/professionals`}>
+    <Route index element={page('Professionals', <ProfessionalList />)} />
+    <Route path=":professionalId" element={page('Professional profile', <ProfessionalProfile />)} />
+  </Route>
+)
+
+/** Supplier / marketplace directory. */
+export const suppliersRoutes = (base: string, section = 'suppliers') => (
+  <Route path={`${base}/${section}`}>
+    <Route index element={page('Suppliers', <MarketList />)} />
+    <Route path=":marketId" element={page('Supplier', <MarketDetails />)} />
+  </Route>
+)
+
+/** Client view of bids on a project: compare, open one, award the contract. */
+export const bidsRoutes = (base: string) => (
+  <Route path={`${base}/bids`}>
+    <Route index element={page('Bid comparison', <BidComparison />)} />
+    <Route path="award" element={page('Award contract', <AwardContract />)} />
+    <Route path=":bidId" element={page('Bid', <BidDetails />)} />
+  </Route>
+)
+
+/** Identity & business verification (not for admin, who runs the queue instead). */
+export const verificationRoutes = (base: string) => (
+  <Route
+    path={`${base}/verification`}
+    element={<HubLayout title="Verification" tabs={tabsOf(`${base}/verification`, [['Overview', ''], ['Status', 'status'], ['Documents', 'documents']])} />}
+  >
+    <Route index element={<Verification />} />
+    <Route path="status" element={<VerificationStatus />} />
+    <Route path="documents" element={<DocumentSubmission />} />
+  </Route>
+)
+
+/** Account settings and security. */
+export const settingsRoutes = (base: string) => (
+  <Route
+    path={`${base}/settings`}
+    element={<HubLayout title="Account settings" tabs={tabsOf(`${base}/settings`, [['Preferences', ''], ['Security', 'security']])} />}
+  >
+    <Route index element={<AccountSettings />} />
+    <Route path="security" element={<Security />} />
+  </Route>
+)
+
+/** Company / organisation: overview, profile, members, roles, permissions. */
+export const organizationRoutes = (base: string, section = 'organization') => (
+  <Route
+    path={`${base}/${section}`}
+    element={
+      <HubLayout
+        title="Organisation"
+        tabs={tabsOf(`${base}/${section}`, [['Overview', ''], ['Profile', 'profile'], ['Members', 'members'], ['Roles', 'roles'], ['Permissions', 'permissions']])}
+      />
+    }
+  >
+    <Route index element={<OrganizationDashboard />} />
+    <Route path="profile" element={<OrganizationProfile />} />
+    <Route path="members" element={<Members />} />
+    <Route path="roles" element={<Roles />} />
+    <Route path="permissions" element={<Permissions />} />
+  </Route>
+)
+
+/** Site monitoring: daily reports and site photos. */
+export const monitoringRoutes = (base: string) => (
+  <Route path={`${base}/monitoring`} element={page('Site monitoring', <DailyReport />)} />
+)
+
 /* =============================================================================
  * CONTRACTOR   /app/contractor/*
  * ========================================================================== */
@@ -284,6 +401,16 @@ export const contractorRoutes = (
       <Route path=":evidenceId" element={<EvidenceDetails />} />
     </Route>
 
+    <Route
+      path={`${C}/milestones/new`}
+      element={page('New milestone', <CreateMilestone />)}
+    />
+
+    {/* Your company profile, portfolio and verification */}
+    <Route path={`${C}/company`} element={page('Company profile', <ContractorProfile />)} />
+    <Route path={`${C}/company/portfolio`} element={page('Portfolio', <ContractorPortfolio />)} />
+    <Route path={`${C}/company/verification`} element={page('Company verification', <ContractorVerification />)} />
+
     {/* Materials */}
     <Route
       path={`${C}/materials`}
@@ -310,6 +437,12 @@ export const contractorRoutes = (
       }
     />
 
+    {suppliersRoutes(C)}
+    {professionalsRoutes(C)}
+    {monitoringRoutes(C)}
+    {verificationRoutes(C)}
+    {organizationRoutes(C)}
+    {settingsRoutes(C)}
     {documentsRoutes(C)}
     {paymentsRoutes(C)}
     {disputesRoutes(C)}
@@ -369,6 +502,10 @@ export const marketRoutes = (
       <Route path="verify" element={<DeliveryVerification />} />
     </Route>
 
+    <Route path={`${M}/storefront`} element={page('Storefront', <MarketStorefront />)} />
+    {verificationRoutes(M)}
+    {organizationRoutes(M)}
+    {settingsRoutes(M)}
     {documentsRoutes(M)}
     {paymentsRoutes(M)}
     {disputesRoutes(M)}
@@ -412,6 +549,10 @@ export const professionalRoutes = (
       }
     />
 
+    <Route path={`${P}/expert-profile`} element={page('Expert profile', <ProfessionalProfile />)} />
+    {verificationRoutes(P)}
+    {organizationRoutes(P)}
+    {settingsRoutes(P)}
     {documentsRoutes(P)}
     {paymentsRoutes(P)}
     {decisionRoute(P)}
@@ -497,6 +638,10 @@ export const pmRoutes = (
       }
     />
 
+    <Route path={`${PM}/projects/:projectId`} element={page('Project overview', <ProjectOverview />)} />
+    {monitoringRoutes(PM)}
+    {verificationRoutes(PM)}
+    {settingsRoutes(PM)}
     {documentsRoutes(PM)}
     {workspaceRoutes(PM)}
   </>
@@ -508,9 +653,6 @@ export const pmRoutes = (
  * ========================================================================== */
 
 const A = '/app/admin'
-
-const tabsOf = (base: string, items: Array<[label: string, sub: string]>): SectionTab[] =>
-  items.map(([label, sub], i) => ({ label, to: sub ? `${base}/${sub}` : base, end: i === 0 }))
 
 export const adminRoutes = (
   <>
@@ -543,6 +685,8 @@ export const adminRoutes = (
         </ModulePage>
       }
     />
+    <Route path={`${A}/projects/new`} element={page('Create project', <CreateProject />)} />
+    <Route path={`${A}/projects/:projectId`} element={page('Project overview', <ProjectOverview />)} />
     <Route
       path={`${A}/marketplace`}
       element={<HubLayout title="Marketplace" tabs={tabsOf(`${A}/marketplace`, [['Listings', ''], ['Catalogue', 'catalogue'], ['Analytics', 'analytics']])} />}
@@ -550,6 +694,7 @@ export const adminRoutes = (
       <Route index element={<MarketList />} />
       <Route path="catalogue" element={<Catalogue />} />
       <Route path="analytics" element={<MarketplaceAnalytics />} />
+      <Route path=":marketId" element={<MarketDetails />} />
     </Route>
     <Route
       path={`${A}/procurement`}
@@ -619,6 +764,16 @@ export const adminRoutes = (
       <Route path="risk" element={<RiskAnalytics />} />
     </Route>
 
+    {/* Evidence reviewed across all projects */}
+    <Route path={`${A}/evidence`} element={page('Evidence', <EvidenceLibrary />)} />
+    <Route path={`${A}/evidence/:evidenceId`} element={page('Evidence', <EvidenceDetails />)} />
+    <Route path={`${A}/evidence/:evidenceId/review`} element={page('Review evidence', <EvidenceReview />)} />
+
+    {contractorsRoutes(A)}
+    {professionalsRoutes(A)}
+    {monitoringRoutes(A)}
+    {organizationRoutes(A, 'organizations')}
+    {settingsRoutes(A)}
     {documentsRoutes(A)}
     {decisionRoute(A)}
     {workspaceRoutes(A)}

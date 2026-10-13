@@ -18,6 +18,7 @@ import { Badge } from '@/components/ui/Badge'
 import type { Bid } from '@/modules/bidding/types'
 import { bids } from '@/data/mockData'
 
+import { ActionButton, RoleLink } from '@/components/ui/ModuleActions'
 const bidStatusTone = {
   draft: 'neutral',
   submitted: 'neutral',
@@ -91,8 +92,7 @@ export function BidDetails() {
         <div className="absolute left-[48%] top-1/2 h-36 w-36 -translate-y-1/2 rounded-full bg-white/[0.018]" />
 
         <div className="relative">
-          <button
-            type="button"
+          <RoleLink route="bids"
             className="
               inline-flex
               items-center
@@ -106,7 +106,7 @@ export function BidDetails() {
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             Back to bid comparison
-          </button>
+          </RoleLink>
 
           <div className="mt-7 flex flex-col gap-7 lg:flex-row lg:items-end lg:justify-between">
             <div className="flex min-w-0 items-start gap-4 sm:gap-5">
@@ -601,7 +601,7 @@ export function BidDetails() {
           </div>
 
           <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
-            <button
+            <ActionButton message="Clarification requested" description="The contractor will see your question in Messages" tone="info"
               type="button"
               className="
                 rounded-xl
@@ -620,10 +620,9 @@ export function BidDetails() {
               "
             >
               Request clarification
-            </button>
+            </ActionButton>
 
-            <button
-              type="button"
+            <RoleLink route="bids" sub="award"
               className="
                 group
                 inline-flex
@@ -646,7 +645,7 @@ export function BidDetails() {
             >
               Award contract
               <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
-            </button>
+            </RoleLink>
           </div>
         </div>
       </section>

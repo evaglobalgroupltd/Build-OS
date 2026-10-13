@@ -1,3 +1,4 @@
+import { useMemo, useState } from 'react'
 import {
   AlertTriangle,
   BadgeCheck,
@@ -20,6 +21,7 @@ import {
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 
+import { ActionButton } from '@/components/ui/ModuleActions'
 type VerificationStatus =
   | 'Submitted'
   | 'Need More Information'
@@ -153,6 +155,27 @@ const verificationStats = [
 ] as const
 
 export function AdminVerificationQueue() {
+  const [query, setQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState<'All' | VerificationStatus>('All')
+  const [riskFilter, setRiskFilter] = useState('Any')
+  const [filtersOpen, setFiltersOpen] = useState(false)
+  const [page, setPage] = useState(1)
+  const PAGE_SIZE = 5
+
+  const filteredQueue = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    return verificationQueue.filter(
+      (a) =>
+        (statusFilter === 'All' || a.status === statusFilter) &&
+        (riskFilter === 'Any' || a.risk === riskFilter) &&
+        (q === '' || JSON.stringify(a).toLowerCase().includes(q)),
+    )
+  }, [query, statusFilter, riskFilter])
+
+  const pageCount = Math.max(1, Math.ceil(filteredQueue.length / PAGE_SIZE))
+  const currentPage = Math.min(page, pageCount)
+  const visibleQueue = filteredQueue.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
+
   return (
     <div className="space-y-7">
       {/* ------------------------------------------------------------------ */}
@@ -188,21 +211,21 @@ export function AdminVerificationQueue() {
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <button
+            <ActionButton message="Verification rules" description="Documents must be clear, in date and match the account name" tone="info"
               type="button"
               className="inline-flex h-10 items-center gap-2 rounded-full border border-ink/[0.08] bg-white px-4 text-xs font-semibold text-ink/65 shadow-[0_4px_16px_rgba(20,40,30,0.035)] transition-all hover:border-ink/15 hover:bg-paper-2 hover:text-ink"
             >
               <FileCheck2 className="h-3.5 w-3.5" />
               Verification rules
-            </button>
+            </ActionButton>
 
-            <button
+            <ActionButton message="Queue sorted by oldest first" description="Newest submissions are at the bottom" tone="info"
               type="button"
               className="inline-flex h-10 items-center gap-2 rounded-full bg-ink px-4 text-xs font-semibold text-white shadow-[0_8px_20px_rgba(20,40,30,0.12)] transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_26px_rgba(20,40,30,0.16)]"
             >
               <Users className="h-3.5 w-3.5" />
               Review all
-            </button>
+            </ActionButton>
           </div>
         </div>
       </section>
@@ -278,6 +301,8 @@ export function AdminVerificationQueue() {
               <input
                 type="search"
                 placeholder="Search applicant, ID or registration..."
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
                 className="h-10 w-full rounded-xl border border-ink/[0.08] bg-paper-2 pl-10 pr-3 text-xs text-ink outline-none transition-all placeholder:text-ink/30 focus:border-[#12613E]/25 focus:bg-white focus:ring-2 focus:ring-[#12613E]/[0.06]"
               />
             </div>
@@ -285,18 +310,37 @@ export function AdminVerificationQueue() {
             <div className="flex flex-wrap items-center gap-2">
               <button
                 type="button"
+                onClick={() => setFiltersOpen((open) => !open)}
+                aria-expanded={filtersOpen}
                 className="inline-flex items-center gap-2 rounded-full border border-ink/[0.08] bg-white px-3.5 py-2 text-[11px] font-semibold text-ink/60 transition-colors hover:bg-paper-2 hover:text-ink"
               >
                 <Filter className="h-3.5 w-3.5" />
                 Filters
               </button>
 
-              {statusFilters.slice(0, 3).map((filter) => (
+              {filtersOpen && (
+                <select
+                  aria-label="Risk level"
+                  value={riskFilter}
+                  onChange={(e) => setRiskFilter(e.target.value)}
+                  className="rounded-full border border-ink/[0.08] bg-white px-3.5 py-2 text-[11px] font-semibold text-ink/70 focus:outline-none"
+                >
+                  {['Any', 'Low', 'Medium', 'High'].map((r) => (
+                    <option key={r} value={r}>
+                      {r === 'Any' ? 'Any risk' : `${r} risk`}
+                    </option>
+                  ))}
+                </select>
+              )}
+
+              {statusFilters.slice(0, 4).map((filter) => (
                 <button
                   key={filter}
                   type="button"
+                  onClick={() => setStatusFilter(filter)}
+                  aria-pressed={statusFilter === filter}
                   className={
-                    filter === 'Submitted'
+                    statusFilter === filter
                       ? 'rounded-full bg-ink px-3.5 py-2 text-[11px] font-semibold text-white shadow-[0_5px_14px_rgba(20,40,30,0.10)]'
                       : 'rounded-full border border-ink/[0.08] bg-white px-3.5 py-2 text-[11px] font-semibold text-ink/50 transition-colors hover:bg-paper-2 hover:text-ink'
                   }
@@ -344,7 +388,7 @@ export function AdminVerificationQueue() {
             </thead>
 
             <tbody className="divide-y divide-ink/[0.055]">
-              {verificationQueue.map((applicant) => (
+              {visibleQueue.map((applicant) => (
                 <VerificationRow
                   key={applicant.id}
                   applicant={applicant}
@@ -364,15 +408,19 @@ export function AdminVerificationQueue() {
           </p>
 
           <div className="flex items-center gap-1.5">
-            <PaginationButton disabled>
+            <PaginationButton disabled={currentPage === 1} onClick={() => setPage(currentPage - 1)}>
               Previous
             </PaginationButton>
 
-            <PaginationButton active>1</PaginationButton>
+            {Array.from({ length: pageCount }, (_, i) => i + 1).map((n) => (
+              <PaginationButton key={n} active={n === currentPage} onClick={() => setPage(n)}>
+                {n}
+              </PaginationButton>
+            ))}
 
-            <PaginationButton>2</PaginationButton>
-
-            <PaginationButton>Next</PaginationButton>
+            <PaginationButton disabled={currentPage === pageCount} onClick={() => setPage(currentPage + 1)}>
+              Next
+            </PaginationButton>
           </div>
         </div>
       </Card>
@@ -664,14 +712,14 @@ function VerificationRow({
 
       {/* Action */}
       <td className="px-6 py-5 text-right">
-        <button
+        <ActionButton message="Submission opened for review" description="Approve or reject it from the review panel" tone="info"
           type="button"
           className="inline-flex items-center gap-1.5 rounded-full border border-ink/[0.08] bg-white px-3.5 py-2 text-[10px] font-semibold text-ink/55 shadow-[0_3px_10px_rgba(20,40,30,0.025)] transition-all hover:border-ink/15 hover:bg-paper-2 hover:text-ink"
         >
           <Eye className="h-3.5 w-3.5" />
           Review
           <ChevronRight className="h-3 w-3 text-ink/25" />
-        </button>
+        </ActionButton>
       </td>
     </tr>
   )
@@ -847,14 +895,18 @@ function PaginationButton({
   children,
   active = false,
   disabled = false,
+  onClick,
 }: {
   children: React.ReactNode
   active?: boolean
   disabled?: boolean
+  onClick?: () => void
 }) {
   return (
     <button
       type="button"
+      onClick={onClick}
+      aria-current={active ? 'page' : undefined}
       disabled={disabled}
       className={
         active

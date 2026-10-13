@@ -1,3 +1,4 @@
+import { useMemo, useState } from 'react'
 import {
   Activity,
   AlertTriangle,
@@ -14,6 +15,7 @@ import {
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 
+import { PrintButton, RoleLink } from '@/components/ui/ModuleActions'
 const auditSummary = [
   {
     label: 'Audit Events',
@@ -118,6 +120,19 @@ const summaryToneStyles = {
 } as const
 
 export function AuditReports() {
+  const [searchOpen, setSearchOpen] = useState(false)
+  const [query, setQuery] = useState('')
+  const [category, setCategory] = useState('All')
+
+  const visibleEvents = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    return recentAuditEvents.filter(
+      (event) =>
+        (category === 'All' || event.category === category) &&
+        (q === '' || `${event.action} ${event.actor} ${event.category} ${event.date}`.toLowerCase().includes(q)),
+    )
+  }, [query, category])
+
   return (
     <div className="space-y-7">
 
@@ -162,7 +177,7 @@ export function AuditReports() {
 
           <div className="flex flex-wrap gap-2.5">
 
-            <button
+            <PrintButton
               type="button"
               className="
                 inline-flex
@@ -184,10 +199,12 @@ export function AuditReports() {
             >
               <Download className="h-3.5 w-3.5" />
               Export audit log
-            </button>
+            </PrintButton>
 
             <button
               type="button"
+              onClick={() => setSearchOpen((open) => !open)}
+              aria-expanded={searchOpen}
               className="
                 inline-flex
                 items-center
@@ -307,9 +324,33 @@ export function AuditReports() {
 
         <CardBody className="pt-3">
 
+          {searchOpen && (
+            <div className="mb-3 flex flex-wrap items-center gap-3 rounded-xl border border-line bg-paper p-3">
+              <input
+                type="search"
+                aria-label="Search audit events"
+                placeholder="Search action, actor or date..."
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                className="min-w-[220px] flex-1 rounded-md border border-line bg-white px-3 py-2 text-sm text-ink focus:outline-none"
+              />
+              <select
+                aria-label="Event category"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="rounded-md border border-line bg-white px-3 py-2 text-sm text-ink focus:outline-none"
+              >
+                {['All', ...new Set(recentAuditEvents.map((e) => e.category))].map((c) => (
+                  <option key={c}>{c}</option>
+                ))}
+              </select>
+              <span className="text-xs text-ink/45">{visibleEvents.length} of {recentAuditEvents.length} events</span>
+            </div>
+          )}
+
           <div className="divide-y divide-ink/[0.06]">
 
-            {recentAuditEvents.map((event) => {
+            {visibleEvents.map((event) => {
               const status = statusStyles[event.tone]
               const StatusIcon = status.icon
 
@@ -393,8 +434,7 @@ export function AuditReports() {
 
           <div className="mt-3 flex justify-end border-t border-ink/[0.06] pt-4">
 
-            <button
-              type="button"
+            <RoleLink to="/app/admin/users/audit-logs"
               className="
                 inline-flex
                 items-center
@@ -408,7 +448,7 @@ export function AuditReports() {
             >
               View complete audit history
               <ArrowUpRight className="h-3.5 w-3.5" />
-            </button>
+            </RoleLink>
 
           </div>
 
@@ -640,8 +680,7 @@ function AuditDomainCard({
 
         </div>
 
-        <button
-          type="button"
+        <RoleLink route="evidence"
           className="
             mt-4
             flex
@@ -664,7 +703,7 @@ function AuditDomainCard({
         >
           <span>Open detailed records</span>
           <ArrowUpRight className="h-3.5 w-3.5 text-ink/30" />
-        </button>
+        </RoleLink>
 
       </CardBody>
     </Card>

@@ -15,6 +15,7 @@ import {
 
 import { Card } from '@/components/ui/Card'
 
+import { ActionButton } from '@/components/ui/ModuleActions'
 type RiskSeverity = 'critical' | 'high' | 'medium' | 'low'
 type RiskStatus = 'open' | 'investigating' | 'mitigated'
 
@@ -386,13 +387,13 @@ function RiskRow({
                   Risk mitigated
                 </span>
               ) : (
-                <button
+                <ActionButton message="Risk marked for review" description="It has been added to the project risk log" tone="info"
                   type="button"
                   className="inline-flex items-center gap-2 rounded-[10px] bg-[#18271F] px-3.5 py-2.5 text-[10px] font-semibold text-white transition hover:bg-[#12613E]"
                 >
                   Review risk
                   <ArrowUpRight className="h-3.5 w-3.5" />
-                </button>
+                </ActionButton>
               )}
             </div>
           </div>

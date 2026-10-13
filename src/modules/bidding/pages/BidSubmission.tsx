@@ -16,6 +16,7 @@ import {
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 
+import { ActionButton } from '@/components/ui/ModuleActions'
 interface CostItem {
   id: string
   description: string
@@ -784,12 +785,12 @@ export function BidSubmission() {
           ACTIONS
       ───────────────────────────────────────────────────────────── */}
       <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
-        <button
+        <ActionButton message="Draft saved" description="You can finish this bid later from My bids" tone="info"
           type="button"
           className="inline-flex items-center justify-center rounded-full border border-ink/[0.09] bg-white px-5 py-3 text-[10px] font-bold uppercase tracking-[0.08em] text-ink/50 transition-all duration-200 hover:border-ink/[0.15] hover:bg-[#F6F8F5] hover:text-ink"
         >
           Save draft
-        </button>
+        </ActionButton>
 
         <button
           type="submit"

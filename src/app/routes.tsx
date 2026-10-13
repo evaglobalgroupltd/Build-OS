@@ -29,6 +29,11 @@ import { clientHubRoutes } from './clientHubs'
 /* Contractor, Marketplace, Professional, Project Manager, Admin: roleHubs.tsx */
 /* -------------------------------------------------------------------------- */
 
+import { ForgotPassword } from '@/modules/authentication/pages/ForgotPassword'
+import { ResetPassword } from '@/modules/authentication/pages/ResetPassword'
+import { VerifyEmail } from '@/modules/authentication/pages/VerifyEmail'
+import { VerifyPhone } from '@/modules/authentication/pages/VerifyPhone'
+import { MFA } from '@/modules/authentication/pages/MFA'
 import { adminRoutes, contractorRoutes, marketRoutes, pmRoutes, professionalRoutes } from './roleHubs'
 
 /* -------------------------------------------------------------------------- */
@@ -62,6 +67,11 @@ export function AppRoutes() {
         <Route path="/login" element={<Login />} />
         <Route path="/join" element={<Join />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
+        <Route path="/verify-phone" element={<VerifyPhone />} />
+        <Route path="/mfa" element={<MFA />} />
         <Route path="/projects" element={<PublicProjectsPage />} />
         <Route path="/solutions/:audience" element={<Solutions />} />
         <Route path="/about" element={<About />} />

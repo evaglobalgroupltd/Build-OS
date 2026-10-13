@@ -18,7 +18,7 @@ import {
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
-import { RoleLink, SoonButton } from '@/components/ui/ModuleActions'
+import { ActionButton, RoleLink } from '@/components/ui/ModuleActions'
 
 type DocumentStatus =
   | 'draft'
@@ -285,7 +285,7 @@ export function DocumentDetails() {
                     {document.fileType} · {document.fileSize}
                   </span>
 
-                  <SoonButton
+                  <ActionButton message="More actions" description="Share, rename and archive arrive with file storage" tone="info"
                     aria-label="More document actions"
                     className="
                       flex
@@ -304,7 +304,7 @@ export function DocumentDetails() {
                     "
                   >
                     <MoreHorizontal className="h-4 w-4" />
-                  </SoonButton>
+                  </ActionButton>
                 </div>
               </div>
             </div>
@@ -348,7 +348,7 @@ export function DocumentDetails() {
                   </p>
 
                   <div className="mt-5 flex flex-wrap justify-center gap-2">
-                    <SoonButton
+                    <ActionButton message="Opening document" description="The preview connects when file storage is set up" tone="info"
                       className="
                         inline-flex
                         items-center
@@ -368,9 +368,9 @@ export function DocumentDetails() {
                     >
                       <FileText className="h-3.5 w-3.5" />
                       View document
-                    </SoonButton>
+                    </ActionButton>
 
-                    <SoonButton
+                    <ActionButton message="Download queued" description="The file downloads once storage is connected" tone="info"
                       className="
                         inline-flex
                         items-center
@@ -392,7 +392,7 @@ export function DocumentDetails() {
                     >
                       <Download className="h-3.5 w-3.5" />
                       Download
-                    </SoonButton>
+                    </ActionButton>
                   </div>
                 </div>
               </div>
@@ -723,7 +723,7 @@ export function DocumentDetails() {
             </div>
 
             <div className="space-y-2 p-4">
-              <SoonButton
+              <ActionButton message="Opening document" description="The preview connects when file storage is set up" tone="info"
                 className="
                   flex
                   h-10
@@ -742,9 +742,9 @@ export function DocumentDetails() {
               >
                 <FileText className="h-3.5 w-3.5" />
                 View document
-              </SoonButton>
+              </ActionButton>
 
-              <SoonButton
+              <ActionButton message="Download queued" description="The file downloads once storage is connected" tone="info"
                 className="
                   flex
                   h-10
@@ -766,7 +766,7 @@ export function DocumentDetails() {
               >
                 <Download className="h-3.5 w-3.5" />
                 Download copy
-              </SoonButton>
+              </ActionButton>
             </div>
           </Card>
         </aside>

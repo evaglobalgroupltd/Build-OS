@@ -21,6 +21,7 @@ import {
 
 import { Card } from '@/components/ui/Card'
 
+import { RoleLink } from '@/components/ui/ModuleActions'
 interface MetricCardProps {
   label: string
   value: string
@@ -612,13 +613,12 @@ export function ContractorAnalytics() {
                     </p>
                   </div>
 
-                  <button
-                    type="button"
+                  <RoleLink route="projects" sub="current"
                     className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-ink/[0.08] text-ink/35 transition-all duration-200 hover:border-[#B85C12]/30 hover:text-[#B85C12]"
                     aria-label={`Open ${project.name}`}
                   >
                     <ExternalArrow className="h-4 w-4" />
-                  </button>
+                  </RoleLink>
                 </div>
               </div>
             </div>
@@ -700,13 +700,12 @@ export function ContractorAnalytics() {
                       {item.description}
                     </p>
 
-                    <button
-                      type="button"
-                      className="mt-2 flex items-center gap-1 text-[10px] font-bold text-[#B85C12] opacity-0 transition-opacity group-hover:opacity-100"
+                    <RoleLink route="verification"
+                      className="mt-2 flex items-center gap-1 text-[10px] font-bold text-[#B85C12] opacity-0 [@media(hover:none)]:opacity-100 transition-opacity group-hover:opacity-100"
                     >
                       Review item
                       <ExternalArrow className="h-3 w-3" />
-                    </button>
+                    </RoleLink>
                   </div>
                 </div>
               )
@@ -803,13 +802,12 @@ export function ContractorAnalytics() {
             </div>
           </div>
 
-          <button
-            type="button"
+          <RoleLink route="contractors" sub="current"
             className="relative mt-5 flex items-center gap-2 text-[11px] font-bold text-white transition-colors hover:text-[#D88A4B]"
           >
             Strengthen profile
             <ExternalArrow className="h-3.5 w-3.5" />
-          </button>
+          </RoleLink>
         </div>
       </section>
 
@@ -835,13 +833,12 @@ export function ContractorAnalytics() {
           </div>
         </div>
 
-        <button
-          type="button"
+        <RoleLink route="reports" sub="audit"
           className="flex shrink-0 items-center gap-1.5 text-[10px] font-bold text-[#B85C12]"
         >
           View full performance history
           <ExternalArrow className="h-3 w-3" />
-        </button>
+        </RoleLink>
       </div>
     </div>
   )

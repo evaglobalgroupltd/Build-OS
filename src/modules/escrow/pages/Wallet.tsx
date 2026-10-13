@@ -356,7 +356,7 @@ export function Wallet() {
           subtitle="Deposits, releases, freezes and refunds recorded against your projects"
           action={
             <RoleLink route="money" sub="transactions"
-              className="group hidden items-center gap-1.5 rounded-full border border-ink/[0.07] bg-white px-3.5 py-2 text-[10px] font-semibold text-ink/50 transition hover:border-ink/[0.12] hover:text-ink sm:inline-flex"
+              className="inline-flex group items-center gap-1.5 rounded-full border border-ink/[0.07] bg-white px-3.5 py-2 text-[10px] font-semibold text-ink/50 transition hover:border-ink/[0.12] hover:text-ink"
             >
               View all
               <ChevronRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />

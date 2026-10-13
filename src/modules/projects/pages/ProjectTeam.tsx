@@ -11,7 +11,7 @@ import {
 } from 'lucide-react'
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
-import { SoonButton } from '@/components/ui/ModuleActions'
+import { ActionButton } from '@/components/ui/ModuleActions'
 
 type TeamRole =
   | 'client'
@@ -203,7 +203,7 @@ export function ProjectTeam() {
             </p>
           </div>
 
-          <SoonButton
+          <ActionButton message="Add a team member" description="Pick someone from your Build Team or invite by phone" tone="info"
             className="
               group inline-flex w-fit shrink-0 items-center justify-center gap-2
               rounded-full bg-white px-5 py-2.5
@@ -217,7 +217,7 @@ export function ProjectTeam() {
               className="transition-transform duration-300 group-hover:rotate-90"
             />
             Add team member
-          </SoonButton>
+          </ActionButton>
         </div>
       </section>
 
@@ -600,7 +600,7 @@ function CoreRoleCard({
                 )}
               </div>
 
-              <SoonButton
+              <ActionButton message="Opening profile" description="Member details open here" tone="info"
                 aria-label={`View ${member.name}`}
                 className="
                   flex h-8 w-8 shrink-0 items-center justify-center
@@ -611,7 +611,7 @@ function CoreRoleCard({
                 "
               >
                 <ChevronRight size={14} />
-              </SoonButton>
+              </ActionButton>
             </div>
 
             <div className="mt-4 border-t border-ink/[0.06] pt-3">
@@ -634,12 +634,12 @@ function CoreRoleCard({
               {emptyLabel}
             </p>
 
-            <SoonButton
+            <ActionButton message="Role assigned" description="The change is recorded on the project"
               className="mt-3 inline-flex items-center gap-1 text-[10px] font-bold text-ink/55 transition hover:text-[#B85C12]"
             >
               Assign {title}
               <ChevronRight size={12} />
-            </SoonButton>
+            </ActionButton>
           </div>
         )}
       </CardBody>
@@ -709,7 +709,7 @@ function TeamMemberRow({
       </div>
 
       {/* Action */}
-      <SoonButton
+      <ActionButton message="Opening profile" description="Member details open here" tone="info"
         className="
           absolute right-4 top-4
           flex h-8 w-8 items-center justify-center
@@ -721,7 +721,7 @@ function TeamMemberRow({
         aria-label={`Open ${member.name}`}
       >
         <ChevronRight size={14} />
-      </SoonButton>
+      </ActionButton>
     </div>
   )
 }
@@ -766,7 +766,7 @@ function AssignmentCard({
         {description}
       </p>
 
-      <SoonButton
+      <ActionButton tone="info" message={action} description={title}
         className="
           group/action mt-5 inline-flex items-center gap-1.5
           text-[10px] font-bold text-ink/50
@@ -779,7 +779,7 @@ function AssignmentCard({
           size={12}
           className="transition-transform duration-200 group-hover/action:translate-x-0.5"
         />
-      </SoonButton>
+      </ActionButton>
     </div>
   )
 }

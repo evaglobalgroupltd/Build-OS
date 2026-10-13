@@ -16,6 +16,7 @@ import { useMemo, useState } from 'react'
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 
+import { ActionButton, RoleLink } from '@/components/ui/ModuleActions'
 type InvitationStatus =
   | 'New'
   | 'Reviewing'
@@ -464,23 +465,22 @@ function InvitationRow({
 
           {/* Actions */}
           <div className="flex shrink-0 gap-2">
-            <button
+            <ActionButton message="Opening invitation" description="Review the scope and fee before responding" tone="info"
               type="button"
               className="group/button inline-flex items-center justify-center gap-1.5 rounded-xl border border-ink/[0.07] bg-white px-4 py-2.5 text-[11px] font-semibold text-ink shadow-[0_2px_8px_rgba(11,18,32,0.025)] transition-all duration-200 hover:-translate-y-0.5 hover:border-[#1657FF]/20 hover:bg-[#1657FF] hover:text-white hover:shadow-[0_8px_20px_rgba(22,87,255,0.14)]"
             >
               View details
 
               <ChevronRight className="h-3.5 w-3.5 text-ink/25 transition-all group-hover/button:translate-x-0.5 group-hover/button:text-white" />
-            </button>
+            </ActionButton>
 
             {canRespond && (
-              <button
-                type="button"
+              <RoleLink route="proposals"
                 className="group/button inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#0B1220] px-4 py-2.5 text-[11px] font-semibold text-white shadow-[0_5px_15px_rgba(11,18,32,0.12)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#1657FF] hover:shadow-[0_8px_20px_rgba(22,87,255,0.18)]"
               >
                 <Send className="h-3.5 w-3.5 transition-transform group-hover/button:-translate-y-0.5 group-hover/button:translate-x-0.5" />
                 Submit proposal
-              </button>
+              </RoleLink>
             )}
           </div>
         </div>

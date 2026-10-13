@@ -9,7 +9,7 @@ import {
 } from 'lucide-react'
 
 import { Card } from '@/components/ui/Card'
-import { PrintButton, RoleLink, SoonButton } from '@/components/ui/ModuleActions'
+import { ActionButton, PrintButton, RoleLink } from '@/components/ui/ModuleActions'
 
 const reports = [
   {
@@ -109,7 +109,7 @@ function ReportTypeCard({
 
   return (
     <Card className="group overflow-hidden">
-      <SoonButton
+      <ActionButton tone="info" message={`Opening ${title} reports`} description="Full reports open when the backend is connected"
         className="relative w-full p-5 text-left transition duration-300 hover:bg-ink/[0.015] sm:p-6"
       >
         <div className="flex items-start justify-between gap-4">
@@ -148,7 +148,7 @@ function ReportTypeCard({
             className={`h-px w-8 transition-all duration-500 group-hover:w-16 ${styles.line}`}
           />
         </div>
-      </SoonButton>
+      </ActionButton>
     </Card>
   )
 }
@@ -218,20 +218,20 @@ function ReportRow({
         </div>
 
         <div className="flex items-center gap-2">
-          <SoonButton
+          <ActionButton message="Download queued" description="The report downloads once storage is connected" tone="info"
             className="inline-flex h-9 items-center justify-center gap-2 rounded-[10px] border border-ink/[0.08] bg-white px-3 text-[11px] font-semibold text-ink/60 transition hover:border-[#12613E]/20 hover:bg-[#12613E]/[0.03] hover:text-[#12613E]"
             title="Download report"
           >
             <Download className="h-3.5 w-3.5" strokeWidth={1.8} />
             <span className="hidden sm:inline">Download</span>
-          </SoonButton>
+          </ActionButton>
 
-          <SoonButton
+          <ActionButton message="Opening report" description="Full reports open when the backend is connected" tone="info"
             className="flex h-9 w-9 items-center justify-center rounded-[10px] text-ink/25 transition hover:bg-ink/[0.04] hover:text-ink"
             aria-label={`Open ${title}`}
           >
             <ChevronRight className="h-4 w-4" strokeWidth={1.8} />
-          </SoonButton>
+          </ActionButton>
         </div>
       </div>
     </div>

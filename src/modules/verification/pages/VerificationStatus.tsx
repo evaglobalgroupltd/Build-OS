@@ -14,6 +14,7 @@ import {
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 
+import { RoleLink } from '@/components/ui/ModuleActions'
 type VerificationStatusType =
   | 'Draft'
   | 'Submitted'
@@ -164,13 +165,12 @@ export function VerificationStatus() {
               </div>
             </div>
 
-            <button
-              type="button"
+            <RoleLink route="verification" sub="documents"
               className="inline-flex w-fit items-center gap-2 rounded-full border border-ink/[0.08] bg-white px-4 py-2.5 text-[10px] font-semibold text-ink/60 shadow-[0_4px_14px_rgba(20,40,30,0.03)] transition-all hover:border-ink/15 hover:bg-paper-2 hover:text-ink"
             >
               <FileText className="h-3.5 w-3.5" />
               View documents
-            </button>
+            </RoleLink>
           </div>
         </div>
 
@@ -347,26 +347,24 @@ export function VerificationStatus() {
                       </div>
                     </div>
 
-                    <button
-                      type="button"
+                    <RoleLink route="documents"
                       className="inline-flex w-fit shrink-0 items-center gap-1.5 rounded-full border border-ink/[0.07] bg-white px-3 py-2 text-[9px] font-semibold text-ink/50 transition-all hover:border-ink/15 hover:bg-paper-2 hover:text-ink sm:self-center"
                     >
                       View
                       <ChevronRight className="h-3 w-3 text-ink/25" />
-                    </button>
+                    </RoleLink>
                   </div>
                 )
               })}
             </div>
 
             <div className="border-t border-ink/[0.06] bg-paper-2/50 px-6 py-4">
-              <button
-                type="button"
+              <RoleLink route="verification" sub="documents"
                 className="inline-flex items-center gap-1.5 text-[10px] font-semibold text-ink/55 transition-colors hover:text-ink"
               >
                 Manage verification documents
                 <ChevronRight className="h-3.5 w-3.5" />
-              </button>
+              </RoleLink>
             </div>
           </Card>
 

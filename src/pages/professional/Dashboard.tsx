@@ -21,6 +21,7 @@ import { useAuth } from '@/context/AuthContext'
 import { useProjectProfile } from '@/hooks/useProjectProfile'
 import { deriveProfessionalDashboardConfig } from '@/derive/professionalDashboardConfig'
 
+import { RoleLink } from '@/components/ui/ModuleActions'
 // `state` / `specialty` map to COVERAGE_STATES / PROFESSIONAL_SPECIALIZATIONS
 // values (see src/data/projectOptions.ts). In mock data today; a real API
 // response should carry these same fields so config.matchesInvitation works
@@ -142,8 +143,7 @@ export function ProfessionalDashboard() {
             )}
           </div>
 
-          <button
-            type="button"
+          <RoleLink route="invitations"
             className="
               flex
               items-center
@@ -161,7 +161,7 @@ export function ProfessionalDashboard() {
           >
             <BriefcaseBusiness size={14} />
             Browse opportunities
-          </button>
+          </RoleLink>
 
         </div>
       </div>
@@ -324,8 +324,7 @@ export function ProfessionalDashboard() {
 
               </div>
 
-              <button
-                type="button"
+              <RoleLink route="invitations"
                 className="
                   mt-6
                   flex
@@ -344,7 +343,7 @@ export function ProfessionalDashboard() {
               >
                 Review invitation
                 <ArrowUpRight size={14} />
-              </button>
+              </RoleLink>
 
             </div>
 
@@ -460,8 +459,7 @@ export function ProfessionalDashboard() {
 
                       </div>
 
-                      <button
-                        type="button"
+                      <RoleLink route="invitations"
                         className="
                           flex
                           shrink-0
@@ -476,7 +474,7 @@ export function ProfessionalDashboard() {
                       >
                         Open
                         <ChevronRight size={14} />
-                      </button>
+                      </RoleLink>
 
                     </div>
                   )
@@ -559,8 +557,7 @@ export function ProfessionalDashboard() {
 
               </div>
 
-              <button
-                type="button"
+              <RoleLink route="money"
                 className="
                   mt-6
                   flex
@@ -585,7 +582,7 @@ export function ProfessionalDashboard() {
                 </span>
 
                 <ChevronRight size={15} />
-              </button>
+              </RoleLink>
 
             </CardBody>
 
@@ -705,8 +702,7 @@ export function ProfessionalDashboard() {
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
 
-          <button
-            type="button"
+          <RoleLink route="invitations"
             className="
               group
               flex
@@ -743,10 +739,9 @@ export function ProfessionalDashboard() {
               className="text-ink/25 transition group-hover:text-ink/50"
             />
 
-          </button>
+          </RoleLink>
 
-          <button
-            type="button"
+          <RoleLink route="proposals"
             className="
               group
               flex
@@ -783,10 +778,9 @@ export function ProfessionalDashboard() {
               className="text-ink/25 transition group-hover:text-ink/50"
             />
 
-          </button>
+          </RoleLink>
 
-          <button
-            type="button"
+          <RoleLink route="deliverables"
             className="
               group
               flex
@@ -823,7 +817,7 @@ export function ProfessionalDashboard() {
               className="text-ink/25 transition group-hover:text-ink/50"
             />
 
-          </button>
+          </RoleLink>
 
         </div>
 

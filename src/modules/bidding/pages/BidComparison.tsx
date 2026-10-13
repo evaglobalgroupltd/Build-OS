@@ -15,6 +15,7 @@ import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { bids } from '@/data/mockData'
 
+import { RoleLink } from '@/components/ui/ModuleActions'
 function formatAmount(amount: number, currency: string) {
   const symbol = currency === 'NGN' ? '₦' : '$'
 
@@ -466,8 +467,7 @@ export function BidComparison() {
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <button
-                        type="button"
+                      <RoleLink route="bids" sub="current"
                         className="
                           rounded-full
                           border
@@ -486,11 +486,10 @@ export function BidComparison() {
                         "
                       >
                         View bid
-                      </button>
+                      </RoleLink>
 
                       {!isAwarded && bid.status !== 'rejected' && (
-                        <button
-                          type="button"
+                        <RoleLink route="bids" sub="award"
                           className="
                             group/action
                             inline-flex
@@ -511,7 +510,7 @@ export function BidComparison() {
                         >
                           Review & award
                           <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover/action:translate-x-0.5" />
-                        </button>
+                        </RoleLink>
                       )}
                     </div>
                   </div>

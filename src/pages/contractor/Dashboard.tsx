@@ -20,6 +20,8 @@ import {
   Wallet,
 } from 'lucide-react'
 
+import type { RouteKey } from '@/config/appRoutes'
+
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { StatCard } from '@/components/ui/StatCard'
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
@@ -31,6 +33,7 @@ import { useAuth } from '@/context/AuthContext'
 import { useProjectProfile } from '@/hooks/useProjectProfile'
 import { deriveContractorDashboardConfig } from '@/derive/contractorDashboardConfig'
 
+import { RoleLink } from '@/components/ui/ModuleActions'
 const projectImages = [
   '/images/Yea1.jpeg',
   '/images/Yea2.jpeg',
@@ -89,24 +92,27 @@ const milestones = [
   { label: 'Handover', status: 'pending' },
 ]
 
-const pendingActions = [
+const pendingActions: Array<{ icon: typeof AlertTriangle; tone: 'amber' | 'ink'; text: string; actionLabel: string; route: RouteKey }> = [
   {
     icon: AlertTriangle,
     tone: 'amber',
     text: '1 milestone under inspection — track approval in the vault.',
     actionLabel: 'Open vault',
+    route: 'documents',
   },
   {
     icon: Info,
     tone: 'ink',
     text: '2 new projects open for bids on the marketplace.',
     actionLabel: 'Browse',
+    route: 'projects',
   },
   {
     icon: Info,
     tone: 'ink',
     text: 'A team member invite is still pending acceptance.',
     actionLabel: 'Manage team',
+    route: 'team',
   },
 ]
 
@@ -205,20 +211,18 @@ export function ContractorDashboard() {
         <div className="flex items-center gap-3">
           <TrustScore score={user.trustScore} />
 
-          <button
-            type="button"
+          <RoleLink route="updates"
             className="flex h-10 w-10 items-center justify-center rounded-full border border-ink/10 bg-white text-ink/60 transition hover:border-ink/20 hover:text-ink"
           >
             <Bell size={17} strokeWidth={1.8} />
-          </button>
+          </RoleLink>
 
-          <button
-            type="button"
+          <RoleLink route="bids" sub="submit"
             className="flex h-10 items-center gap-2 rounded-full bg-ink px-4 text-xs font-semibold text-white transition hover:opacity-90"
           >
             <Plus size={15} />
             New bid
-          </button>
+          </RoleLink>
         </div>
       </div>
 
@@ -351,13 +355,12 @@ export function ContractorDashboard() {
                 </p>
               </div>
 
-              <button
-                type="button"
+              <RoleLink route="projects"
                 className="flex shrink-0 items-center justify-center gap-2 rounded-full bg-white px-5 py-2.5 text-xs font-bold text-ink transition hover:bg-white/90"
               >
                 Open project
                 <ArrowUpRight size={14} />
-              </button>
+              </RoleLink>
             </div>
           </div>
         </div>
@@ -446,8 +449,7 @@ export function ContractorDashboard() {
 
             <div className="mt-auto pt-5">
 
-              <button
-                type="button"
+              <RoleLink route="milestones"
                 className="flex w-full items-center justify-between rounded-xl bg-ink px-4 py-3 text-xs font-semibold text-white transition hover:opacity-90"
               >
                 <span className="flex items-center gap-2">
@@ -456,7 +458,7 @@ export function ContractorDashboard() {
                 </span>
 
                 <ChevronRight size={15} />
-              </button>
+              </RoleLink>
 
               <p className="mt-3 text-center text-[10px] leading-4 text-ink/40">
                 Funds are protected and released against approved milestones.
@@ -492,13 +494,12 @@ export function ContractorDashboard() {
                 </p>
               </div>
 
-              <button
-                type="button"
+              <RoleLink route="evidence"
                 className="flex shrink-0 items-center justify-center gap-2 rounded-full bg-[#B85C12] px-5 py-2.5 text-xs font-bold text-white transition hover:opacity-90"
               >
                 <ClipboardCheck size={14} />
                 Submit evidence
-              </button>
+              </RoleLink>
 
             </div>
 
@@ -589,21 +590,19 @@ export function ContractorDashboard() {
 
             <div className="mt-4 flex flex-wrap gap-2">
 
-              <button
-                type="button"
+              <RoleLink route="milestones"
                 className="flex items-center gap-2 rounded-full border border-ink/[0.08] bg-white px-4 py-2 text-[11px] font-semibold text-ink transition hover:border-ink/20"
               >
                 <ArrowUpRight size={13} />
                 View build
-              </button>
+              </RoleLink>
 
-              <button
-                type="button"
+              <RoleLink route="team"
                 className="flex items-center gap-2 rounded-full border border-ink/[0.08] bg-white px-4 py-2 text-[11px] font-semibold text-ink transition hover:border-ink/20"
               >
                 <Users size={13} />
                 Team
-              </button>
+              </RoleLink>
 
             </div>
 
@@ -646,13 +645,12 @@ export function ContractorDashboard() {
             </>
           )}
 
-          <button
-            type="button"
+          <RoleLink route="projects"
             className="mt-5 flex items-center gap-2 text-xs font-bold text-white"
           >
             Explore opportunities
             <ArrowUpRight size={14} />
-          </button>
+          </RoleLink>
 
         </div>
       </section>
@@ -693,12 +691,12 @@ export function ContractorDashboard() {
 
                   </div>
 
-                  <button
-                    type="button"
+                  <RoleLink
+                    route={action.route}
                     className="shrink-0 text-[11px] font-semibold text-[#B85C12]"
                   >
                     {action.actionLabel}
-                  </button>
+                  </RoleLink>
 
                 </div>
               )
@@ -720,12 +718,11 @@ export function ContractorDashboard() {
               </h3>
             </div>
 
-            <button
-              type="button"
+            <RoleLink route="updates"
               className="text-[11px] font-semibold text-[#B85C12]"
             >
               View all
-            </button>
+            </RoleLink>
           </div>
 
           <CardBody className="flex flex-col gap-4 pt-4">
@@ -776,13 +773,12 @@ export function ContractorDashboard() {
             </h2>
           </div>
 
-          <button
-            type="button"
-            className="hidden items-center gap-1 text-xs font-semibold text-[#B85C12] sm:flex"
+          <RoleLink route="projects"
+            className="flex items-center gap-1 text-xs font-semibold text-[#B85C12]"
           >
             View marketplace
             <ChevronRight size={14} />
-          </button>
+          </RoleLink>
 
         </div>
 

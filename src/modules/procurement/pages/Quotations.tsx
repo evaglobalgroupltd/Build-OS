@@ -16,7 +16,7 @@ import { type ComponentType } from 'react'
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
-import { RoleLink, SoonButton } from '@/components/ui/ModuleActions'
+import { ActionButton, RoleLink } from '@/components/ui/ModuleActions'
 
 type QuoteStatus =
   | 'received'
@@ -509,12 +509,12 @@ function QuotationRow({
             value={quote.validUntil}
           />
 
-          <SoonButton
+          <ActionButton message="Opening quotation" description="Compare supplier terms in the quotation panel" tone="info"
             aria-label={`View quotation ${quote.id}`}
             className="col-span-2 flex h-9 w-9 items-center justify-center rounded-full border border-ink/[0.07] text-ink/30 transition-all hover:border-ink/15 hover:bg-ink/[0.04] hover:text-ink sm:col-span-1"
           >
             <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-          </SoonButton>
+          </ActionButton>
         </div>
       </div>
 

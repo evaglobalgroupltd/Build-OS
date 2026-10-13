@@ -20,7 +20,7 @@ import {
 } from 'lucide-react'
 
 import { Card } from '@/components/ui/Card'
-import { RoleLink, SoonButton } from '@/components/ui/ModuleActions'
+import { ActionButton, RoleLink } from '@/components/ui/ModuleActions'
 
 type ApprovalStatus =
   | 'Pending Review'
@@ -634,7 +634,7 @@ export function ApprovalDetails() {
               </div>
 
               <div className="mt-5 grid gap-2.5 sm:grid-cols-[1.4fr_1fr_0.8fr]">
-                <SoonButton
+                <ActionButton message="Release approved" description="Funds will be released from escrow"
                   className="
                     group
                     inline-flex
@@ -664,9 +664,9 @@ export function ApprovalDetails() {
                     size={13}
                     className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                   />
-                </SoonButton>
+                </ActionButton>
 
-                <SoonButton
+                <ActionButton message="Correction requested" description="The requester will be asked to fix and resubmit" tone="info"
                   className="
                     inline-flex
                     min-h-12
@@ -690,9 +690,9 @@ export function ApprovalDetails() {
                 >
                   <MessageSquare size={14} />
                   Correction
-                </SoonButton>
+                </ActionButton>
 
-                <SoonButton
+                <ActionButton message="Release rejected" description="The requester has been notified" tone="error"
                   className="
                     inline-flex
                     min-h-12
@@ -716,7 +716,7 @@ export function ApprovalDetails() {
                 >
                   <XCircle size={14} />
                   Reject
-                </SoonButton>
+                </ActionButton>
               </div>
             </div>
           </Card>

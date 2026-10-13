@@ -41,6 +41,23 @@ export type RouteKey =
   | 'decisions'
   | 'profile'
   | 'team' //         contractor's build team
+  | 'contractors' //  contractor directory
+  | 'professionals' // professional directory
+  | 'suppliers' //    marketplace / supplier directory
+  | 'bids'
+  | 'verification'
+  | 'settings'
+  | 'organization'
+  | 'monitoring'
+  | 'company' //      your own public profile (company / storefront / expert profile)
+  | 'catalogue'
+  | 'quotations'
+  | 'orders'
+  | 'deliveries'
+  | 'proposals'
+  | 'deliverables'
+  | 'invitations'
+  | 'risks'
 
 const BASE: Record<UserRole, string> = {
   client: '/app/client',
@@ -73,6 +90,12 @@ const CLIENT_SECTIONS: Partial<Record<RouteKey, string>> = {
   updates: 'updates',
   passport: 'passport',
   decisions: 'decisions',
+  contractors: 'contractors',
+  professionals: 'professionals',
+  suppliers: 'suppliers',
+  bids: 'bids',
+  verification: 'verification',
+  settings: 'settings',
 }
 
 const SECTIONS: Record<UserRole, Partial<Record<RouteKey, string>>> = {
@@ -82,6 +105,7 @@ const SECTIONS: Record<UserRole, Partial<Record<RouteKey, string>>> = {
     profile: 'profile',
     projects: 'available',
     team: 'team',
+    bids: 'bids',
     money: 'payments',
     procurement: 'materials',
     reports: 'reports',
@@ -92,10 +116,21 @@ const SECTIONS: Record<UserRole, Partial<Record<RouteKey, string>>> = {
     decisions: 'decisions',
     documents: 'documents',
     evidence: 'evidence',
+    verification: 'verification',
+    settings: 'settings',
+    organization: 'organization',
+    monitoring: 'monitoring',
+    company: 'company',
+    suppliers: 'suppliers',
+    professionals: 'professionals',
   },
   market_place: {
     profile: 'profile',
     projects: 'orders',
+    catalogue: 'catalogue',
+    quotations: 'quotations',
+    orders: 'orders',
+    deliveries: 'deliveries',
     money: 'payments',
     procurement: 'orders',
     disputes: 'disputes',
@@ -103,6 +138,10 @@ const SECTIONS: Record<UserRole, Partial<Record<RouteKey, string>>> = {
     updates: 'updates',
     decisions: 'decisions',
     documents: 'documents',
+    verification: 'verification',
+    settings: 'settings',
+    organization: 'organization',
+    company: 'storefront',
   },
   project_manager: {
     profile: 'profile',
@@ -111,18 +150,29 @@ const SECTIONS: Record<UserRole, Partial<Record<RouteKey, string>>> = {
     milestones: 'milestones',
     evidence: 'evidence',
     inspections: 'inspections',
+    risks: 'risks',
+    monitoring: 'monitoring',
     messages: 'messages',
     updates: 'updates',
     documents: 'documents',
+    verification: 'verification',
+    settings: 'settings',
   },
   professional: {
     profile: 'profile',
     projects: 'invitations',
+    invitations: 'invitations',
+    proposals: 'proposals',
+    deliverables: 'deliverables',
     money: 'payments',
     messages: 'messages',
     updates: 'updates',
     decisions: 'decisions',
     documents: 'documents',
+    verification: 'verification',
+    settings: 'settings',
+    organization: 'organization',
+    company: 'expert-profile',
   },
   admin: {
     profile: 'profile',
@@ -131,20 +181,27 @@ const SECTIONS: Record<UserRole, Partial<Record<RouteKey, string>>> = {
     procurement: 'procurement',
     reports: 'reports',
     disputes: 'disputes',
-    evidence: 'compliance',
+    evidence: 'evidence',
     documents: 'documents',
     messages: 'messages',
     updates: 'updates',
     decisions: 'decisions',
+    contractors: 'contractors',
+    professionals: 'professionals',
+    suppliers: 'marketplace',
+    verification: 'verification',
+    settings: 'settings',
+    organization: 'organizations',
+    monitoring: 'monitoring',
   },
 }
 
 /**
  * Sub-pages each role really has, per concept. Module pages ask for things like
  * routes.to('disputes', 'current/evidence'); a sub-path only gets appended when it is
- * listed here, otherwise the link lands on the section's main page instead of a dead
- * route. ":id" matches any single segment (the demo pages use "current" as a stand-in id).
- * Client has every sub-page, so it is unrestricted.
+ * listed here, otherwise `can()` is false and <RoleLink> hides itself instead of
+ * leading to a dead end. ":id" matches any single segment (demo pages use "current"
+ * as a stand-in id). Client has every sub-page, so it is unrestricted.
  *
  * Adding a nested <Route> for a role? Add its sub-path here too.
  */
@@ -152,6 +209,9 @@ const COMMON_SUBS: Partial<Record<RouteKey, string[]>> = {
   updates: ['notifications', 'preferences'],
   documents: ['upload', ':id', ':id/history'],
   disputes: ['new', ':id', ':id/evidence', ':id/responses', ':id/resolution'],
+  settings: ['security'],
+  verification: ['status', 'documents'],
+  organization: ['profile', 'members', 'roles', 'permissions'],
 }
 
 const SUBS: Partial<Record<UserRole, Partial<Record<RouteKey, string[]>>>> = {
@@ -159,16 +219,22 @@ const SUBS: Partial<Record<UserRole, Partial<Record<RouteKey, string[]>>>> = {
     ...COMMON_SUBS,
     money: ['transactions', 'requests'],
     procurement: ['new'],
-    milestones: [':id'],
+    milestones: [':id', 'new'],
     evidence: [':id'],
+    bids: [':id', 'submit'],
+    company: ['portfolio', 'verification'],
+    suppliers: [':id'],
+    professionals: [':id'],
   },
   market_place: {
     ...COMMON_SUBS,
     money: ['transactions', 'requests'],
+    deliveries: ['verify'],
   },
   project_manager: {
     ...COMMON_SUBS,
     evidence: [':id', ':id/review'],
+    projects: [':id'],
   },
   professional: {
     ...COMMON_SUBS,
@@ -176,25 +242,38 @@ const SUBS: Partial<Record<UserRole, Partial<Record<RouteKey, string[]>>>> = {
   },
   admin: {
     ...COMMON_SUBS,
+    verification: [],
     money: ['transactions', 'approvals', 'requests', 'frozen', 'refunds'],
     reports: ['financial', 'audit', 'compliance', 'projects'],
-    evidence: ['audit-logs', 'settings'],
+    evidence: [':id', ':id/review'],
+    projects: [':id', 'new'],
+    contractors: [':id', ':id/details', ':id/portfolio', ':id/verification'],
+    professionals: [':id'],
+    suppliers: ['catalogue', 'analytics', ':id'],
   },
+}
+
+/** Concept/sub pairs that live under a different section for a role. */
+const ALIASES: Partial<Record<UserRole, Record<string, string>>> = {
+  market_place: { 'procurement/verify': 'deliveries/verify' },
 }
 
 const CLIENT_ROLES = new Set<UserRole>(['client', 'diaspora_client'])
 
-function subAllowed(role: UserRole, key: RouteKey, sub: string): boolean {
-  if (CLIENT_ROLES.has(role)) return true
-  const normalized = sub
+const normalizeSub = (sub: string) =>
+  sub
     .replace(/^\/+|\/+$/g, '')
     .split('/')
     .map((seg) => (seg === 'current' ? ':id' : seg))
     .join('/')
+
+function subAllowed(role: UserRole, key: RouteKey, sub: string): boolean {
+  if (CLIENT_ROLES.has(role)) return true
+  const normalized = normalizeSub(sub)
   return (SUBS[role]?.[key] ?? []).some((pattern) => {
     const p = pattern.split('/')
     const n = normalized.split('/')
-    return p.length === n.length && p.every((seg, i) => seg === ':id' ? n[i] !== '' : seg === n[i])
+    return p.length === n.length && p.every((seg, i) => (seg === ':id' ? n[i] !== '' && n[i] !== 'new' : seg === n[i]))
   })
 }
 
@@ -215,6 +294,9 @@ export function routeFor(role: UserRole, key: RouteKey, sub?: string): string {
 
   if (key === 'overview') return base
 
+  const alias = sub ? ALIASES[role]?.[`${key}/${normalizeSub(sub)}`] : undefined
+  if (alias) return `${base}/${alias}`
+
   const section = SECTIONS[role]?.[key]
   if (!section) {
     warn(`Role "${role}" has no "${key}" section. Sending to its dashboard (${base}).`)
@@ -232,6 +314,13 @@ export function routeFor(role: UserRole, key: RouteKey, sub?: string): string {
 
 export function hasRoute(role: UserRole, key: RouteKey): boolean {
   return key === 'overview' || Boolean(SECTIONS[role]?.[key])
+}
+
+/** True when this role really has that page (so a link to it will not dead-end). */
+export function canRoute(role: UserRole, key: RouteKey, sub?: string): boolean {
+  if (!hasRoute(role, key)) return false
+  if (!sub) return true
+  return Boolean(ALIASES[role]?.[`${key}/${normalizeSub(sub)}`]) || subAllowed(role, key, sub)
 }
 
 /** /app/client/escrow/fund -> "client" (null if the path isn't under a known role). */
@@ -252,6 +341,7 @@ export function useAppRoutes() {
       role,
       to: (key: RouteKey, sub?: string) => routeFor(role, key, sub),
       has: (key: RouteKey) => hasRoute(role, key),
+      can: (key: RouteKey, sub?: string) => canRoute(role, key, sub),
     }),
     [role],
   )

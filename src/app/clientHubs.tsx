@@ -2,6 +2,14 @@ import type { ReactNode } from 'react'
 import { Navigate, Route, useParams } from 'react-router-dom'
 
 import { CaseLayout, HubLayout, ModulePage } from '@/components/ui/HubLayout'
+import {
+  bidsRoutes,
+  contractorsRoutes,
+  professionalsRoutes,
+  settingsRoutes,
+  suppliersRoutes,
+  verificationRoutes,
+} from '@/app/roleHubs'
 import { projects } from '@/data/mockData'
 import type { Project } from '@/modules/projects/types'
 
@@ -19,6 +27,7 @@ import {
 
 /* ---- Pages that carry their own DashboardLayout (hand-built client pages) ---- */
 import { ClientDashboard, ClientProjectPage } from '@/pages/client/Dashboard'
+import { ComplianceReports } from '@/modules/reports/pages/ComplianceReports'
 import { DecisionsPage as ClientDecisionsPage } from '@/pages/workspace/Decisions'
 import { ProfilePage } from '@/pages/Profile'
 import { MessagesPage } from '@/pages/workspace/Messages'
@@ -125,6 +134,12 @@ export const clientHubRoutes = (
   <>
     {/* ---------------- Overview ---------------- */}
     <Route path="/app/client" element={<ClientDashboard />} />
+    {contractorsRoutes('/app/client')}
+    {professionalsRoutes('/app/client')}
+    {suppliersRoutes('/app/client')}
+    {bidsRoutes('/app/client')}
+    {verificationRoutes('/app/client')}
+    {settingsRoutes('/app/client')}
     <Route
       path="/app/client/profile"
       element={
@@ -207,6 +222,7 @@ export const clientHubRoutes = (
       <Route path="orders" element={<PurchaseOrders />} />
       <Route path="deliveries" element={<Deliveries />} />
       <Route path="verify" element={<DeliveryVerification />} />
+      <Route path=":requestId" element={<QuoteComparison />} />
     </Route>
 
     {/* ---------------- Reports ---------------- */}
@@ -218,6 +234,7 @@ export const clientHubRoutes = (
       <Route path="weekly" element={<WeeklyReport />} />
       <Route path="monthly" element={<MonthlyReport />} />
       <Route path="library" element={<ReportLibrary />} />
+      <Route path="compliance" element={<ComplianceReports />} />
     </Route>
 
     {/* ---------------- Disputes ---------------- */}

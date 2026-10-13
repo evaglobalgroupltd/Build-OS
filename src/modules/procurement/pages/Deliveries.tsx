@@ -11,7 +11,7 @@ import {
 
 import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
-import { RoleLink, SoonButton } from '@/components/ui/ModuleActions'
+import { ActionButton, RoleLink } from '@/components/ui/ModuleActions'
 
 type DeliveryStatus =
   | 'in transit'
@@ -369,7 +369,7 @@ function DeliveryRow({ delivery }: { delivery: Delivery }) {
             }
           />
 
-          <SoonButton
+          <ActionButton message="Opening delivery" description="Receipt and verification details open here" tone="info"
             aria-label={`View delivery for ${delivery.item}`}
             className="
               flex
@@ -395,7 +395,7 @@ function DeliveryRow({ delivery }: { delivery: Delivery }) {
             "
           >
             <ChevronRight className="h-[15px] w-[15px] transition-transform duration-200 group-hover:translate-x-0.5" />
-          </SoonButton>
+          </ActionButton>
         </div>
       </div>
 

@@ -12,11 +12,14 @@ import {
   Wallet,
 } from 'lucide-react'
 
+import type { RouteKey } from '@/config/appRoutes'
+
 import type { Project } from '@/modules/projects/types'
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { StagePill } from '@/modules/projects/components/StagePill'
 
+import { RoleLink } from '@/components/ui/ModuleActions'
 type ProjectOverviewProps = {
   project?: Project
 }
@@ -144,8 +147,7 @@ export function ProjectOverview({
 
             </div>
 
-            <button
-              type="button"
+            <RoleLink route="projects" sub="current"
               className="
                 group
                 flex
@@ -171,7 +173,7 @@ export function ProjectOverview({
                 size={14}
                 className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
               />
-            </button>
+            </RoleLink>
 
           </div>
 
@@ -335,8 +337,7 @@ export function ProjectOverview({
 
             </div>
 
-            <button
-              type="button"
+            <RoleLink route="milestones" sub="current"
               className="
                 group
                 mt-5
@@ -355,7 +356,7 @@ export function ProjectOverview({
                 size={13}
                 className="transition-transform duration-200 group-hover:translate-x-0.5"
               />
-            </button>
+            </RoleLink>
 
           </CardBody>
         </Card>
@@ -464,6 +465,7 @@ export function ProjectOverview({
             title="Milestones"
             description="Review construction progress, submitted evidence and milestone approvals."
             action="Open milestones"
+            route="milestones"
             tone="green"
           />
 
@@ -472,6 +474,7 @@ export function ProjectOverview({
             title="Procurement"
             description="Track material requests, supplier activity, orders and deliveries."
             action="Open procurement"
+            route="procurement"
           />
 
           <ActionCard
@@ -479,6 +482,7 @@ export function ProjectOverview({
             title="Documents"
             description="Access project records, evidence, approvals and reporting documents."
             action="Open documents"
+            route="documents"
           />
 
         </div>
@@ -526,8 +530,7 @@ export function ProjectOverview({
 
             </div>
 
-            <button
-              type="button"
+            <RoleLink route="decisions"
               className="
                 flex
                 w-fit
@@ -547,7 +550,7 @@ export function ProjectOverview({
             >
               Review now
               <ArrowUpRight size={13} />
-            </button>
+            </RoleLink>
 
           </div>
         </section>
@@ -833,12 +836,14 @@ function ActionCard({
   title,
   description,
   action,
+  route,
   tone = 'default',
 }: {
   icon: React.ElementType
   title: string
   description: string
   action: string
+  route: RouteKey
   tone?: 'default' | 'green'
 }) {
   return (
@@ -865,8 +870,8 @@ function ActionCard({
           {description}
         </p>
 
-        <button
-          type="button"
+        <RoleLink
+          route={route}
           className="
             mt-5
             flex
@@ -885,7 +890,7 @@ function ActionCard({
             size={13}
             className="transition-transform duration-200 group-hover:translate-x-0.5"
           />
-        </button>
+        </RoleLink>
 
       </CardBody>
     </Card>

@@ -1,3 +1,4 @@
+import { useMemo, useState } from 'react'
 import {
   AlertTriangle,
   CalendarDays,
@@ -22,6 +23,7 @@ import {
   CardHeader,
 } from '@/components/ui/Card'
 
+import { RoleLink } from '@/components/ui/ModuleActions'
 type EvidenceStatus =
   | 'submitted'
   | 'under_review'
@@ -186,7 +188,26 @@ const evidence = [
   },
 ]
 
+const STATUS_CHIPS = ['All', 'Under review', 'Verified', 'Blocked'] as const
+
 export function EvidenceLibrary() {
+  const [query, setQuery] = useState('')
+  const [chip, setChip] = useState<(typeof STATUS_CHIPS)[number]>('All')
+  const [typeFilter, setTypeFilter] = useState<'all' | EvidenceType>('all')
+  const [filtersOpen, setFiltersOpen] = useState(false)
+
+  const visibleEvidence = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    return evidence.filter((item) => {
+      const statusOk =
+        chip === 'All' ||
+        (chip === 'Verified' && item.status === 'verified') ||
+        (chip === 'Under review' && (item.status === 'submitted' || item.status === 'under_review')) ||
+        (chip === 'Blocked' && (item.status === 'blocked' || item.status === 'rejected'))
+      return statusOk && (typeFilter === 'all' || item.type === typeFilter) && (q === '' || JSON.stringify(item).toLowerCase().includes(q))
+    })
+  }, [query, chip, typeFilter])
+
   const totalEvidence = evidence.length
 
   const verifiedCount = evidence.filter(
@@ -244,6 +265,8 @@ export function EvidenceLibrary() {
 
         <button
           type="button"
+          onClick={() => setFiltersOpen((open) => !open)}
+          aria-expanded={filtersOpen}
           className="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-full border border-ink/[0.08] bg-white px-4 text-xs font-semibold text-ink/65 shadow-[0_6px_20px_rgba(20,30,25,0.035)] transition-all duration-200 hover:-translate-y-0.5 hover:border-ink/[0.15] hover:text-ink hover:shadow-[0_10px_26px_rgba(20,30,25,0.055)]"
         >
           <Filter className="h-3.5 w-3.5" />
@@ -337,19 +360,40 @@ export function EvidenceLibrary() {
               <input
                 type="search"
                 placeholder="Search evidence, project, milestone or submitter..."
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
                 className="h-11 w-full rounded-[13px] border border-ink/[0.07] bg-[#F7F8F6] pl-10 pr-4 text-xs text-ink outline-none transition-all placeholder:text-ink/30 focus:border-[#12613E]/[0.20] focus:bg-white focus:ring-4 focus:ring-[#12613E]/[0.04]"
               />
             </div>
 
             <div className="flex flex-wrap gap-1.5">
-              <FilterChip label="All" active />
-              <FilterChip label="Under review" />
-              <FilterChip label="Verified" />
-              <FilterChip label="Blocked" />
+              {STATUS_CHIPS.map((label) => (
+                <FilterChip key={label} label={label} active={chip === label} onClick={() => setChip(label)} />
+              ))}
             </div>
           </div>
         </CardBody>
       </Card>
+
+      {filtersOpen && (
+        <div className="flex flex-wrap items-center gap-3 rounded-xl border border-line bg-paper p-4">
+          <label htmlFor="evidence-type" className="text-xs font-medium text-ink/60">
+            Evidence type
+          </label>
+          <select
+            id="evidence-type"
+            value={typeFilter}
+            onChange={(e) => setTypeFilter(e.target.value as 'all' | EvidenceType)}
+            className="rounded-md border border-line bg-white px-3 py-2 text-sm capitalize text-ink focus:outline-none"
+          >
+            {['all', 'milestone', 'monitoring', 'procurement', 'document', 'dispute'].map((t) => (
+              <option key={t} value={t}>
+                {t === 'all' ? 'All types' : t}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       {/* =========================================================
           RECORDS
@@ -362,7 +406,10 @@ export function EvidenceLibrary() {
 
         <CardBody className="p-3 sm:p-4">
           <div className="space-y-2.5">
-            {evidence.map((item) => (
+            {visibleEvidence.length === 0 && (
+              <p className="py-8 text-center text-sm text-ink/45">No evidence matches those filters.</p>
+            )}
+            {visibleEvidence.map((item) => (
               <EvidenceRecordRow
                 key={item.id}
                 evidence={item}
@@ -476,13 +523,17 @@ function EvidenceStat({
 function FilterChip({
   label,
   active = false,
+  onClick,
 }: {
   label: string
   active?: boolean
+  onClick?: () => void
 }) {
   return (
     <button
       type="button"
+      onClick={onClick}
+      aria-pressed={active}
       className={`rounded-full px-3 py-2 text-[10px] font-semibold transition-all ${
         active
           ? 'bg-ink text-white shadow-[0_4px_12px_rgba(20,30,25,0.10)]'
@@ -519,8 +570,7 @@ function EvidenceRecordRow({
   }[evidence.type]
 
   return (
-    <button
-      type="button"
+    <RoleLink route="evidence" sub="current"
       className="group relative w-full overflow-hidden rounded-[18px] border border-ink/[0.07] bg-white p-4 text-left shadow-[0_4px_18px_rgba(20,30,25,0.025)] transition-all duration-200 hover:-translate-y-0.5 hover:border-ink/[0.12] hover:shadow-[0_12px_34px_rgba(20,30,25,0.055)] sm:p-5"
     >
       {/* Bottom status rail */}
@@ -626,7 +676,7 @@ function EvidenceRecordRow({
           </div>
         </div>
       </div>
-    </button>
+    </RoleLink>
   )
 }
 

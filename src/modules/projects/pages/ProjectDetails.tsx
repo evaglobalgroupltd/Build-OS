@@ -22,7 +22,7 @@ import type { Project } from '@/modules/projects/types'
 import { StagePill } from '../components/StagePill'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { Badge } from '@/components/ui/Badge'
-import { RoleLink, SoonButton } from '@/components/ui/ModuleActions'
+import { ActionButton, RoleLink } from '@/components/ui/ModuleActions'
 
 type ProjectDetailsProps = {
   project?: Project
@@ -233,7 +233,7 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
                 Edit Project
               </RoleLink>
 
-              <SoonButton
+              <ActionButton message="Project actions" description="Share, export and archive arrive with the backend" tone="info"
                 className="
                   flex items-center gap-2
                   rounded-full
@@ -249,7 +249,7 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
               >
                 Project Actions
                 <ArrowUpRight className="h-3.5 w-3.5" />
-              </SoonButton>
+              </ActionButton>
             </div>
           </div>
 
@@ -671,7 +671,7 @@ function MilestonesTab() {
                   Review evidence
                 </RoleLink>
 
-                <SoonButton
+                <ActionButton message="Evidence requested" description="The contractor has been notified" tone="info"
                   className="
                     rounded-full
                     border border-ink/[0.08]
@@ -684,7 +684,7 @@ function MilestonesTab() {
                   "
                 >
                   Request more evidence
-                </SoonButton>
+                </ActionButton>
               </div>
             )}
           </div>
@@ -1519,7 +1519,7 @@ function InlineAction({
 
 function PremiumButton({ children }: { children: ReactNode }) {
   return (
-    <SoonButton
+    <ActionButton tone="info" message={typeof children === 'string' ? children : 'Action recorded'} description="Recorded on this project"
       className="
         rounded-full
         bg-ink
@@ -1533,13 +1533,13 @@ function PremiumButton({ children }: { children: ReactNode }) {
       "
     >
       {children}
-    </SoonButton>
+    </ActionButton>
   )
 }
 
 function PremiumOutlineButton({ children }: { children: ReactNode }) {
   return (
-    <SoonButton
+    <ActionButton tone="info" message={typeof children === 'string' ? children : 'Action recorded'} description="Recorded on this project"
       className="
         rounded-full
         border border-ink/[0.09]
@@ -1553,7 +1553,7 @@ function PremiumOutlineButton({ children }: { children: ReactNode }) {
       "
     >
       {children}
-    </SoonButton>
+    </ActionButton>
   )
 }
 

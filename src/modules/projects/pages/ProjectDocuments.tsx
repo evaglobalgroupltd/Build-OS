@@ -15,7 +15,7 @@ import {
 
 import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
-import { RoleLink, SoonButton } from '@/components/ui/ModuleActions'
+import { ActionButton, RoleLink } from '@/components/ui/ModuleActions'
 
 type DocumentCategory =
   | 'land'
@@ -664,7 +664,7 @@ function DocumentRow({
 
         <div className="flex items-center gap-1 sm:opacity-40 sm:transition-opacity sm:group-hover:opacity-100">
 
-          <SoonButton
+          <ActionButton message="Opening document" description="The preview connects when file storage is set up" tone="info"
             aria-label={`View ${document.name}`}
             className="
               flex
@@ -681,9 +681,9 @@ function DocumentRow({
             "
           >
             <Eye className="h-[14px] w-[14px]" />
-          </SoonButton>
+          </ActionButton>
 
-          <SoonButton
+          <ActionButton message="Download queued" description="The file downloads once storage is connected" tone="info"
             aria-label={`Download ${document.name}`}
             className="
               flex
@@ -700,7 +700,7 @@ function DocumentRow({
             "
           >
             <Download className="h-[14px] w-[14px]" />
-          </SoonButton>
+          </ActionButton>
 
         </div>
 

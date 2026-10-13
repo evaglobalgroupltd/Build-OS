@@ -1,4 +1,4 @@
-import type { ComponentType } from 'react'
+import { useMemo, useState, type ComponentType } from 'react'
 
 import {
   AlertTriangle,
@@ -13,8 +13,11 @@ import {
   UserCheck,
 } from 'lucide-react'
 
+import { RoleLink } from '@/components/ui/ModuleActions'
+
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 
+import { ActionButton } from '@/components/ui/ModuleActions'
 type InspectionStatus =
   | 'Scheduled'
   | 'In Progress'
@@ -155,7 +158,22 @@ const inspections: Inspection[] = [
   },
 ]
 
+const INSPECTION_FILTERS = ['All', 'Scheduled', 'Pending review', 'Completed', 'Action required'] as const
+
+const FILTER_STATUS: Record<string, InspectionStatus | undefined> = {
+  Scheduled: 'Scheduled',
+  'Pending review': 'Pending Review',
+  Completed: 'Completed',
+  'Action required': 'Requires Action',
+}
+
 export function Inspections() {
+  const [filter, setFilter] = useState<(typeof INSPECTION_FILTERS)[number]>('All')
+  const visibleInspections = useMemo(
+    () => (filter === 'All' ? inspections : inspections.filter((item) => item.status === FILTER_STATUS[filter])),
+    [filter],
+  )
+
   const scheduledCount = inspections.filter(
     (item) => item.status === 'Scheduled',
   ).length
@@ -237,13 +255,13 @@ export function Inspections() {
               </div>
             </div>
 
-            <button
+            <ActionButton message="Inspection scheduled" description="The site team has been notified"
               type="button"
               className="inline-flex shrink-0 items-center justify-center gap-2 rounded-[13px] bg-ink px-4.5 py-3 text-xs font-semibold text-white shadow-[0_12px_28px_rgba(20,40,30,0.16)] transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_34px_rgba(20,40,30,0.2)]"
             >
               <Plus className="h-4 w-4" />
               Schedule inspection
-            </button>
+            </ActionButton>
           </div>
         </div>
 
@@ -326,11 +344,9 @@ export function Inspections() {
             </div>
 
             <div className="flex flex-wrap gap-2">
-              <FilterButton label="All" active />
-              <FilterButton label="Scheduled" />
-              <FilterButton label="Pending review" />
-              <FilterButton label="Completed" />
-              <FilterButton label="Action required" />
+              {INSPECTION_FILTERS.map((label) => (
+                <FilterButton key={label} label={label} active={filter === label} onClick={() => setFilter(label)} />
+              ))}
             </div>
           </div>
         </CardBody>
@@ -338,7 +354,10 @@ export function Inspections() {
 
       {/* Queue */}
       <div className="space-y-4">
-        {inspections.map((inspection) => (
+        {visibleInspections.length === 0 && (
+          <p className="py-10 text-center text-sm text-ink/45">No inspections match that filter.</p>
+        )}
+        {visibleInspections.map((inspection) => (
           <InspectionRow
             key={inspection.id}
             inspection={inspection}
@@ -450,13 +469,13 @@ export function Inspections() {
               </div>
             </div>
 
-            <button
+            <ActionButton message="Inspection created" description="It now appears in the schedule"
               type="button"
               className="inline-flex shrink-0 items-center justify-center gap-2 rounded-[12px] border border-ink/[0.08] bg-white px-4 py-2.5 text-xs font-semibold text-ink/60 shadow-sm transition-all hover:-translate-y-0.5 hover:border-ink/[0.12] hover:bg-[#F8FAF8] hover:text-ink"
             >
               <Plus className="h-4 w-4" />
               Create inspection
-            </button>
+            </ActionButton>
           </div>
         </CardBody>
       </Card>
@@ -560,15 +579,16 @@ function InspectionRow({
           </div>
 
           {/* Open */}
-          <button
-            type="button"
+          <RoleLink
+            route="evidence"
+            sub="current"
             className="inline-flex h-10 w-full shrink-0 items-center justify-center gap-2 rounded-[12px] border border-ink/[0.07] bg-white px-3 text-xs font-semibold text-ink/50 transition-all hover:border-[#12613E]/20 hover:bg-[#12613E]/[0.035] hover:text-[#12613E] sm:w-auto xl:h-11 xl:w-11 xl:px-0"
             aria-label={`Open ${inspection.title}`}
           >
             <span className="xl:hidden">Open inspection</span>
 
             <ChevronRight className="h-4 w-4" />
-          </button>
+          </RoleLink>
         </div>
       </div>
 
@@ -727,13 +747,17 @@ function InspectionMetric({
 function FilterButton({
   label,
   active = false,
+  onClick,
 }: {
   label: string
   active?: boolean
+  onClick?: () => void
 }) {
   return (
     <button
       type="button"
+      onClick={onClick}
+      aria-pressed={active}
       className={`rounded-[11px] px-3.5 py-2 text-[10px] font-semibold transition-all ${
         active
           ? 'bg-ink text-white shadow-[0_7px_18px_rgba(20,40,30,0.12)]'

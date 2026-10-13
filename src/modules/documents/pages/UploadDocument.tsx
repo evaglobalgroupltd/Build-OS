@@ -13,7 +13,7 @@ import {
 } from 'lucide-react'
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
-import { RoleLink, SoonButton } from '@/components/ui/ModuleActions'
+import { ActionButton, RoleLink } from '@/components/ui/ModuleActions'
 
 const documentCategories = [
   'Land & Ownership',
@@ -297,12 +297,12 @@ export function UploadDocument() {
                     </p>
                   </div>
 
-                  <SoonButton
+                  <ActionButton message="Selection cleared" description="Choose another file to continue" tone="info"
                     aria-label="Remove selected document"
                     className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-ink/20 transition hover:bg-red-500/[0.06] hover:text-red-600"
                   >
                     <X className="h-4 w-4" />
-                  </SoonButton>
+                  </ActionButton>
                 </div>
               </div>
             </CardBody>
@@ -347,18 +347,18 @@ export function UploadDocument() {
             </div>
 
             <div className="flex flex-col-reverse gap-2 sm:flex-row">
-              <SoonButton
+              <ActionButton message="Draft saved" description="Finish uploading later from your vault"
                 className="h-11 rounded-xl border border-line bg-white px-5 text-xs font-semibold text-ink/50 transition hover:border-ink/10 hover:bg-[#F6F8FC] hover:text-ink"
               >
                 Save as draft
-              </SoonButton>
+              </ActionButton>
 
-              <SoonButton
+              <ActionButton message="Document uploaded" description="It is now in your vault and queued for verification"
                 className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-[#0B1220] px-6 text-xs font-semibold text-white shadow-[0_8px_20px_rgba(11,18,32,0.12)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#1657FF] hover:shadow-[0_10px_24px_rgba(22,87,255,0.18)]"
               >
                 <UploadCloud className="h-4 w-4" />
                 Upload document
-              </SoonButton>
+              </ActionButton>
             </div>
           </div>
         </div>

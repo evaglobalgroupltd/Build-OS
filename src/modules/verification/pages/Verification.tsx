@@ -16,6 +16,7 @@ import {
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 
+import { RoleLink } from '@/components/ui/ModuleActions'
 type VerificationStatus =
   | 'Draft'
   | 'Submitted'
@@ -169,13 +170,12 @@ export function Verification() {
               </div>
             </div>
 
-            <button
-              type="button"
+            <RoleLink to="/contact"
               className="inline-flex w-fit items-center gap-2 rounded-full border border-ink/[0.08] bg-white px-4 py-2.5 text-[10px] font-semibold text-ink/60 shadow-[0_4px_14px_rgba(20,40,30,0.03)] transition-all hover:border-ink/15 hover:bg-paper-2 hover:text-ink"
             >
               <HelpCircle className="h-3.5 w-3.5" />
               Need help?
-            </button>
+            </RoleLink>
           </div>
         </div>
 
@@ -329,13 +329,12 @@ export function Verification() {
             </div>
 
             <div className="border-t border-ink/[0.06] bg-paper-2/50 px-6 py-4 sm:px-7">
-              <button
-                type="button"
+              <RoleLink route="verification" sub="documents"
                 className="inline-flex items-center gap-2 rounded-full bg-ink px-4 py-2.5 text-[10px] font-semibold text-white shadow-[0_7px_18px_rgba(20,40,30,0.10)] transition-all hover:-translate-y-0.5 hover:shadow-[0_10px_22px_rgba(20,40,30,0.14)]"
               >
                 <Upload className="h-3.5 w-3.5" />
                 Upload document
-              </button>
+              </RoleLink>
             </div>
           </Card>
 
@@ -637,13 +636,14 @@ function DocumentRow({
           </div>
         </div>
 
-        <button
-          type="button"
+        <RoleLink
+          route="verification"
+          sub="documents"
           className="inline-flex shrink-0 items-center gap-1.5 self-start rounded-full border border-ink/[0.08] bg-white px-3.5 py-2.5 text-[10px] font-semibold text-ink/55 shadow-[0_3px_10px_rgba(20,40,30,0.025)] transition-all hover:border-ink/15 hover:bg-paper-2 hover:text-ink sm:self-center"
         >
           {document.status === 'Pending' ? 'Review' : 'View'}
           <ChevronRight className="h-3.5 w-3.5 text-ink/25" />
-        </button>
+        </RoleLink>
       </div>
     </div>
   )

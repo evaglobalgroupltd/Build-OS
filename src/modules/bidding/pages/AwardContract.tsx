@@ -15,6 +15,7 @@ import {
 import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 
+import { ActionButton } from '@/components/ui/ModuleActions'
 interface SelectedBid {
   bidId: string
   projectId: string
@@ -639,7 +640,7 @@ export function AwardContract() {
               </p>
             </div>
 
-            <button
+            <ActionButton message="Contract awarded" description="The contractor has been notified and escrow funding can begin"
               type="button"
               className="
                 group
@@ -664,7 +665,7 @@ export function AwardContract() {
             >
               Award contract
               <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
-            </button>
+            </ActionButton>
           </div>
         </div>
       </section>

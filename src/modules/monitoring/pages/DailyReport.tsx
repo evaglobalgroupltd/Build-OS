@@ -18,7 +18,7 @@ import {
 } from 'lucide-react'
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
-import { PrintButton, SoonButton } from '@/components/ui/ModuleActions'
+import { ActionButton, PrintButton } from '@/components/ui/ModuleActions'
 
 type ReportStatus =
   | 'Draft'
@@ -267,7 +267,7 @@ export function DailyReport() {
                 Export Report
               </PrintButton>
 
-              <SoonButton
+              <ActionButton message="Report opened" description="Review the notes and photos below" tone="info"
                 className="
                   inline-flex items-center gap-2 rounded-full
                   bg-ink px-4.5 py-2.5
@@ -279,7 +279,7 @@ export function DailyReport() {
               >
                 <CheckCircle2 className="h-3.5 w-3.5" />
                 Review Report
-              </SoonButton>
+              </ActionButton>
             </div>
           </div>
         </div>
@@ -756,7 +756,7 @@ export function DailyReport() {
             </div>
 
             <div className="flex shrink-0 flex-wrap gap-2">
-              <SoonButton
+              <ActionButton message="Report rejected" description="The submitter will be asked to resubmit" tone="error"
                 className="
                   inline-flex items-center gap-2 rounded-full
                   border border-rose-200 bg-rose-50 px-4 py-2.5
@@ -767,9 +767,9 @@ export function DailyReport() {
               >
                 <X className="h-3.5 w-3.5" />
                 Reject Report
-              </SoonButton>
+              </ActionButton>
 
-              <SoonButton
+              <ActionButton message="Clarification requested" description="The submitter has been notified" tone="info"
                 className="
                   inline-flex items-center gap-2 rounded-full
                   border border-[#B85C12]/15 bg-[#FBF6F1]
@@ -780,9 +780,9 @@ export function DailyReport() {
               >
                 <AlertTriangle className="h-3.5 w-3.5" />
                 Request Clarification
-              </SoonButton>
+              </ActionButton>
 
-              <SoonButton
+              <ActionButton message="Report approved" description="It is now part of the project record"
                 className="
                   inline-flex items-center gap-2 rounded-full
                   bg-ink px-4 py-2.5
@@ -794,7 +794,7 @@ export function DailyReport() {
               >
                 <Check className="h-3.5 w-3.5" />
                 Approve Report
-              </SoonButton>
+              </ActionButton>
             </div>
           </div>
         </CardBody>

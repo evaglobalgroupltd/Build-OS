@@ -19,6 +19,7 @@ import {
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 
+import { RoleLink } from '@/components/ui/ModuleActions'
 /* -------------------------------------------------------------------------- */
 /* Data                                                                       */
 /* -------------------------------------------------------------------------- */
@@ -177,20 +178,18 @@ export function OrganizationDashboard() {
             </div>
 
             <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
+              <RoleLink route="organization" sub="profile"
                 className="inline-flex h-11 items-center justify-center rounded-xl border border-ink/[0.08] bg-white px-4 text-xs font-semibold text-ink/60 shadow-sm transition-all hover:border-ink/[0.14] hover:text-ink"
               >
                 Organization settings
-              </button>
+              </RoleLink>
 
-              <button
-                type="button"
+              <RoleLink route="projects"
                 className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-[#18271F] px-5 text-xs font-semibold text-white shadow-[0_10px_24px_rgba(24,39,31,0.16)] transition-all hover:-translate-y-0.5 hover:bg-[#12613E]"
               >
                 <FolderKanban className="h-3.5 w-3.5" />
                 View projects
-              </button>
+              </RoleLink>
             </div>
           </div>
         </div>
@@ -301,13 +300,12 @@ export function OrganizationDashboard() {
           </div>
 
           <div className="border-t border-ink/[0.06] px-6 py-4">
-            <button
-              type="button"
+            <RoleLink route="projects"
               className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#12613E] transition-colors hover:text-[#0E4C31]"
             >
               View all projects
               <ChevronRight className="h-3.5 w-3.5" />
-            </button>
+            </RoleLink>
           </div>
         </Card>
 
@@ -330,13 +328,12 @@ export function OrganizationDashboard() {
           </div>
 
           <div className="border-t border-ink/[0.06] bg-[#FBFCFA] px-5 py-4">
-            <button
-              type="button"
+            <RoleLink route="reports" sub="compliance"
               className="inline-flex items-center gap-1.5 text-xs font-semibold text-ink/55 transition-colors hover:text-[#12613E]"
             >
               View all exceptions
               <ArrowUpRight className="h-3.5 w-3.5" />
-            </button>
+            </RoleLink>
           </div>
         </Card>
       </div>
@@ -507,13 +504,12 @@ export function OrganizationDashboard() {
         </div>
 
         <div className="border-t border-ink/[0.06] px-6 py-4">
-          <button
-            type="button"
+          <RoleLink route="updates"
             className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#12613E] transition-colors hover:text-[#0E4C31]"
           >
             View activity history
             <ChevronRight className="h-3.5 w-3.5" />
-          </button>
+          </RoleLink>
         </div>
       </Card>
     </div>
@@ -793,13 +789,15 @@ function AttentionItem({
             {item.description}
           </p>
 
-          <button
-            type="button"
+          <RoleLink
+            route="reports"
+            sub="compliance"
+            fallbackRoute="reports"
             className="mt-3 inline-flex items-center gap-1 text-[10px] font-semibold text-ink/50 transition-colors hover:text-[#12613E]"
           >
             {item.action}
             <ArrowUpRight className="h-3 w-3" />
-          </button>
+          </RoleLink>
         </div>
       </div>
     </div>

@@ -13,15 +13,8 @@
  * `useWorkforce()` and the `actions` object, so nothing else has to change.
  * ========================================================================== */
 
-import {
-  useEffect,
-  useMemo,
-  useState,
-  useSyncExternalStore,
-  type FormEvent,
-  type ReactNode,
-} from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { useMemo, useState, useSyncExternalStore, type FormEvent } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import {
   ArrowRight,
   BadgeCheck,
@@ -47,7 +40,13 @@ import {
   X,
 } from 'lucide-react'
 
-import { useAppRoutes } from '@/config/appRoutes'
+import { Badge } from '@/components/ui/Badge'
+import { Button } from '@/components/ui/Button'
+import { EmptyState } from '@/components/ui/EmptyState'
+import { Modal } from '@/components/ui/Modal'
+import { RoleLink } from '@/components/ui/ModuleActions'
+import { FormField, SelectField, TextAreaField } from '@/components/forms/FormField'
+import { toast } from '@/context/ToastContext'
 import { AvailableProjects } from '@/modules/bidding/pages/AvailableProjects'
 
 /* -------------------------------------------------------------------------- */
@@ -111,10 +110,10 @@ const TRADES = [
 
 const TEAM_ROLES = ['Engineer', 'Supervisor', ...TRADES]
 
-const AVAILABILITY_META: Record<Availability, { label: string; className: string }> = {
-  available: { label: 'Available now', className: 'bg-emerald-50 text-emerald-700' },
-  limited: { label: 'Limited slots', className: 'bg-amber-50 text-amber-700' },
-  booked: { label: 'Fully booked', className: 'bg-slate-100 text-slate-500' },
+const AVAILABILITY_META: Record<Availability, { label: string; tone: 'teal' | 'amber' | 'neutral' }> = {
+  available: { label: 'Available now', tone: 'teal' },
+  limited: { label: 'Limited slots', tone: 'amber' },
+  booked: { label: 'Fully booked', tone: 'neutral' },
 }
 
 const naira = (n: number) => `₦${n.toLocaleString('en-NG')}`
@@ -337,7 +336,9 @@ const actions = {
     setState({ team: [{ ...input, id: `tm-${nextId++}` }, ...state.team] })
   },
   removeMember(id: string) {
-    setState({ team: state.team.filter((member) => member.id !== id) })
+    const member = state.team.find((m) => m.id === id)
+    setState({ team: state.team.filter((m) => m.id !== id) })
+    if (member) toast.info(member.status === 'invited' ? 'Invitation cancelled' : 'Removed from team', member.name)
   },
   togglePermission(id: string, permission: Permission) {
     setState({
@@ -354,6 +355,7 @@ const actions = {
     })
   },
   toggleSaved(artisanId: string) {
+    toast.info(state.saved.includes(artisanId) ? 'Removed from saved artisans' : 'Saved to your shortlist')
     setState({
       saved: state.saved.includes(artisanId)
         ? state.saved.filter((id) => id !== artisanId)
@@ -372,6 +374,7 @@ const actions = {
       dayRate,
     })
     setState({ lastInvite: { name: artisan.name, project } })
+    toast.success('Invitation sent', `${artisan.name} · ${project}`)
   },
   dismissInvite() {
     setState({ lastInvite: null })
@@ -379,84 +382,27 @@ const actions = {
 }
 
 /* -------------------------------------------------------------------------- */
-/* Shared UI                                                                  */
+/* Shared bits                                                                */
 /* -------------------------------------------------------------------------- */
 
-const inputClass =
-  'w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-[#B85C12] focus:ring-2 focus:ring-[#B85C12]/15'
+const chipClass = (selected: boolean) =>
+  [
+    'inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold transition',
+    'focus:outline-none focus-visible:ring-2 focus-visible:ring-ink/20',
+    selected ? 'border-ink bg-ink text-white' : 'border-line bg-white text-ink/65 hover:border-ink/25 hover:text-ink',
+  ].join(' ')
 
 function Avatar({ name, size = 'md' }: { name: string; size?: 'md' | 'lg' }) {
   return (
     <div
       className={[
-        'flex shrink-0 items-center justify-center rounded-full bg-[#9A4E26] font-bold text-white',
+        'flex shrink-0 items-center justify-center rounded-full bg-ink font-semibold text-white',
         size === 'lg' ? 'h-14 w-14 text-base' : 'h-11 w-11 text-sm',
       ].join(' ')}
       aria-hidden
     >
       {initials(name)}
     </div>
-  )
-}
-
-function Modal({
-  title,
-  subtitle,
-  onClose,
-  children,
-}: {
-  title: string
-  subtitle?: string
-  onClose: () => void
-  children: ReactNode
-}) {
-  useEffect(() => {
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose()
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [onClose])
-
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-[#0B1F16]/50 p-4 backdrop-blur-[2px] sm:items-center"
-      onMouseDown={(event) => {
-        if (event.target === event.currentTarget) onClose()
-      }}
-    >
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-label={title}
-        className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl"
-      >
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h2 className="text-lg font-bold text-[#173629]">{title}</h2>
-            {subtitle && <p className="mt-1 text-sm text-slate-500">{subtitle}</p>}
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Close"
-            className="rounded-full p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
-        <div className="mt-5">{children}</div>
-      </div>
-    </div>
-  )
-}
-
-function Field({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <label className="block">
-      <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</span>
-      {children}
-    </label>
   )
 }
 
@@ -476,7 +422,7 @@ function PermissionPicker({
             key={permission.key}
             className={[
               'flex cursor-pointer items-start gap-3 rounded-xl border p-3 transition',
-              checked ? 'border-[#B85C12]/40 bg-[#FFF7F0]' : 'border-slate-200 hover:bg-slate-50',
+              checked ? 'border-teal/30 bg-teal-light' : 'border-line hover:bg-paper',
             ].join(' ')}
           >
             <input
@@ -485,46 +431,16 @@ function PermissionPicker({
               onChange={() =>
                 onChange(checked ? value.filter((p) => p !== permission.key) : [...value, permission.key])
               }
-              className="mt-0.5 h-4 w-4 accent-[#B85C12]"
+              className="mt-0.5 h-4 w-4 accent-teal"
             />
             <span>
-              <span className="block text-sm font-semibold text-slate-800">{permission.label}</span>
-              <span className="block text-xs text-slate-500">{permission.hint}</span>
+              <span className="block text-sm font-semibold text-ink">{permission.label}</span>
+              <span className="block text-xs text-ink/50">{permission.hint}</span>
             </span>
           </label>
         )
       })}
     </div>
-  )
-}
-
-function PrimaryButton({
-  children,
-  onClick,
-  type = 'button',
-  disabled,
-  className = '',
-}: {
-  children: ReactNode
-  onClick?: () => void
-  type?: 'button' | 'submit'
-  disabled?: boolean
-  className?: string
-}) {
-  return (
-    <button
-      type={type}
-      onClick={onClick}
-      disabled={disabled}
-      className={[
-        'inline-flex items-center justify-center gap-2 rounded-2xl bg-[#9A4E26] px-5 py-2.5 text-sm font-bold text-white shadow-sm transition',
-        'hover:bg-[#843F1C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B85C12] focus-visible:ring-offset-2',
-        'disabled:cursor-not-allowed disabled:opacity-50',
-        className,
-      ].join(' ')}
-    >
-      {children}
-    </button>
   )
 }
 
@@ -540,21 +456,15 @@ function AddMemberModal({ onClose }: { onClose: () => void }) {
   const [permissions, setPermissions] = useState<Permission[]>(['proof'])
   const [touched, setTouched] = useState(false)
 
-  const phoneOk = /^[0-9+\s-]{10,15}$/.test(phone.trim())
-  const valid = name.trim().length > 1 && phoneOk
+  const nameError = name.trim().length > 1 ? undefined : 'Enter their name.'
+  const phoneError = /^[0-9+\s-]{10,15}$/.test(phone.trim()) ? undefined : 'Enter a valid phone number.'
 
   const submit = (event: FormEvent) => {
     event.preventDefault()
     setTouched(true)
-    if (!valid) return
-    actions.addMember({
-      name: name.trim(),
-      trade,
-      phone: phone.trim(),
-      project,
-      status: 'invited',
-      permissions,
-    })
+    if (nameError || phoneError) return
+    actions.addMember({ name: name.trim(), trade, phone: phone.trim(), project, status: 'invited', permissions })
+    toast.success('Invitation sent', `${name.trim()} · ${project}`)
     onClose()
   }
 
@@ -565,64 +475,49 @@ function AddMemberModal({ onClose }: { onClose: () => void }) {
       onClose={onClose}
     >
       <form onSubmit={submit} className="space-y-4" noValidate>
-        <Field label="Full name">
-          <input
-            className={inputClass}
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="e.g. Emeka Eze"
-            autoFocus
-          />
-          {touched && name.trim().length <= 1 && <p className="mt-1 text-xs text-red-600">Enter their name.</p>}
-        </Field>
+        <FormField
+          label="Full name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="e.g. Emeka Eze"
+          error={touched ? nameError : undefined}
+          autoFocus
+        />
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Role / trade">
-            <select className={inputClass} value={trade} onChange={(e) => setTrade(e.target.value)}>
-              {TEAM_ROLES.map((role) => (
-                <option key={role}>{role}</option>
-              ))}
-            </select>
-          </Field>
-          <Field label="Assign to project">
-            <select className={inputClass} value={project} onChange={(e) => setProject(e.target.value)}>
-              {CONTRACTOR_PROJECTS.map((p) => (
-                <option key={p}>{p}</option>
-              ))}
-            </select>
-          </Field>
+          <SelectField label="Role / trade" value={trade} onChange={(e) => setTrade(e.target.value)}>
+            {TEAM_ROLES.map((role) => (
+              <option key={role}>{role}</option>
+            ))}
+          </SelectField>
+          <SelectField label="Assign to project" value={project} onChange={(e) => setProject(e.target.value)}>
+            {CONTRACTOR_PROJECTS.map((p) => (
+              <option key={p}>{p}</option>
+            ))}
+          </SelectField>
         </div>
 
-        <Field label="Phone number">
-          <input
-            className={inputClass}
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            placeholder="08012345678"
-            inputMode="tel"
-          />
-          {touched && !phoneOk && <p className="mt-1 text-xs text-red-600">Enter a valid phone number.</p>}
-        </Field>
+        <FormField
+          label="Phone number"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          placeholder="08012345678"
+          inputMode="tel"
+          error={touched ? phoneError : undefined}
+        />
 
         <div>
-          <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-            What can they do?
-          </span>
+          <span className="mb-1.5 block text-xs font-medium text-ink/60">What can they do?</span>
           <PermissionPicker value={permissions} onChange={setPermissions} />
         </div>
 
         <div className="flex justify-end gap-3 pt-2">
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-2xl px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-100"
-          >
+          <Button type="button" variant="ghost" onClick={onClose}>
             Cancel
-          </button>
-          <PrimaryButton type="submit">
-            <Send className="h-4 w-4" />
+          </Button>
+          <Button type="submit" icon={<Send className="h-4 w-4" />}>
             Send invitation
-          </PrimaryButton>
+          </Button>
         </div>
       </form>
     </Modal>
@@ -634,21 +529,16 @@ function MemberCard({ member }: { member: TeamMember }) {
   const invited = member.status === 'invited'
 
   return (
-    <article className="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-sm transition hover:shadow-md">
+    <article className="rounded-2xl border border-line bg-white p-5 shadow-sm transition hover:shadow-md">
       <div className="flex items-start gap-4">
         <Avatar name={member.name} />
         <div className="min-w-0 flex-1">
-          <h3 className="truncate text-base font-bold text-[#173629]">{member.name}</h3>
-          <p className="text-sm text-slate-500">{member.trade}</p>
+          <h3 className="truncate text-base font-semibold text-ink">{member.name}</h3>
+          <p className="text-sm text-ink/50">{member.trade}</p>
         </div>
-        <span
-          className={[
-            'rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wide',
-            invited ? 'bg-amber-50 text-amber-700' : 'bg-emerald-50 text-emerald-700',
-          ].join(' ')}
-        >
+        <Badge tone={invited ? 'amber' : 'teal'} dot>
           {invited ? 'Invited' : 'Active'}
-        </span>
+        </Badge>
       </div>
 
       {/* Access: tap a chip to grant or revoke */}
@@ -666,8 +556,8 @@ function MemberCard({ member }: { member: TeamMember }) {
               className={[
                 'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition',
                 granted
-                  ? 'bg-[#FDF1E7] text-[#9A4E26] hover:bg-[#FBE5D3]'
-                  : 'border border-dashed border-slate-300 text-slate-400 hover:border-[#B85C12]/50 hover:text-[#9A4E26]',
+                  ? 'bg-teal-light text-teal hover:bg-teal/15'
+                  : 'border border-dashed border-line text-ink/40 hover:border-ink/30 hover:text-ink/70',
               ].join(' ')}
             >
               <Icon className="h-3 w-3" />
@@ -677,41 +567,33 @@ function MemberCard({ member }: { member: TeamMember }) {
         })}
       </div>
 
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-2 text-sm text-slate-600">
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-2 text-sm text-ink/60">
         <span>{member.project}</span>
-        <span className="inline-flex items-center gap-1.5 text-slate-500">
+        <span className="inline-flex items-center gap-1.5 text-ink/45">
           <Phone className="h-3.5 w-3.5" />
           {member.phone}
         </span>
       </div>
 
-      {member.dayRate !== undefined && member.permissions.includes('financials') === false && (
-        <p className="mt-2 text-xs text-slate-400">Day rate {naira(member.dayRate)} · hidden from them</p>
-      )}
-
-      <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3">
+      <div className="mt-4 flex items-center justify-between border-t border-line pt-3">
         {invited ? (
-          <span className="inline-flex items-center gap-1.5 text-xs text-slate-500">
+          <span className="inline-flex items-center gap-1.5 text-xs text-ink/50">
             <Clock3 className="h-3.5 w-3.5" />
             Waiting for them to accept
           </span>
         ) : (
-          <span className="inline-flex items-center gap-1.5 text-xs text-emerald-700">
+          <span className="inline-flex items-center gap-1.5 text-xs text-teal">
             <CheckCircle2 className="h-3.5 w-3.5" />
             On site
           </span>
         )}
 
         {confirmRemove ? (
-          <span className="flex items-center gap-2 text-xs">
-            <button
-              type="button"
-              onClick={() => actions.removeMember(member.id)}
-              className="font-bold text-red-600 hover:underline"
-            >
+          <span className="flex items-center gap-3 text-xs">
+            <button type="button" onClick={() => actions.removeMember(member.id)} className="font-semibold text-brick hover:underline">
               Remove
             </button>
-            <button type="button" onClick={() => setConfirmRemove(false)} className="font-semibold text-slate-500 hover:underline">
+            <button type="button" onClick={() => setConfirmRemove(false)} className="font-medium text-ink/50 hover:underline">
               Keep
             </button>
           </span>
@@ -719,7 +601,7 @@ function MemberCard({ member }: { member: TeamMember }) {
           <button
             type="button"
             onClick={() => setConfirmRemove(true)}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-400 transition hover:text-red-600"
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-ink/40 transition hover:text-brick"
           >
             <Trash2 className="h-3.5 w-3.5" />
             {invited ? 'Cancel invite' : 'Remove'}
@@ -732,7 +614,6 @@ function MemberCard({ member }: { member: TeamMember }) {
 
 export function BuildTeamPage() {
   const { team } = useWorkforce()
-  const { routes } = useWorkspaceRoutes()
 
   const [query, setQuery] = useState('')
   const [status, setStatus] = useState<'all' | MemberStatus>('all')
@@ -755,34 +636,41 @@ export function BuildTeamPage() {
   const canSeeMoney = team.filter((m) => m.permissions.includes('financials')).length
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="relative overflow-hidden rounded-[24px] bg-[#173629] px-6 py-7 text-white sm:px-8">
-        <div className="absolute -right-16 -top-20 h-56 w-56 rounded-full bg-white/[0.04]" />
-        <div className="absolute -bottom-24 right-24 h-44 w-44 rounded-full bg-[#B85C12]/10" />
+    <div className="space-y-7">
+      {/* Hero (same pattern as My Bids) */}
+      <section className="relative overflow-hidden rounded-[24px] bg-[#173629] px-6 py-7 text-white sm:px-8 sm:py-8">
+        <div className="absolute -right-24 -top-28 h-80 w-80 rounded-full bg-white/[0.035]" />
+        <div className="absolute -bottom-32 right-16 h-64 w-64 rounded-full bg-[#B85C12]/10" />
+
         <div className="relative flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-xl">
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-white/60">
+            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-white/45">
               <Users className="h-4 w-4" />
               Workforce
             </div>
-            <h1 className="mt-2 text-3xl font-bold tracking-tight">Build Team</h1>
-            <p className="mt-2 text-sm leading-6 text-white/70">
+            <h1 className="mt-2 text-3xl font-semibold tracking-tight">Build Team</h1>
+            <p className="mt-2 text-sm leading-6 text-white/65">
               {team.length} members · you control who uploads proof, updates progress, and sees financials.
             </p>
           </div>
+
           <div className="flex flex-wrap gap-3">
-            <Link
-              to={`${routes.projects}?tab=artisans`}
-              className="inline-flex items-center gap-2 rounded-2xl border border-white/20 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10"
+            <RoleLink
+              route="projects"
+              className="inline-flex h-11 items-center gap-2 rounded-full border border-white/20 px-5 text-xs font-semibold text-white transition hover:bg-white/10"
+              to="/app/contractor/available?tab=artisans"
             >
               <Store className="h-4 w-4" />
               Find artisans
-            </Link>
-            <PrimaryButton onClick={() => setAdding(true)} className="bg-[#B85C12] hover:bg-[#A0510F]">
+            </RoleLink>
+            <button
+              type="button"
+              onClick={() => setAdding(true)}
+              className="inline-flex h-11 items-center gap-2 rounded-full bg-white px-5 text-xs font-semibold text-ink transition hover:bg-white/90"
+            >
               <Plus className="h-4 w-4" />
               Add Team Member
-            </PrimaryButton>
+            </button>
           </div>
         </div>
 
@@ -794,19 +682,20 @@ export function BuildTeamPage() {
             ['Can see financials', canSeeMoney],
           ].map(([label, value]) => (
             <div key={label} className="rounded-2xl bg-white/[0.07] px-4 py-3">
-              <dd className="text-2xl font-bold">{value}</dd>
-              <dt className="text-xs text-white/60">{label}</dt>
+              <dd className="text-2xl font-semibold">{value}</dd>
+              <dt className="text-xs text-white/55">{label}</dt>
             </div>
           ))}
         </dl>
-      </div>
+      </section>
 
       {/* Filters */}
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
         <div className="relative flex-1">
-          <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/35" />
           <input
-            className={`${inputClass} pl-10`}
+            aria-label="Search team"
+            className="w-full rounded-md border border-line bg-white py-2.5 pl-10 pr-3 text-sm text-ink placeholder:text-ink/30 focus:outline-none"
             placeholder="Search by name, trade or project…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -814,24 +703,13 @@ export function BuildTeamPage() {
         </div>
         <div className="flex flex-wrap gap-2">
           {(['all', 'active', 'invited'] as const).map((value) => (
-            <button
-              key={value}
-              type="button"
-              onClick={() => setStatus(value)}
-              aria-pressed={status === value}
-              className={[
-                'rounded-full px-4 py-2 text-sm font-semibold capitalize transition',
-                status === value
-                  ? 'bg-[#9A4E26] text-white'
-                  : 'border border-slate-200 bg-white text-slate-600 hover:bg-slate-50',
-              ].join(' ')}
-            >
+            <button key={value} type="button" onClick={() => setStatus(value)} aria-pressed={status === value} className={`${chipClass(status === value)} capitalize`}>
               {value}
             </button>
           ))}
         </div>
         <select
-          className={`${inputClass} lg:w-64`}
+          className="rounded-md border border-line bg-white px-3 py-2.5 text-sm text-ink focus:outline-none lg:w-64"
           value={project}
           onChange={(e) => setProject(e.target.value)}
           aria-label="Filter by project"
@@ -843,13 +721,17 @@ export function BuildTeamPage() {
         </select>
       </div>
 
-      {/* Members */}
       {visible.length === 0 ? (
-        <div className="rounded-3xl border border-dashed border-slate-300 bg-white px-6 py-14 text-center">
-          <Users className="mx-auto h-8 w-8 text-slate-300" />
-          <p className="mt-3 text-sm font-semibold text-slate-700">No team members match.</p>
-          <p className="mt-1 text-sm text-slate-500">Clear the filters, or invite someone new.</p>
-        </div>
+        <EmptyState
+          icon={Users}
+          title="No team members match"
+          description="Clear the filters, or invite someone new."
+          action={
+            <Button size="sm" icon={<Plus className="h-4 w-4" />} onClick={() => setAdding(true)}>
+              Add team member
+            </Button>
+          }
+        />
       ) : (
         <div className="grid gap-4 lg:grid-cols-2">
           {visible.map((member) => (
@@ -889,102 +771,84 @@ function InviteModal({ artisan, onClose }: { artisan: Artisan; onClose: () => vo
       onClose={onClose}
     >
       <form onSubmit={submit} className="space-y-4">
-        <Field label="Project">
-          <select className={inputClass} value={project} onChange={(e) => setProject(e.target.value)}>
-            {CONTRACTOR_PROJECTS.map((p) => (
-              <option key={p}>{p}</option>
-            ))}
-          </select>
-        </Field>
+        <SelectField label="Project" value={project} onChange={(e) => setProject(e.target.value)}>
+          {CONTRACTOR_PROJECTS.map((p) => (
+            <option key={p}>{p}</option>
+          ))}
+        </SelectField>
 
-        <Field label="Offered day rate (₦)">
-          <input className={inputClass} value={rate} onChange={(e) => setRate(e.target.value)} inputMode="numeric" />
-          <p className="mt-1 text-xs text-slate-500">
-            Listed rate is {naira(artisan.dayRate)}.
-            {rateNumber > 0 && rateNumber !== artisan.dayRate && (
-              <> Your offer is {rateNumber > artisan.dayRate ? 'above' : 'below'} it.</>
-            )}
-          </p>
-        </Field>
+        <FormField
+          label="Offered day rate (₦)"
+          value={rate}
+          onChange={(e) => setRate(e.target.value)}
+          inputMode="numeric"
+          error={rateNumber ? undefined : 'Enter a day rate.'}
+        />
+        <p className="-mt-2 text-xs text-ink/40">
+          Listed rate is {naira(artisan.dayRate)}.
+          {rateNumber > 0 && rateNumber !== artisan.dayRate && <> Your offer is {rateNumber > artisan.dayRate ? 'above' : 'below'} it.</>}
+        </p>
 
-        <Field label="Message (optional)">
-          <textarea
-            className={`${inputClass} min-h-[84px] resize-y`}
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-            placeholder="Scope, start date, anything they should know…"
-          />
-        </Field>
+        <TextAreaField
+          label="Message (optional)"
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          placeholder="Scope, start date, anything they should know…"
+        />
 
         <div>
-          <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-            Site access once they join
-          </span>
+          <span className="mb-1.5 block text-xs font-medium text-ink/60">Site access once they join</span>
           <PermissionPicker value={permissions} onChange={setPermissions} />
         </div>
 
         <div className="flex justify-end gap-3 pt-2">
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-2xl px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-100"
-          >
+          <Button type="button" variant="ghost" onClick={onClose}>
             Cancel
-          </button>
-          <PrimaryButton type="submit" disabled={!rateNumber}>
-            <Send className="h-4 w-4" />
+          </Button>
+          <Button type="submit" disabled={!rateNumber} icon={<Send className="h-4 w-4" />}>
             Send invitation
-          </PrimaryButton>
+          </Button>
         </div>
       </form>
     </Modal>
   )
 }
 
-function ArtisanCard({
-  artisan,
-  onInvite,
-}: {
-  artisan: Artisan
-  onInvite: (artisan: Artisan) => void
-}) {
+function ArtisanCard({ artisan, onInvite }: { artisan: Artisan; onInvite: (artisan: Artisan) => void }) {
   const { team, saved } = useWorkforce()
   const [showHistory, setShowHistory] = useState(false)
 
   const membership = team.find((member) => member.artisanId === artisan.id)
   const isSaved = saved.includes(artisan.id)
   const availability = AVAILABILITY_META[artisan.availability]
-  const { routes } = useWorkspaceRoutes()
 
   return (
-    <article className="flex flex-col rounded-3xl border border-slate-200/80 bg-white p-5 shadow-sm transition hover:shadow-md">
+    <article className="flex flex-col rounded-2xl border border-line bg-white p-5 shadow-sm transition hover:shadow-md">
       <div className="flex items-start gap-4">
         <Avatar name={artisan.name} size="lg" />
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5">
-            <h3 className="truncate text-lg font-bold text-[#173629]">{artisan.name}</h3>
-            {artisan.verified && <BadgeCheck className="h-4 w-4 shrink-0 text-emerald-600" aria-label="Verified" />}
+            <h3 className="truncate text-lg font-semibold text-ink">{artisan.name}</h3>
+            {artisan.verified && <BadgeCheck className="h-4 w-4 shrink-0 text-teal" aria-label="Verified" />}
           </div>
-          <p className="mt-0.5 inline-flex items-center gap-1.5 text-sm font-semibold text-[#9A4E26]">
+          <p className="mt-0.5 inline-flex items-center gap-1.5 text-sm font-medium text-ink/70">
             <Wrench className="h-3.5 w-3.5" />
             {artisan.trade}
           </p>
-          <p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-500">
+          <p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-ink/50">
             <span className="inline-flex items-center gap-1">
               <MapPin className="h-3.5 w-3.5" />
               {artisan.location}
             </span>
-            <span className="inline-flex items-center gap-1 text-amber-600">
+            <span className="inline-flex items-center gap-1 text-amber-dark">
               <Star className="h-3.5 w-3.5 fill-current" />
               {artisan.rating.toFixed(1)} ({artisan.reviews})
             </span>
           </p>
         </div>
-        <span
-          className={`shrink-0 rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wide ${availability.className}`}
-        >
+        <Badge tone={availability.tone} dot>
           {availability.label}
-        </span>
+        </Badge>
       </div>
 
       <dl className="mt-4 grid grid-cols-3 gap-3">
@@ -993,18 +857,18 @@ function ArtisanCard({
           [`${artisan.years}y`, 'Experience'],
           [naira(artisan.dayRate), 'Day rate'],
         ].map(([value, label]) => (
-          <div key={label} className="rounded-2xl border border-[#F3E1D0] bg-[#FFF8F1] px-3 py-3 text-center">
-            <dd className="text-base font-bold text-[#173629]">{value}</dd>
-            <dt className="mt-0.5 text-[10px] font-bold uppercase tracking-wide text-slate-500">{label}</dt>
+          <div key={label} className="rounded-xl border border-line bg-paper px-3 py-3 text-center">
+            <dd className="text-base font-semibold text-ink">{value}</dd>
+            <dt className="mt-0.5 text-[10px] font-semibold uppercase tracking-wide text-ink/45">{label}</dt>
           </div>
         ))}
       </dl>
 
-      <p className="mt-4 text-sm leading-6 text-slate-600">{artisan.bio}</p>
+      <p className="mt-4 text-sm leading-6 text-ink/65">{artisan.bio}</p>
 
       <div className="mt-3 flex flex-wrap gap-2">
         {artisan.skills.map((skill) => (
-          <span key={skill} className="rounded-full bg-[#FDF1E7] px-3 py-1 text-xs font-semibold text-[#9A4E26]">
+          <span key={skill} className="rounded-full border border-line bg-paper px-3 py-1 text-xs font-medium text-ink/65">
             {skill}
           </span>
         ))}
@@ -1012,63 +876,61 @@ function ArtisanCard({
 
       <div className="mt-5 flex items-center gap-2.5">
         {membership ? (
-          <Link
-            to={routes.team}
-            className="inline-flex flex-1 items-center justify-center gap-2 rounded-2xl bg-emerald-50 px-5 py-2.5 text-sm font-bold text-emerald-700 transition hover:bg-emerald-100"
+          <RoleLink
+            route="team"
+            className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-teal-light px-5 py-2.5 text-sm font-semibold text-teal transition hover:bg-teal/15"
           >
             <CheckCircle2 className="h-4 w-4" />
             {membership.status === 'invited' ? 'Invited' : 'On your team'}
-            <span className="hidden text-xs font-medium text-emerald-600/80 sm:inline">· {membership.project}</span>
-          </Link>
+            <span className="hidden text-xs font-medium opacity-70 sm:inline">· {membership.project}</span>
+          </RoleLink>
         ) : (
-          <PrimaryButton
+          <Button
             onClick={() => onInvite(artisan)}
             disabled={artisan.availability === 'booked'}
+            icon={<UserPlus className="h-4 w-4" />}
             className="flex-1 sm:flex-none"
           >
-            <UserPlus className="h-4 w-4" />
             {artisan.availability === 'booked' ? 'Fully booked' : 'Invite to Project'}
-          </PrimaryButton>
+          </Button>
         )}
 
-        <button
-          type="button"
+        <Button
+          variant="secondary"
           onClick={() => setShowHistory((open) => !open)}
           aria-expanded={showHistory}
-          className="inline-flex items-center gap-2 rounded-2xl border border-[#E8D3BF] px-4 py-2.5 text-sm font-bold text-[#9A4E26] transition hover:bg-[#FFF8F1]"
+          icon={<History className="h-4 w-4" />}
+          iconRight={<ChevronDown className={`h-4 w-4 transition ${showHistory ? 'rotate-180' : ''}`} />}
         >
-          <History className="h-4 w-4" />
           View History
-          <ChevronDown className={`h-4 w-4 transition ${showHistory ? 'rotate-180' : ''}`} />
-        </button>
+        </Button>
 
-        <button
-          type="button"
+        <Button
+          variant="secondary"
           onClick={() => actions.toggleSaved(artisan.id)}
           aria-pressed={isSaved}
           aria-label={isSaved ? `Remove ${artisan.name} from saved` : `Save ${artisan.name}`}
-          className="rounded-2xl border border-[#E8D3BF] p-2.5 text-[#9A4E26] transition hover:bg-[#FFF8F1]"
         >
           {isSaved ? <BookmarkCheck className="h-5 w-5" /> : <Bookmark className="h-5 w-5" />}
-        </button>
+        </Button>
       </div>
 
       {showHistory && (
-        <div className="mt-4 rounded-2xl bg-slate-50 p-4">
-          <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Work history on Build OS</p>
+        <div className="mt-4 rounded-xl bg-paper p-4">
+          <p className="text-[10px] font-semibold uppercase tracking-wide text-ink/45">Work history on Build OS</p>
           <ul className="mt-3 space-y-3">
             {artisan.history.map((job) => (
               <li key={`${job.project}-${job.year}`} className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-sm font-semibold text-slate-800">{job.project}</p>
-                  <p className="text-xs text-slate-500">{job.note}</p>
+                  <p className="text-sm font-semibold text-ink">{job.project}</p>
+                  <p className="text-xs text-ink/50">{job.note}</p>
                 </div>
                 <div className="shrink-0 text-right">
-                  <p className="inline-flex items-center gap-1 text-sm font-bold text-amber-600">
+                  <p className="inline-flex items-center gap-1 text-sm font-semibold text-amber-dark">
                     <Star className="h-3.5 w-3.5 fill-current" />
                     {job.rating.toFixed(1)}
                   </p>
-                  <p className="text-xs text-slate-400">{job.year}</p>
+                  <p className="text-xs text-ink/40">{job.year}</p>
                 </div>
               </li>
             ))}
@@ -1083,7 +945,6 @@ type SortKey = 'rating' | 'rate' | 'experience' | 'projects'
 
 function ArtisanMarketplace() {
   const { saved, lastInvite } = useWorkforce()
-  const { routes } = useWorkspaceRoutes()
 
   const [query, setQuery] = useState('')
   const [trade, setTrade] = useState('all')
@@ -1112,108 +973,70 @@ function ArtisanMarketplace() {
     return [...list].sort(by[sort])
   }, [query, trade, availability, onlySaved, sort, saved])
 
+  const selectClass = 'rounded-md border border-line bg-white px-3 py-2.5 text-sm text-ink focus:outline-none'
+
   return (
     <div className="space-y-5">
       {lastInvite && (
-        <div
-          role="status"
-          className="flex items-start justify-between gap-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800"
-        >
+        <div role="status" className="flex items-start justify-between gap-4 rounded-xl border border-teal/25 bg-teal-light px-4 py-3 text-sm text-teal">
           <p>
             Invitation sent to <strong>{lastInvite.name}</strong> for {lastInvite.project}.{' '}
-            <Link to={routes.team} className="inline-flex items-center gap-1 font-bold underline-offset-2 hover:underline">
+            <RoleLink route="team" className="inline-flex items-center gap-1 font-semibold underline-offset-2 hover:underline">
               Open Build Team <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
+            </RoleLink>
           </p>
-          <button type="button" onClick={actions.dismissInvite} aria-label="Dismiss" className="text-emerald-600 hover:text-emerald-800">
+          <button type="button" onClick={actions.dismissInvite} aria-label="Dismiss" className="opacity-70 hover:opacity-100">
             <X className="h-4 w-4" />
           </button>
         </div>
       )}
 
       <div className="relative">
-        <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+        <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/35" />
         <input
-          className={`${inputClass} rounded-2xl py-3.5 pl-11`}
+          aria-label="Search artisans"
+          className="w-full rounded-xl border border-line bg-white py-3.5 pl-11 pr-4 text-sm text-ink placeholder:text-ink/30 focus:outline-none"
           placeholder="Search artisans by trade, skill, name or location…"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
       </div>
 
-      {/* Trade chips */}
       <div className="flex flex-wrap gap-2.5">
-        {['all', ...TRADES].map((t) => {
-          const selected = trade === t
-          return (
-            <button
-              key={t}
-              type="button"
-              aria-pressed={selected}
-              onClick={() => setTrade(t)}
-              className={[
-                'inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition',
-                selected
-                  ? 'bg-[#9A4E26] text-white shadow-sm'
-                  : 'border border-slate-200 bg-white text-slate-600 hover:bg-slate-50',
-              ].join(' ')}
-            >
-              {t === 'all' ? 'All trades' : t}
-              <span className={selected ? 'text-white/80' : 'text-[#B85C12]'}>{countFor(t)}</span>
-            </button>
-          )
-        })}
+        {['all', ...TRADES].map((t) => (
+          <button key={t} type="button" aria-pressed={trade === t} onClick={() => setTrade(t)} className={chipClass(trade === t)}>
+            {t === 'all' ? 'All trades' : t}
+            <span className={trade === t ? 'text-white/70' : 'text-ink/40'}>{countFor(t)}</span>
+          </button>
+        ))}
       </div>
 
-      {/* Secondary controls */}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-ink/50">
           {visible.length} artisan{visible.length === 1 ? '' : 's'} · verified artisans have passed Build OS identity checks
         </p>
         <div className="flex flex-wrap items-center gap-2.5">
-          <select
-            className={`${inputClass} !w-auto`}
-            value={availability}
-            onChange={(e) => setAvailability(e.target.value as 'all' | Availability)}
-            aria-label="Availability"
-          >
+          <select className={selectClass} value={availability} onChange={(e) => setAvailability(e.target.value as 'all' | Availability)} aria-label="Availability">
             <option value="all">Any availability</option>
             <option value="available">Available now</option>
             <option value="limited">Limited slots</option>
             <option value="booked">Fully booked</option>
           </select>
-          <select
-            className={`${inputClass} !w-auto`}
-            value={sort}
-            onChange={(e) => setSort(e.target.value as SortKey)}
-            aria-label="Sort by"
-          >
+          <select className={selectClass} value={sort} onChange={(e) => setSort(e.target.value as SortKey)} aria-label="Sort by">
             <option value="rating">Top rated</option>
             <option value="rate">Lowest day rate</option>
             <option value="experience">Most experienced</option>
             <option value="projects">Most projects</option>
           </select>
-          <button
-            type="button"
-            onClick={() => setOnlySaved((v) => !v)}
-            aria-pressed={onlySaved}
-            className={[
-              'inline-flex items-center gap-2 rounded-xl px-3.5 py-2.5 text-sm font-semibold transition',
-              onlySaved ? 'bg-[#FDF1E7] text-[#9A4E26]' : 'border border-slate-200 bg-white text-slate-600 hover:bg-slate-50',
-            ].join(' ')}
-          >
-            <Bookmark className="h-4 w-4" />
+          <button type="button" onClick={() => setOnlySaved((v) => !v)} aria-pressed={onlySaved} className={chipClass(onlySaved)}>
+            <Bookmark className="h-3.5 w-3.5" />
             Saved {saved.length}
           </button>
         </div>
       </div>
 
       {visible.length === 0 ? (
-        <div className="rounded-3xl border border-dashed border-slate-300 bg-white px-6 py-14 text-center">
-          <Search className="mx-auto h-8 w-8 text-slate-300" />
-          <p className="mt-3 text-sm font-semibold text-slate-700">No artisans match those filters.</p>
-          <p className="mt-1 text-sm text-slate-500">Try another trade or clear the search.</p>
-        </div>
+        <EmptyState icon={Search} title="No artisans match those filters" description="Try another trade or clear the search." />
       ) : (
         <div className="grid items-start gap-5 xl:grid-cols-2">
           {visible.map((artisan) => (
@@ -1249,22 +1072,10 @@ export function MarketplacePage() {
         {tabs.map(({ key, label, icon: Icon, count }) => {
           const selected = tab === key
           return (
-            <button
-              key={key}
-              type="button"
-              role="tab"
-              aria-selected={selected}
-              onClick={() => select(key)}
-              className={[
-                'inline-flex items-center gap-2.5 rounded-full px-5 py-3 text-sm font-bold transition',
-                selected
-                  ? 'bg-[#9A4E26] text-white shadow-sm'
-                  : 'border border-slate-200 bg-white text-slate-700 hover:bg-slate-50',
-              ].join(' ')}
-            >
+            <button key={key} type="button" role="tab" aria-selected={selected} onClick={() => select(key)} className={`${chipClass(selected)} px-5 py-3 text-sm`}>
               <Icon className="h-4 w-4" />
               {label}
-              <span className={selected ? 'text-white/80' : 'text-[#B85C12]'}>{count}</span>
+              <span className={selected ? 'text-white/70' : 'text-ink/40'}>{count}</span>
             </button>
           )
         })}
@@ -1273,18 +1084,4 @@ export function MarketplacePage() {
       {tab === 'projects' ? <AvailableProjects /> : <ArtisanMarketplace />}
     </div>
   )
-}
-
-/* -------------------------------------------------------------------------- */
-/* Local helper: role-aware links (kept here so the file stays self-contained) */
-/* -------------------------------------------------------------------------- */
-
-function useWorkspaceRoutes() {
-  const app = useAppRoutes()
-  return {
-    routes: {
-      projects: app.to('projects'),
-      team: app.to('team'),
-    },
-  }
 }

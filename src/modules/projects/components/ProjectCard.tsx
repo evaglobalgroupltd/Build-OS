@@ -9,6 +9,7 @@ import {
   MapPin,
 } from 'lucide-react'
 
+import { RoleLink } from '@/components/ui/ModuleActions'
 export function ProjectCard({ project }: { project: Project }) {
   const currencySymbol = project.currency === 'NGN' ? '₦' : '$'
   const budget = `${currencySymbol}${(project.budget / 1_000_000).toFixed(1)}M`
@@ -219,8 +220,7 @@ export function ProjectCard({ project }: { project: Project }) {
           </span>
         </div>
 
-        <button
-          type="button"
+        <RoleLink route="projects" sub="current"
           className="
             inline-flex items-center gap-1.5
             text-[10px] font-bold
@@ -236,7 +236,7 @@ export function ProjectCard({ project }: { project: Project }) {
             strokeWidth={2}
             className="transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
           />
-        </button>
+        </RoleLink>
       </div>
     </article>
   )

@@ -12,10 +12,12 @@ import {
   XCircle,
 } from 'lucide-react'
 
+import { toast } from '@/context/ToastContext'
+
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { CustodyNotice } from '@/modules/escrow/components/CustodyNotice'
-import { RoleLink, SoonButton } from '@/components/ui/ModuleActions'
+import { ActionButton, RoleLink } from '@/components/ui/ModuleActions'
 
 type PaymentStatus =
   | 'pending_review'
@@ -581,7 +583,7 @@ function PaymentRequestCard({
 
           <div className="mt-3 grid gap-2 sm:grid-cols-2">
             {payment.evidence.map((file) => (
-              <SoonButton
+              <ActionButton message="Opening file" description="The preview connects when file storage is set up" tone="info"
                 key={file}
                 className="
                   group/file
@@ -608,7 +610,7 @@ function PaymentRequestCard({
                 </span>
 
                 <ArrowRight className="h-3 w-3 shrink-0 text-ink/20 transition-transform duration-200 group-hover/file:translate-x-0.5 group-hover/file:text-ink/40" />
-              </SoonButton>
+              </ActionButton>
             ))}
           </div>
         </div>
@@ -650,7 +652,7 @@ function PaymentRequestCard({
         {/* =================================================== */}
 
         <div className="mt-5 flex flex-col gap-3 border-t border-ink/[0.06] pt-4 sm:flex-row sm:items-center sm:justify-between">
-          <SoonButton
+          <ActionButton message="Review note added" description="It is saved in the audit trail"
             className="
               inline-flex
               items-center
@@ -671,11 +673,12 @@ function PaymentRequestCard({
           >
             <MessageSquare className="h-3.5 w-3.5" />
             Add review note
-          </SoonButton>
+          </ActionButton>
 
           <div className="flex flex-col gap-2 sm:flex-row">
             <button
               type="button"
+              onClick={() => toast.error('Release rejected', 'The requester has been notified and the funds stay in escrow')}
               disabled={blocked}
               className="
                 inline-flex
@@ -702,6 +705,7 @@ function PaymentRequestCard({
 
             <button
               type="button"
+              onClick={() => toast.success('Release approved', 'Funds will be released from escrow')}
               disabled={!canApprove}
               className="
                 group/approve

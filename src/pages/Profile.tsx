@@ -412,7 +412,7 @@ export function ProfilePage() {
 
           <div className="flex flex-col justify-center gap-2">
             <Link
-              to={app.to('documents')}
+              to={app.can('verification', 'documents') ? app.to('verification', 'documents') : app.to('documents')}
               className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
             >
               <FileText className="h-4 w-4 text-slate-400" />
@@ -424,6 +424,13 @@ export function ProfilePage() {
 
       <Section icon={KeyRound} title="Security" description="Change your password. You will stay signed in on this device.">
         <PasswordForm />
+        <Link
+          to={app.to('settings', 'security')}
+          className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-slate-600 transition hover:text-slate-900"
+        >
+          <ShieldCheck className="h-4 w-4" />
+          Two-factor authentication, devices and sessions
+        </Link>
       </Section>
 
       <Section icon={Bell} title="Notifications" description="Choose what Build OS tells you about, and how.">

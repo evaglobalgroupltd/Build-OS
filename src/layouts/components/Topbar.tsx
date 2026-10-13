@@ -8,7 +8,7 @@ import {
   type ReactNode,
 } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import {
+import { Settings,
   ArrowUpRight,
   CheckCircle2,
   ChevronDown,
@@ -476,6 +476,28 @@ function AccountMenu() {
               aria-hidden="true"
             />
           </Link>
+
+          {app.can('settings') && (
+            <Link
+              to={app.to('settings')}
+              role="menuitem"
+              onClick={() => setOpen(false)}
+              className={menuItem}
+            >
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg border border-line bg-ink/[0.025]">
+                <Settings size={16} strokeWidth={1.7} className="text-ink/45" aria-hidden="true" />
+              </span>
+
+              <span className="flex-1">
+                <span className="block">Account settings</span>
+                <span className="mt-0.5 block text-[10px] font-normal text-ink/35">
+                  Preferences & security
+                </span>
+              </span>
+
+              <ArrowUpRight size={14} strokeWidth={1.7} className="text-ink/20" aria-hidden="true" />
+            </Link>
+          )}
 
           <button
             type="button"

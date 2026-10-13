@@ -1,4 +1,4 @@
-import type { ComponentType } from 'react'
+import { useState, type ComponentType } from 'react'
 
 import {
   Check,
@@ -108,6 +108,7 @@ const enabledPermissions = new Set([
 ])
 
 export function Permissions() {
+  const [selectedIndex, setSelectedIndex] = useState(0)
   return (
     <div className="space-y-7">
       {/* ------------------------------------------------------------------ */}
@@ -222,12 +223,14 @@ export function Permissions() {
         <CardBody>
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             {roles.map((role, index) => {
-              const selected = index === 0
+              const selected = index === selectedIndex
 
               return (
                 <button
                   key={role.name}
                   type="button"
+                  onClick={() => setSelectedIndex(index)}
+                  aria-pressed={selected}
                   className={`group relative overflow-hidden rounded-[18px] border p-4 text-left transition-all duration-200 ${
                     selected
                       ? 'border-[#18271F] bg-[#18271F] text-white shadow-[0_14px_32px_rgba(24,39,31,0.16)]'

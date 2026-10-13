@@ -1,3 +1,4 @@
+import { useMemo, useState } from 'react'
 import {
   CheckCircle2,
   ChevronRight,
@@ -13,7 +14,7 @@ import {
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
-import { RoleLink, SoonButton } from '@/components/ui/ModuleActions'
+import { RoleLink } from '@/components/ui/ModuleActions'
 
 type DocumentStatus = 'Verified' | 'Pending Review' | 'Needs Information'
 
@@ -122,6 +123,20 @@ const statusTone: Record<DocumentStatus, 'teal' | 'amber' | 'brick'> = {
 }
 
 export function DocumentVault() {
+  const [category, setCategory] = useState('All documents')
+  const [query, setQuery] = useState('')
+  const [needsAttention, setNeedsAttention] = useState(false)
+
+  const visibleDocuments = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    return documents.filter(
+      (doc) =>
+        (category === 'All documents' || doc.category === category) &&
+        (!needsAttention || doc.status !== 'Verified') &&
+        (q === '' || `${doc.name} ${doc.project} ${doc.id}`.toLowerCase().includes(q)),
+    )
+  }, [category, query, needsAttention])
+
   return (
     <div className="space-y-7">
       {/* ─────────────────────────────────────────────────────────────
@@ -237,35 +252,38 @@ export function DocumentVault() {
 
           <CardBody className="pt-1">
             <nav className="space-y-1" aria-label="Document categories">
-              {categories.map((category, index) => (
-                <SoonButton
-                  key={category.label}
+              {categories.map((entry) => (
+                <button
+                  key={entry.label}
+                  type="button"
+                  onClick={() => setCategory(entry.label)}
+                  aria-pressed={category === entry.label}
                   className={`group flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left transition-all duration-200 ${
-                    index === 0
+                    category === entry.label
                       ? 'bg-[#0B1220] text-white shadow-[0_7px_18px_rgba(11,18,32,0.12)]'
                       : 'text-ink/50 hover:bg-[#F6F8FC] hover:text-ink'
                   }`}
                 >
                   <span className="flex min-w-0 items-center gap-2.5">
-                    {index === 0 && (
+                    {category === entry.label && (
                       <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#34A6FF]" />
                     )}
 
                     <span className="truncate text-[11px] font-semibold">
-                      {category.label}
+                      {entry.label}
                     </span>
                   </span>
 
                   <span
                     className={`ml-3 rounded-full px-2 py-0.5 font-mono text-[9px] ${
-                      index === 0
+                      category === entry.label
                         ? 'bg-white/10 text-white/55'
                         : 'bg-[#F6F8FC] text-ink/30'
                     }`}
                   >
-                    {category.count}
+                    {entry.count}
                   </span>
-                </SoonButton>
+                </button>
               ))}
             </nav>
 
@@ -303,16 +321,21 @@ export function DocumentVault() {
                     type="search"
                     placeholder="Search documents, projects or document IDs..."
                     aria-label="Search documents"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
                     className="h-11 w-full rounded-xl border border-line bg-[#F6F8FC] pl-10 pr-4 text-xs font-medium text-ink outline-none transition placeholder:text-ink/25 focus:border-[#1657FF]/30 focus:bg-white focus:ring-4 focus:ring-[#1657FF]/[0.06]"
                   />
                 </div>
 
-                <SoonButton
+                <button
+                  type="button"
+                  onClick={() => setNeedsAttention((on) => !on)}
+                  aria-pressed={needsAttention}
                   className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-line bg-white px-4 text-xs font-semibold text-ink/50 transition hover:border-ink/10 hover:bg-[#F6F8FC] hover:text-ink"
                 >
                   <span className="h-1.5 w-1.5 rounded-full bg-[#1657FF]" />
-                  Filter
-                </SoonButton>
+                  {needsAttention ? 'Needs attention' : 'Filter'}
+                </button>
               </div>
             </CardBody>
           </Card>
@@ -321,12 +344,15 @@ export function DocumentVault() {
           <Card className="overflow-hidden rounded-[22px]">
             <CardHeader
               title="Project documents"
-              subtitle={`${documents.length} documents currently associated with your projects`}
+              subtitle={`${visibleDocuments.length} of ${documents.length} documents shown`}
             />
 
             <CardBody>
               <div className="space-y-2.5">
-                {documents.map((document) => (
+                {visibleDocuments.length === 0 && (
+                  <p className="py-10 text-center text-sm text-ink/45">No documents match those filters.</p>
+                )}
+                {visibleDocuments.map((document) => (
                   <DocumentRow
                     key={document.id}
                     document={document}

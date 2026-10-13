@@ -1,3 +1,4 @@
+import { useMemo, useState } from 'react'
 import {
   BadgeCheck,
   Building2,
@@ -13,6 +14,11 @@ import {
 } from 'lucide-react'
 
 import { Card, CardBody } from '@/components/ui/Card'
+
+import { ActionButton, RoleLink } from '@/components/ui/ModuleActions'
+import { toast } from '@/context/ToastContext'
+
+const CHIPS = ['All contractors', 'Verified only', 'Residential', 'Commercial', 'Civil works', 'Available now'] as const
 
 const contractors = [
   {
@@ -82,6 +88,26 @@ const contractors = [
 ]
 
 export function ContractorList() {
+  const [query, setQuery] = useState('')
+  const [chip, setChip] = useState<(typeof CHIPS)[number]>('All contractors')
+  const [panelOpen, setPanelOpen] = useState(false)
+  const [minTrust, setMinTrust] = useState(0)
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    return contractors.filter((c) => {
+      const text = `${c.name} ${c.category} ${c.location} ${c.specialties.join(' ')}`.toLowerCase()
+      const chipOk =
+        chip === 'All contractors' ||
+        (chip === 'Verified only' && c.verified) ||
+        (chip === 'Residential' && text.includes('residential')) ||
+        (chip === 'Commercial' && text.includes('commercial')) ||
+        (chip === 'Civil works' && (text.includes('civil') || text.includes('infrastructure'))) ||
+        (chip === 'Available now' && c.status === 'Available')
+      return chipOk && c.trustScore >= minTrust && (q === '' || text.includes(q))
+    })
+  }, [query, chip, minTrust])
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -123,12 +149,16 @@ export function ContractorList() {
               <input
                 type="search"
                 placeholder="Search contractors, companies or specialties..."
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
                 className="h-11 w-full rounded-xl border border-line bg-paper-2 pl-10 pr-4 text-sm text-ink outline-none transition focus:border-ink/20 focus:ring-2 focus:ring-ink/5"
               />
             </div>
 
             <button
               type="button"
+              onClick={() => setPanelOpen((open) => !open)}
+              aria-expanded={panelOpen}
               className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-line px-4 text-xs font-semibold text-ink/60 transition-colors hover:bg-ink/[0.03] hover:text-ink"
             >
               <SlidersHorizontal className="h-4 w-4" />
@@ -137,6 +167,10 @@ export function ContractorList() {
 
             <button
               type="button"
+              onClick={() => {
+                setPanelOpen(false)
+                toast.info(`${filtered.length} contractor${filtered.length === 1 ? '' : 's'} match`)
+              }}
               className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-ink px-4 text-xs font-semibold text-white transition-opacity hover:opacity-90"
             >
               <Filter className="h-4 w-4" />
@@ -144,13 +178,34 @@ export function ContractorList() {
             </button>
           </div>
 
+          {panelOpen && (
+            <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-line bg-paper p-4">
+              <label htmlFor="min-trust" className="text-xs font-medium text-ink/60">
+                Minimum trust score
+              </label>
+              <select
+                id="min-trust"
+                value={minTrust}
+                onChange={(e) => setMinTrust(Number(e.target.value))}
+                className="rounded-md border border-line bg-white px-3 py-2 text-sm text-ink focus:outline-none"
+              >
+                <option value={0}>Any</option>
+                <option value={80}>80+</option>
+                <option value={85}>85+</option>
+                <option value={90}>90+</option>
+              </select>
+              {minTrust > 0 && (
+                <button type="button" onClick={() => setMinTrust(0)} className="text-xs font-semibold text-ink/50 hover:text-ink">
+                  Reset
+                </button>
+              )}
+            </div>
+          )}
+
           <div className="mt-4 flex flex-wrap gap-2">
-            <FilterChip label="All contractors" active />
-            <FilterChip label="Verified only" />
-            <FilterChip label="Residential" />
-            <FilterChip label="Commercial" />
-            <FilterChip label="Civil works" />
-            <FilterChip label="Available now" />
+            {CHIPS.map((label) => (
+              <FilterChip key={label} label={label} active={chip === label} onClick={() => setChip(label)} />
+            ))}
           </div>
         </CardBody>
       </Card>
@@ -194,13 +249,13 @@ export function ContractorList() {
             </div>
 
             <p className="text-xs text-ink/40">
-              {contractors.length} contractors shown
+              {filtered.length} contractors shown
             </p>
           </div>
         </div>
 
         <div className="divide-y divide-line">
-          {contractors.map((contractor) => (
+          {filtered.map((contractor) => (
             <ContractorCard
               key={contractor.id}
               contractor={contractor}
@@ -293,20 +348,19 @@ function ContractorCard({
 
         {/* Actions */}
         <div className="flex shrink-0 flex-col gap-2 sm:flex-row xl:flex-col">
-          <button
-            type="button"
+          <RoleLink route="contractors" sub="current"
             className="inline-flex items-center justify-center gap-2 rounded-xl border border-line px-4 py-2.5 text-xs font-semibold text-ink/60 transition-colors hover:bg-ink/[0.03] hover:text-ink"
           >
             View profile
             <ChevronRight className="h-3.5 w-3.5" />
-          </button>
+          </RoleLink>
 
-          <button
+          <ActionButton message="Invitation sent" description="They can accept or decline from their phone"
             type="button"
             className="inline-flex items-center justify-center gap-2 rounded-xl bg-ink px-4 py-2.5 text-xs font-semibold text-white transition-opacity hover:opacity-90"
           >
             Invite to project
-          </button>
+          </ActionButton>
 
           <span
             className={
@@ -368,13 +422,17 @@ function Metric({
 function FilterChip({
   label,
   active = false,
+  onClick,
 }: {
   label: string
   active?: boolean
+  onClick?: () => void
 }) {
   return (
     <button
       type="button"
+      onClick={onClick}
+      aria-pressed={active}
       className={
         active
           ? 'rounded-full bg-ink px-3 py-1.5 text-[10px] font-semibold text-white'

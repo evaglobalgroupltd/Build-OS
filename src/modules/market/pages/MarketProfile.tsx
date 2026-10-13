@@ -22,6 +22,7 @@ import {
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 
+import { RoleLink } from '@/components/ui/ModuleActions'
 const supplier = {
   name: 'Prime Build Materials Ltd.',
   initials: 'PB',
@@ -196,22 +197,20 @@ export function Market_PlaceProfile() {
 
             {/* Actions */}
             <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
+              <RoleLink route="messages"
                 className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.06] px-4 py-3 text-xs font-semibold text-white/75 backdrop-blur-sm transition-all hover:border-white/20 hover:bg-white/[0.1] hover:text-white"
               >
                 <Mail className="h-3.5 w-3.5" />
                 Contact supplier
-              </button>
+              </RoleLink>
 
-              <button
-                type="button"
+              <RoleLink route="quotations"
                 className="group/cta inline-flex items-center gap-2 rounded-xl bg-white px-4 py-3 text-xs font-semibold text-[#0B1220] shadow-lg shadow-black/10 transition-all hover:-translate-y-0.5 hover:bg-white/95"
               >
                 Request quotation
 
                 <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover/cta:translate-x-0.5" />
-              </button>
+              </RoleLink>
             </div>
           </div>
         </div>
@@ -402,14 +401,13 @@ export function Market_PlaceProfile() {
             </div>
 
             <div className="border-t border-line bg-paper-2/40 px-6 py-4">
-              <button
-                type="button"
+              <RoleLink route="catalogue"
                 className="group/link inline-flex items-center gap-1.5 text-xs font-semibold text-ink/55 transition-colors hover:text-ink"
               >
                 View full catalogue
 
                 <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover/link:translate-x-0.5" />
-              </button>
+              </RoleLink>
             </div>
           </Card>
 

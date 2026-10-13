@@ -1,4 +1,4 @@
-import type { ComponentType } from 'react'
+import { useMemo, useState, type ComponentType } from 'react'
 
 import {
   BadgeCheck,
@@ -21,6 +21,7 @@ import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 import type { MarketSupplier } from '@/modules/market/services/MarketService'
 import { mockSuppliers } from '@/mocks/suppliers'
 
+import { RoleLink } from '@/components/ui/ModuleActions'
 const categories = [
   'All suppliers',
   'General Materials',
@@ -36,6 +37,26 @@ export function MarketList() {
   // Temporary data source.
   // Replace with MarketService.list() when the backend is available.
   const suppliers: MarketSupplier[] = mockSuppliers
+
+  const [query, setQuery] = useState('')
+  const [category, setCategory] = useState(categories[0]!)
+  const [sortByTrust, setSortByTrust] = useState(false)
+  const [filtersOpen, setFiltersOpen] = useState(false)
+  const [verifiedOnly, setVerifiedOnly] = useState(false)
+
+  const visibleSuppliers = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    const key = category.toLowerCase().split(/[ &]+/)[0]!
+    const list = suppliers.filter((supplier) => {
+      const text = `${supplier.name} ${supplier.category} ${supplier.location} ${supplier.specialties.join(' ')}`.toLowerCase()
+      return (
+        (category === categories[0] || text.includes(key)) &&
+        (!verifiedOnly || supplier.status === 'Verified') &&
+        (q === '' || text.includes(q))
+      )
+    })
+    return sortByTrust ? [...list].sort((a, b) => b.trustScore - a.trustScore) : list
+  }, [suppliers, query, category, sortByTrust, verifiedOnly])
 
   const verifiedSuppliers = suppliers.filter(
     (supplier) => supplier.status === 'Verified',
@@ -123,14 +144,13 @@ export function MarketList() {
               </div>
             </div>
 
-            <button
-              type="button"
+            <RoleLink route="procurement" sub="new"
               className="group/button inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-white px-4 py-3 text-xs font-semibold text-[#0B1220] shadow-lg shadow-black/10 transition-all hover:-translate-y-0.5 hover:bg-white/95"
             >
               <Package className="h-4 w-4" />
               Browse materials
               <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover/button:translate-x-0.5" />
-            </button>
+            </RoleLink>
           </div>
         </div>
 
@@ -182,6 +202,8 @@ export function MarketList() {
               <input
                 type="search"
                 placeholder="Search suppliers, materials, categories or locations..."
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
                 className="h-12 w-full rounded-2xl border border-line bg-paper-2/70 pl-11 pr-4 text-sm text-ink outline-none transition-all placeholder:text-ink/30 hover:border-ink/15 focus:border-[#1657FF]/40 focus:bg-white focus:ring-4 focus:ring-[#1657FF]/5"
               />
             </div>
@@ -189,6 +211,8 @@ export function MarketList() {
             <div className="flex flex-wrap gap-2">
               <button
                 type="button"
+                onClick={() => setFiltersOpen((open) => !open)}
+                aria-expanded={filtersOpen}
                 className="inline-flex h-11 items-center gap-2 rounded-xl border border-line bg-white px-4 text-xs font-semibold text-ink/60 transition-all hover:border-ink/15 hover:bg-paper-2 hover:text-ink"
               >
                 <Filter className="h-3.5 w-3.5" />
@@ -197,6 +221,8 @@ export function MarketList() {
 
               <button
                 type="button"
+                onClick={() => setSortByTrust((on) => !on)}
+                aria-pressed={sortByTrust}
                 className="inline-flex h-11 items-center gap-2 rounded-xl border border-line bg-white px-4 text-xs font-semibold text-ink/60 transition-all hover:border-ink/15 hover:bg-paper-2 hover:text-ink"
               >
                 <SlidersHorizontal className="h-3.5 w-3.5" />
@@ -205,19 +231,28 @@ export function MarketList() {
             </div>
           </div>
 
+          {filtersOpen && (
+            <label className="mt-4 flex w-fit cursor-pointer items-center gap-2 rounded-xl border border-line bg-paper px-4 py-3 text-xs font-medium text-ink/70">
+              <input type="checkbox" checked={verifiedOnly} onChange={(e) => setVerifiedOnly(e.target.checked)} className="h-4 w-4 accent-teal" />
+              Verified suppliers only
+            </label>
+          )}
+
           <div className="mt-5 border-t border-line pt-4">
             <div className="flex items-center gap-2 overflow-x-auto pb-1">
-              {categories.map((category, index) => (
+              {categories.map((chip) => (
                 <button
-                  key={category}
+                  key={chip}
                   type="button"
+                  onClick={() => setCategory(chip)}
+                  aria-pressed={category === chip}
                   className={
-                    index === 0
+                    category === chip
                       ? 'shrink-0 rounded-full bg-[#0B1220] px-4 py-2 text-xs font-semibold text-white shadow-sm transition-all hover:bg-[#111b2f]'
                       : 'shrink-0 rounded-full border border-line bg-white px-4 py-2 text-xs font-medium text-ink/50 transition-all hover:border-ink/15 hover:bg-paper-2 hover:text-ink'
                   }
                 >
-                  {category}
+                  {chip}
                 </button>
               ))}
             </div>
@@ -247,13 +282,13 @@ export function MarketList() {
             </div>
 
             <span className="shrink-0 rounded-full border border-line bg-white px-3 py-1.5 text-[10px] font-semibold text-ink/50 shadow-sm">
-              {suppliers.length} suppliers
+              {visibleSuppliers.length} suppliers
             </span>
           </div>
 
-          {suppliers.length > 0 ? (
+          {visibleSuppliers.length > 0 ? (
             <div className="grid gap-4 lg:grid-cols-2">
-              {suppliers.map((supplier) => (
+              {visibleSuppliers.map((supplier) => (
                 <SupplierCard
                   key={supplier.id}
                   supplier={supplier}
@@ -539,14 +574,13 @@ function SupplierCard({
             </span>
           </div>
 
-          <button
-            type="button"
+          <RoleLink route="suppliers" sub="current"
             className="inline-flex shrink-0 items-center gap-1.5 rounded-lg px-2 py-1 text-[10px] font-semibold text-ink/55 transition-all hover:bg-paper-2 hover:text-ink"
           >
             View supplier
 
             <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-          </button>
+          </RoleLink>
         </div>
       </CardBody>
     </Card>

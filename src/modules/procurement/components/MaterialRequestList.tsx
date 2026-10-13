@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import { Badge } from '@/components/ui/Badge'
 
+import { RoleLink } from '@/components/ui/ModuleActions'
 const statusConfig = {
   requested: {
     label: 'Requested',
@@ -208,8 +209,7 @@ export function MaterialRequestList({
               </div>
 
               {/* Action */}
-              <button
-                type="button"
+              <RoleLink route="procurement" sub="current"
                 aria-label={`View ${request.item}`}
                 className="
                   flex
@@ -233,7 +233,7 @@ export function MaterialRequestList({
                 "
               >
                 <ChevronRight className="h-[15px] w-[15px] transition-transform duration-200 group-hover:translate-x-0.5" />
-              </button>
+              </RoleLink>
             </div>
           </article>
         )

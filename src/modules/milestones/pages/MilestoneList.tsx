@@ -1,4 +1,4 @@
-import type { ComponentType } from 'react'
+import { useMemo, useState, type ComponentType } from 'react'
 
 import {
   AlertTriangle,
@@ -21,6 +21,7 @@ import {
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 
+import { RoleLink } from '@/components/ui/ModuleActions'
 type MilestoneStatus =
   | 'Pending'
   | 'In Progress'
@@ -162,7 +163,23 @@ const milestones: Milestone[] = [
   },
 ]
 
+type MilestoneFilter = 'all' | 'review' | 'risk'
+
 export function MilestoneList() {
+  const [query, setQuery] = useState('')
+  const [filter, setFilter] = useState<MilestoneFilter>('all')
+
+  const visibleMilestones = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    return milestones.filter(
+      (milestone) =>
+        (filter === 'all' ||
+          (filter === 'review' && milestone.status === 'Under Review') ||
+          (filter === 'risk' && (milestone.risk !== 'Low' || milestone.status === 'Rejected' || milestone.status === 'Disputed'))) &&
+        (q === '' || JSON.stringify(milestone).toLowerCase().includes(q)),
+    )
+  }, [query, filter])
+
   const approved = milestones.filter(
     (milestone) => milestone.status === 'Approved',
   ).length
@@ -287,21 +304,19 @@ export function MilestoneList() {
               </div>
 
               <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
-                <button
-                  type="button"
+                <RoleLink route="milestones" sub="current"
                   className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.06] px-4 text-xs font-semibold text-white/75 transition-all hover:border-white/20 hover:bg-white/[0.1] hover:text-white"
                 >
                   <Filter className="h-3.5 w-3.5" />
                   View controls
-                </button>
+                </RoleLink>
 
-                <button
-                  type="button"
+                <RoleLink route="milestones" sub="current"
                   className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-white px-4 text-xs font-semibold text-[#0B1220] transition-transform hover:-translate-y-0.5"
                 >
                   Review active milestone
                   <ChevronRight className="h-3.5 w-3.5" />
-                </button>
+                </RoleLink>
               </div>
             </div>
           </div>
@@ -444,22 +459,24 @@ export function MilestoneList() {
                   <input
                     type="search"
                     placeholder="Search milestones, phases or contractors..."
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
                     className="h-11 w-full rounded-xl border border-line bg-paper-2 pl-11 pr-4 text-sm text-ink outline-none transition-all placeholder:text-ink/30 focus:border-[#1657FF]/30 focus:bg-white focus:ring-4 focus:ring-[#1657FF]/[0.05]"
                   />
                 </div>
 
                 <div className="flex flex-wrap gap-2">
-                  <FilterButton active>
+                  <FilterButton active={filter === 'all'} onClick={() => setFilter('all')}>
                     <Filter className="h-3.5 w-3.5" />
                     All milestones
                   </FilterButton>
 
-                  <FilterButton>
+                  <FilterButton active={filter === 'review'} onClick={() => setFilter('review')}>
                     <Clock3 className="h-3.5 w-3.5" />
                     Needs review
                   </FilterButton>
 
-                  <FilterButton>
+                  <FilterButton active={filter === 'risk'} onClick={() => setFilter('risk')}>
                     <AlertTriangle className="h-3.5 w-3.5" />
                     At risk
                   </FilterButton>
@@ -482,11 +499,14 @@ export function MilestoneList() {
 
             <CardBody>
               <div className="space-y-0">
-                {milestones.map((milestone, index) => (
+                {visibleMilestones.length === 0 && (
+                  <p className="py-8 text-center text-sm text-ink/45">No milestones match that filter.</p>
+                )}
+                {visibleMilestones.map((milestone, index) => (
                   <MilestoneRow
                     key={milestone.id}
                     milestone={milestone}
-                    last={index === milestones.length - 1}
+                    last={index === visibleMilestones.length - 1}
                   />
                 ))}
               </div>
@@ -750,13 +770,12 @@ function MilestoneRow({
               </p>
             </div>
 
-            <button
-              type="button"
+            <RoleLink route="milestones" sub="current"
               className="inline-flex shrink-0 items-center gap-1.5 self-start rounded-lg px-2 py-1.5 text-xs font-semibold text-ink/45 transition-colors hover:bg-paper-2 hover:text-ink"
             >
               View details
               <ChevronRight className="h-3.5 w-3.5" />
-            </button>
+            </RoleLink>
           </div>
 
           {/* Progress */}
@@ -962,13 +981,17 @@ function ProgressLegend({
 function FilterButton({
   children,
   active = false,
+  onClick,
 }: {
   children: React.ReactNode
   active?: boolean
+  onClick?: () => void
 }) {
   return (
     <button
       type="button"
+      onClick={onClick}
+      aria-pressed={active}
       className={`inline-flex h-11 items-center gap-2 rounded-xl border px-3.5 text-xs font-medium transition-all ${
         active
           ? 'border-[#1657FF]/20 bg-[#1657FF]/[0.06] text-[#1657FF]'
@@ -1144,12 +1167,14 @@ function AlertCard({
           </p>
         </div>
 
-        <button
-          type="button"
-          className={`hidden rounded-lg px-2.5 py-1.5 text-[10px] font-semibold transition-colors sm:block ${classes.action}`}
+        <RoleLink
+          route="milestones"
+          sub="current"
+          fallbackRoute="milestones"
+          className={`block rounded-lg px-2.5 py-1.5 text-[10px] font-semibold transition-colors ${classes.action}`}
         >
           {action}
-        </button>
+        </RoleLink>
       </div>
     </div>
   )

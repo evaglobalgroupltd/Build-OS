@@ -15,7 +15,7 @@ import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 
 import { materialRequests } from '@/data/mockData'
-import { RoleLink, SoonButton } from '@/components/ui/ModuleActions'
+import { ActionButton, RoleLink } from '@/components/ui/ModuleActions'
 
 export function ProcurementDashboard() {
   const requested = materialRequests.filter(
@@ -513,12 +513,12 @@ function AttentionCard({
             {description}
           </p>
 
-          <SoonButton
+          <ActionButton tone="info" message={action} description="Opens the matching requests"
             className="group/action mt-4 inline-flex items-center gap-1.5 text-[10px] font-semibold text-ink/50 transition-colors hover:text-ink"
           >
             {action}
             <ArrowRight className="h-3 w-3 transition-transform group-hover/action:translate-x-0.5" />
-          </SoonButton>
+          </ActionButton>
         </div>
       </div>
     </div>
@@ -658,12 +658,12 @@ function RequestAttentionRow({
           {statusLabel}
         </Badge>
 
-        <SoonButton
+        <RoleLink route="procurement" sub="current" fallbackRoute="procurement"
           aria-label={`Open ${request.item}`}
           className="flex h-8 w-8 items-center justify-center rounded-full text-ink/25 transition-all hover:bg-ink/[0.05] hover:text-ink focus:outline-none focus:ring-4 focus:ring-ink/[0.04]"
         >
           <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-        </SoonButton>
+        </RoleLink>
       </div>
     </div>
   )

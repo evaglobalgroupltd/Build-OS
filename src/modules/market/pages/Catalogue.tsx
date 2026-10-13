@@ -1,4 +1,5 @@
 
+import { useMemo, useState } from 'react'
 import {
   BadgeCheck,
   Boxes,
@@ -16,6 +17,7 @@ import {
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 
+import { ActionButton, RoleLink } from '@/components/ui/ModuleActions'
 type ProductStatus = 'In Stock' | 'Low Stock' | 'Out of Stock'
 
 interface MarketProduct {
@@ -125,6 +127,21 @@ const categories = [
 ]
 
 export function Catalogue() {
+  const [query, setQuery] = useState('')
+  const [category, setCategory] = useState(categories[0]!)
+  const [stockOnly, setStockOnly] = useState(false)
+  const [filtersOpen, setFiltersOpen] = useState(false)
+
+  const visibleProducts = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    return products.filter(
+      (product) =>
+        (category === categories[0] || product.category === category) &&
+        (!stockOnly || product.stock === 'In Stock') &&
+        (q === '' || `${product.name} ${product.specification} ${product.category}`.toLowerCase().includes(q)),
+    )
+  }, [query, category, stockOnly])
+
   const inStockProducts = products.filter(
     (product) => product.stock === 'In Stock',
   ).length
@@ -197,8 +214,7 @@ export function Catalogue() {
 
             <div className="flex shrink-0 flex-wrap gap-2.5">
 
-              <button
-                type="button"
+              <RoleLink route="quotations"
                 className="
                   inline-flex
                   items-center
@@ -220,9 +236,9 @@ export function Catalogue() {
               >
                 <ClipboardCheck className="h-3.5 w-3.5" />
                 Procurement requests
-              </button>
+              </RoleLink>
 
-              <button
+              <ActionButton message="Draft listing created" description="Add a price and photos to publish it" tone="info"
                 type="button"
                 className="
                   inline-flex
@@ -242,7 +258,7 @@ export function Catalogue() {
               >
                 <Package className="h-3.5 w-3.5" />
                 Add material
-              </button>
+              </ActionButton>
 
             </div>
 
@@ -321,8 +337,7 @@ export function Catalogue() {
 
             </div>
 
-            <button
-              type="button"
+            <RoleLink route="verification"
               className="
                 mx-5 mb-5
                 inline-flex
@@ -341,7 +356,7 @@ export function Catalogue() {
             >
               View verification
               <ChevronRight className="h-3.5 w-3.5" />
-            </button>
+            </RoleLink>
 
           </div>
 
@@ -367,6 +382,8 @@ export function Catalogue() {
                 <input
                   type="search"
                   placeholder="Search materials, specifications or categories..."
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
                   className="
                     h-11.5
                     w-full
@@ -395,6 +412,8 @@ export function Catalogue() {
 
                 <button
                   type="button"
+                  onClick={() => setFiltersOpen((open) => !open)}
+                  aria-expanded={filtersOpen}
                   className="
                     inline-flex
                     items-center
@@ -420,6 +439,8 @@ export function Catalogue() {
 
                 <button
                   type="button"
+                  onClick={() => setStockOnly((on) => !on)}
+                  aria-pressed={stockOnly}
                   className="
                     inline-flex
                     items-center
@@ -440,12 +461,22 @@ export function Catalogue() {
                   "
                 >
                   <Boxes className="h-3.5 w-3.5" />
-                  Availability
+                  {stockOnly ? 'In stock only' : 'Availability'}
                 </button>
 
               </div>
 
             </div>
+
+            {filtersOpen && (
+              <div className="mt-4 flex flex-wrap items-center gap-4 rounded-xl border border-line bg-paper p-4 text-xs text-ink/70">
+                <label className="flex cursor-pointer items-center gap-2 font-medium">
+                  <input type="checkbox" checked={stockOnly} onChange={(e) => setStockOnly(e.target.checked)} className="h-4 w-4 accent-teal" />
+                  Show only items in stock
+                </label>
+                <span className="text-ink/40">{visibleProducts.length} of {products.length} items</span>
+              </div>
+            )}
 
             {/* Category navigation */}
 
@@ -453,13 +484,15 @@ export function Catalogue() {
 
               <div className="flex gap-2 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
 
-                {categories.map((category, index) => (
+                {categories.map((chip) => (
 
                   <button
-                    key={category}
+                    key={chip}
                     type="button"
+                    onClick={() => setCategory(chip)}
+                    aria-pressed={category === chip}
                     className={
-                      index === 0
+                      category === chip
                         ? `
                           shrink-0
                           rounded-full
@@ -489,7 +522,7 @@ export function Catalogue() {
                         `
                     }
                   >
-                    {category}
+                    {chip}
                   </button>
 
                 ))}
@@ -542,7 +575,7 @@ export function Catalogue() {
 
       <div className="grid gap-5 lg:grid-cols-2 2xl:grid-cols-3">
 
-        {products.map((product) => (
+        {visibleProducts.map((product) => (
           <ProductCard
             key={product.id}
             product={product}
@@ -623,13 +656,13 @@ export function Catalogue() {
 
         </div>
 
-        <button
+        <ActionButton message="Inventory updated" description="Stock levels are now current"
           type="button"
           className="inline-flex items-center gap-1 text-[10px] font-bold text-[#1657FF] transition hover:text-[#0f45d0]"
         >
           Update inventory
           <ChevronRight className="h-3.5 w-3.5" />
-        </button>
+        </ActionButton>
 
       </div>
 
@@ -884,7 +917,7 @@ function ProductCard({
 
           </div>
 
-          <button
+          <ActionButton message="Listing opened for editing" description="Changes save automatically" tone="info"
             type="button"
             className="
               inline-flex
@@ -907,7 +940,7 @@ function ProductCard({
           >
             Manage
             <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-          </button>
+          </ActionButton>
 
         </div>
 

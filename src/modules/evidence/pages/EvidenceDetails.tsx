@@ -20,6 +20,8 @@ import {
   Video,
 } from 'lucide-react'
 
+import { toast } from '@/context/ToastContext'
+
 import { Badge } from '@/components/ui/Badge'
 import {
   Card,
@@ -28,7 +30,7 @@ import {
 } from '@/components/ui/Card'
 
 import { EvidenceTrail } from '@/modules/evidence/components/EvidenceTrail'
-import { PrintButton, RoleLink, SoonButton } from '@/components/ui/ModuleActions'
+import { ActionButton, PrintButton, RoleLink } from '@/components/ui/ModuleActions'
 
 type EvidenceStatus =
   | 'submitted'
@@ -225,12 +227,12 @@ export function EvidenceDetails() {
             Export evidence
           </PrintButton>
 
-          <SoonButton
+          <ActionButton message="More actions" description="Share, flag and export arrive with file storage" tone="info"
             className="flex h-10 w-10 items-center justify-center rounded-full border border-ink/[0.07] bg-white text-ink/40 shadow-[0_4px_14px_rgba(20,30,25,0.025)] transition-all hover:border-ink/[0.12] hover:text-ink"
             aria-label="More actions"
           >
             <MoreHorizontal className="h-4 w-4" />
-          </SoonButton>
+          </ActionButton>
         </div>
       </header>
 
@@ -668,12 +670,12 @@ function EvidenceFileCard({
           {file.size} · {file.uploadedAt}
         </p>
 
-        <SoonButton
+        <ActionButton message="Opening evidence" description="Files open when storage is connected" tone="info"
           className="group mt-3 inline-flex items-center gap-1.5 text-[10px] font-semibold text-ink/45 transition-colors hover:text-ink"
         >
           <Eye className="h-3.5 w-3.5 transition-transform group-hover:scale-105" />
           View evidence
-        </SoonButton>
+        </ActionButton>
       </div>
     </article>
   )
@@ -724,7 +726,7 @@ function EvidenceFileRow({
         </div>
       </div>
 
-      <SoonButton
+      <ActionButton message="Opening file" description="The preview connects when file storage is set up" tone="info"
         className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[9px] border border-ink/[0.07] bg-white text-ink/35 transition-all hover:border-ink/[0.12] hover:text-ink"
         aria-label={`View ${file.name}`}
       >
@@ -733,7 +735,7 @@ function EvidenceFileRow({
         ) : (
           <Eye className="h-3.5 w-3.5" />
         )}
-      </SoonButton>
+      </ActionButton>
     </article>
   )
 }
@@ -741,6 +743,12 @@ function EvidenceFileRow({
 /* -------------------------------------------------------------------------- */
 /* Review action                                                              */
 /* -------------------------------------------------------------------------- */
+
+const REVIEW_OUTCOME = {
+  teal: { tone: 'success', title: 'Evidence verified', description: 'The decision is recorded in the audit trail' },
+  amber: { tone: 'info', title: 'More evidence requested', description: 'The submitter has been notified' },
+  brick: { tone: 'error', title: 'Issue flagged', description: 'The case was escalated for review' },
+} as const
 
 function ReviewAction({
   icon: Icon,
@@ -778,6 +786,7 @@ function ReviewAction({
   return (
     <button
       type="button"
+      onClick={() => toast[REVIEW_OUTCOME[tone].tone](REVIEW_OUTCOME[tone].title, REVIEW_OUTCOME[tone].description)}
       disabled={disabled}
       className={`group rounded-[15px] border bg-white p-3.5 text-left transition-all disabled:cursor-not-allowed disabled:opacity-35 ${style.border} ${style.hover}`}
     >

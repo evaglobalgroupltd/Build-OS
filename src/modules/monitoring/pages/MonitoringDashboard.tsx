@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import type { ComponentType } from 'react'
 
 import {
@@ -13,8 +14,12 @@ import {
   Users,
 } from 'lucide-react'
 
+import { toast } from '@/context/ToastContext'
+import { RoleLink } from '@/components/ui/ModuleActions'
+
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 
+import { ActionButton } from '@/components/ui/ModuleActions'
 const reports = [
   {
     date: '28 AUG 2026',
@@ -49,6 +54,7 @@ const reports = [
 ]
 
 export function DailyReport() {
+  const [photos, setPhotos] = useState<string[]>([])
   const totalWorkers = reports.reduce(
     (total, report) => total + report.workers,
     0,
@@ -119,13 +125,13 @@ export function DailyReport() {
               </div>
             </div>
 
-            <button
+            <ActionButton message="Daily report started" description="Add progress notes and photos, then submit" tone="info"
               type="button"
               className="inline-flex shrink-0 items-center justify-center gap-2 rounded-[13px] bg-ink px-4.5 py-3 text-xs font-semibold text-white shadow-[0_12px_28px_rgba(20,40,30,0.16)] transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_34px_rgba(20,40,30,0.2)]"
             >
               <Plus className="h-4 w-4" />
               New daily report
-            </button>
+            </ActionButton>
           </div>
         </div>
       </Card>
@@ -225,9 +231,8 @@ export function DailyReport() {
             <div className="group relative mt-5 flex min-h-[150px] items-center justify-center overflow-hidden rounded-[16px] border border-dashed border-[#12613E]/[0.16] bg-[#12613E]/[0.025] transition-all hover:border-[#12613E]/[0.25] hover:bg-[#12613E]/[0.04]">
               <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(18,97,62,0.05),_transparent_65%)]" />
 
-              <button
-                type="button"
-                className="relative flex flex-col items-center gap-2.5 text-xs text-ink/45 transition-colors hover:text-[#12613E]"
+              <label
+                className="relative cursor-pointer flex flex-col items-center gap-2.5 text-xs text-ink/45 transition-colors hover:text-[#12613E]"
               >
                 <span className="flex h-11 w-11 items-center justify-center rounded-[13px] bg-white text-[#12613E] shadow-[0_8px_24px_rgba(20,40,30,0.07)]">
                   <Camera className="h-5 w-5" />
@@ -238,9 +243,20 @@ export function DailyReport() {
                 </span>
 
                 <span className="text-[10px] text-ink/30">
-                  JPG or PNG · up to 10MB
+                  {photos.length > 0 ? `${photos.length} attached` : 'JPG or PNG, up to 10MB'}
                 </span>
-              </button>
+              <input
+                  type="file"
+                  accept="image/png,image/jpeg"
+                  multiple
+                  className="sr-only"
+                  onChange={(e) => {
+                    const files = Array.from(e.target.files ?? [])
+                    setPhotos(files.map((file) => file.name))
+                    if (files.length) toast.success(`${files.length} photo${files.length === 1 ? '' : 's'} attached`, 'They will be included when you submit the report')
+                  }}
+                />
+              </label>
             </div>
 
             <div className="mt-4 flex items-center justify-between text-[10px] text-ink/35">
@@ -318,8 +334,10 @@ function ReportRow({
         : 'bg-ink/30'
 
   return (
-    <button
-      type="button"
+    <RoleLink
+      route="evidence"
+      sub="current"
+      fallbackRoute="documents"
       className="group flex w-full flex-col gap-5 px-5 py-5 text-left transition-all duration-300 hover:bg-[#FAFBFA] sm:px-6 lg:flex-row lg:items-center lg:gap-6"
     >
       {/* Identity */}
@@ -405,7 +423,7 @@ function ReportRow({
           <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
         </span>
       </div>
-    </button>
+    </RoleLink>
   )
 }
 

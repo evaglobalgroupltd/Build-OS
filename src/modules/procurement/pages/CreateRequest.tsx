@@ -12,7 +12,7 @@ import {
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
-import { SoonButton } from '@/components/ui/ModuleActions'
+import { ActionButton } from '@/components/ui/ModuleActions'
 
 type MaterialLine = {
   id: number
@@ -447,7 +447,7 @@ export function CreateRequest() {
       {/* ===================================================== */}
 
       <div className="flex flex-col-reverse gap-3 border-t border-ink/[0.07] pt-6 sm:flex-row sm:items-center sm:justify-end">
-        <SoonButton
+        <ActionButton message="Draft saved" description="Finish the request later from Material requests"
           className="
             rounded-full
             border
@@ -465,7 +465,7 @@ export function CreateRequest() {
           "
         >
           Save draft
-        </SoonButton>
+        </ActionButton>
 
         <button
           type="submit"

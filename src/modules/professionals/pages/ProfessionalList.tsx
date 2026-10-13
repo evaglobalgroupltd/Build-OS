@@ -13,6 +13,7 @@ import {
 import { useMemo, useState } from 'react'
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 
+import { RoleLink } from '@/components/ui/ModuleActions'
 type ProfessionalCategory =
   | 'Architect'
   | 'Engineer'
@@ -641,8 +642,7 @@ function ProfessionalCard({
       {/* Action */}
       {/* ======================================================= */}
 
-      <button
-        type="button"
+      <RoleLink route="professionals" sub="current"
         className="
           mt-4
           flex
@@ -675,7 +675,7 @@ function ProfessionalCard({
           "
         />
 
-      </button>
+      </RoleLink>
 
     </article>
   )

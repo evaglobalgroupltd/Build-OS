@@ -13,7 +13,7 @@ import { type ReactNode } from 'react'
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
-import { RoleLink, SoonButton } from '@/components/ui/ModuleActions'
+import { ActionButton, RoleLink } from '@/components/ui/ModuleActions'
 
 type Quote = {
   id: string
@@ -133,12 +133,12 @@ export function QuoteComparison() {
             Back to quotations
           </RoleLink>
 
-          <SoonButton
+          <ActionButton message="Supplier selected" description="A purchase order can now be created"
             className="group inline-flex h-10 items-center justify-center gap-2 rounded-full bg-ink px-5 text-[11px] font-semibold text-white shadow-[0_8px_20px_rgba(20,40,30,0.11)] transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_25px_rgba(20,40,30,0.15)]"
           >
             Select supplier
             <ArrowRight className="h-3.5 w-3.5 opacity-55 transition-transform group-hover:translate-x-0.5" />
-          </SoonButton>
+          </ActionButton>
         </div>
       </section>
 
@@ -477,7 +477,7 @@ export function QuoteComparison() {
                         : '',
                     ].join(' ')}
                   >
-                    <SoonButton
+                    <ActionButton message="Quote selected" description="A purchase order can now be created"
                       className={
                         quote.status === 'recommended'
                           ? 'group inline-flex w-full items-center justify-center gap-2 rounded-full bg-ink px-3.5 py-2.5 text-[10px] font-semibold text-white shadow-[0_6px_16px_rgba(20,40,30,0.10)] transition-all hover:-translate-y-0.5 hover:shadow-[0_9px_20px_rgba(20,40,30,0.14)]'
@@ -489,7 +489,7 @@ export function QuoteComparison() {
                         : 'Select this quote'}
 
                       <ArrowRight className="h-3 w-3 opacity-50 transition-transform group-hover:translate-x-0.5" />
-                    </SoonButton>
+                    </ActionButton>
                   </td>
                 ))}
               </tr>
@@ -536,12 +536,12 @@ export function QuoteComparison() {
                 Keep reviewing
               </RoleLink>
 
-              <SoonButton
+              <ActionButton message="Supplier selected" description="A purchase order can now be created"
                 className="group inline-flex h-10 items-center justify-center gap-2 rounded-full bg-ink px-5 text-[10px] font-semibold text-white shadow-[0_7px_18px_rgba(20,40,30,0.10)] transition-all hover:-translate-y-0.5"
               >
                 Select {recommendedQuote.supplier}
                 <ArrowRight className="h-3 w-3 opacity-55 transition-transform group-hover:translate-x-0.5" />
-              </SoonButton>
+              </ActionButton>
             </div>
           </div>
         </CardBody>

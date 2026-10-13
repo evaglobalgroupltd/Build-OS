@@ -14,10 +14,12 @@ import {
   XCircle,
 } from 'lucide-react'
 
+import { toast } from '@/context/ToastContext'
+
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { CustodyNotice } from '@/modules/escrow/components/CustodyNotice'
-import { SoonButton } from '@/components/ui/ModuleActions'
+import { ActionButton } from '@/components/ui/ModuleActions'
 
 type RefundStatus =
   | 'requested'
@@ -223,12 +225,12 @@ export function Refunds() {
           </p>
         </div>
 
-        <SoonButton
+        <ActionButton message="Refund requested" description="An admin will review it within 2 working days"
           className="group inline-flex w-fit shrink-0 items-center gap-2 rounded-full bg-ink px-4 py-2.5 text-[11px] font-semibold text-white shadow-[0_6px_18px_rgba(11,18,32,0.08)] transition duration-200 hover:-translate-y-0.5 hover:bg-ink/90 hover:shadow-[0_9px_24px_rgba(11,18,32,0.12)]"
         >
           <Plus className="h-3.5 w-3.5 transition-transform duration-200 group-hover:rotate-90" />
           Request refund
-        </SoonButton>
+        </ActionButton>
       </div>
 
       {/* ─────────────────────────────────────────────
@@ -612,15 +614,16 @@ function RefundCard({
           </div>
 
           <div className="flex flex-col gap-2 sm:flex-row">
-            <SoonButton
+            <ActionButton message="Opening refund" description="Check the evidence, then decide" tone="info"
               className="inline-flex items-center justify-center gap-2 rounded-full border border-ink/[0.08] bg-white px-4 py-2.5 text-[11px] font-semibold text-ink/55 transition hover:border-ink/[0.13] hover:text-ink"
             >
               <FileText className="h-3.5 w-3.5" />
               View details
-            </SoonButton>
+            </ActionButton>
 
             <button
               type="button"
+              onClick={() => toast.info('Refund review opened', 'Check the evidence, then approve or decline')}
               disabled={blocked || completed}
               className="inline-flex items-center justify-center gap-2 rounded-full bg-ink px-4 py-2.5 text-[11px] font-semibold text-white shadow-[0_5px_14px_rgba(11,18,32,0.08)] transition hover:bg-ink/90 disabled:cursor-not-allowed disabled:opacity-35"
             >

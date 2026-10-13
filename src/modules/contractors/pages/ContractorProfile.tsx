@@ -17,6 +17,7 @@ import {
 
 import { Card, CardBody } from '@/components/ui/Card'
 
+import { ActionButton, RoleLink } from '@/components/ui/ModuleActions'
 const contractor = {
   name: 'Apex Build & Engineering Ltd.',
   category: 'General Building & Civil Engineering Contractor',
@@ -139,21 +140,20 @@ export function ContractorProfile() {
             </div>
 
             <div className="flex flex-col gap-2 sm:flex-row">
-              <button
-                type="button"
+              <RoleLink route="messages"
                 className="inline-flex items-center justify-center gap-2 rounded-xl border border-line px-4 py-2.5 text-xs font-semibold text-ink/60 transition-colors hover:bg-ink/[0.03] hover:text-ink"
               >
                 Contact contractor
                 <Mail className="h-3.5 w-3.5" />
-              </button>
+              </RoleLink>
 
-              <button
+              <ActionButton message="Invitation sent" description="They can accept or decline from their phone"
                 type="button"
                 className="inline-flex items-center justify-center gap-2 rounded-xl bg-ink px-4 py-2.5 text-xs font-semibold text-white transition-opacity hover:opacity-90"
               >
                 Invite to project
                 <ArrowUpRight className="h-3.5 w-3.5" />
-              </button>
+              </ActionButton>
             </div>
           </div>
         </CardBody>
@@ -346,13 +346,12 @@ export function ContractorProfile() {
               title="Selected projects"
             />
 
-            <button
-              type="button"
-              className="hidden items-center gap-1 text-xs font-semibold text-ink/45 transition-colors hover:text-ink sm:inline-flex"
+            <RoleLink route="company" sub="portfolio" fallbackRoute="contractors" fallbackSub="current/portfolio"
+              className="inline-flex items-center gap-1 text-xs font-semibold text-ink/45 transition-colors hover:text-ink"
             >
               View full portfolio
               <ChevronRight className="h-3.5 w-3.5" />
-            </button>
+            </RoleLink>
           </div>
         </div>
 
@@ -431,21 +430,20 @@ export function ContractorProfile() {
             </div>
 
             <div className="flex flex-col gap-2 sm:flex-row">
-              <button
-                type="button"
+              <RoleLink route="messages"
                 className="inline-flex items-center justify-center gap-2 rounded-xl border border-line px-4 py-2.5 text-xs font-semibold text-ink/60 transition-colors hover:bg-ink/[0.03] hover:text-ink"
               >
                 <Phone className="h-3.5 w-3.5" />
                 Contact
-              </button>
+              </RoleLink>
 
-              <button
+              <ActionButton message="Invitation sent" description="They can accept or decline from their phone"
                 type="button"
                 className="inline-flex items-center justify-center gap-2 rounded-xl bg-ink px-5 py-2.5 text-xs font-semibold text-white transition-opacity hover:opacity-90"
               >
                 Invite to project
                 <ArrowUpRight className="h-3.5 w-3.5" />
-              </button>
+              </ActionButton>
             </div>
           </div>
         </CardBody>

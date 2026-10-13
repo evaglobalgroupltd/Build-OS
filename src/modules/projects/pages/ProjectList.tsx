@@ -14,7 +14,7 @@ import { Card, CardBody } from '@/components/ui/Card'
 import { ProjectCard } from '@/modules/projects/components/ProjectCard'
 import type { Project, ProjectStage } from '@/modules/projects/types'
 import { projects } from '@/data/mockData'
-import { RoleLink, SoonButton } from '@/components/ui/ModuleActions'
+import { RoleLink } from '@/components/ui/ModuleActions'
 
 type ProjectFilter = 'all' | ProjectStage
 
@@ -287,7 +287,13 @@ export function ProjectList() {
                 />
               </div>
 
-              <SoonButton
+              <button
+                type="button"
+                onClick={() => {
+                  const bar = document.getElementById('project-stage-filters')
+                  bar?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                  bar?.querySelector('button')?.focus()
+                }}
                 className="
                   inline-flex
                   h-11
@@ -310,7 +316,7 @@ export function ProjectList() {
               >
                 <SlidersHorizontal size={14} />
                 Filters
-              </SoonButton>
+              </button>
 
             </div>
 
@@ -320,7 +326,7 @@ export function ProjectList() {
 
             <div className="relative">
 
-              <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+              <div id="project-stage-filters" className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none">
 
                 {filters.map((item) => {
                   const active = filter === item.value
@@ -399,8 +405,7 @@ export function ProjectList() {
 
                       </div>
 
-                      <button
-                        type="button"
+                      <RoleLink route="projects" sub="current"
                         className="
                           flex
                           items-center
@@ -417,7 +422,7 @@ export function ProjectList() {
                           size={13}
                           className="transition-transform group-hover:translate-x-0.5"
                         />
-                      </button>
+                      </RoleLink>
 
                     </div>
                   </div>

@@ -15,6 +15,7 @@ import { useMemo, useState } from 'react'
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 
+import { ActionButton } from '@/components/ui/ModuleActions'
 type DeliverableStatus =
   | 'Submitted'
   | 'Under Review'
@@ -185,7 +186,7 @@ export function Deliverables() {
           </p>
         </div>
 
-        <button
+        <ActionButton message="Deliverable uploaded" description="It is now with the client for review"
           type="button"
           className="
             group
@@ -209,7 +210,7 @@ export function Deliverables() {
         >
           <Upload className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-y-0.5" />
           Upload deliverable
-        </button>
+        </ActionButton>
       </header>
 
       {/* ========================================================= */}
@@ -456,7 +457,7 @@ function DeliverableRow({
         </div>
 
         {/* Action */}
-        <button
+        <ActionButton message="Opening deliverable" description="The latest version is shown first" tone="info"
           type="button"
           className="
             group/action
@@ -498,7 +499,7 @@ function DeliverableRow({
               group-hover/action:text-white/60
             "
           />
-        </button>
+        </ActionButton>
       </div>
 
       {/* Revision feedback */}
@@ -529,7 +530,7 @@ function DeliverableRow({
 
               {(deliverable.status === 'Revision Requested' ||
                 deliverable.status === 'Rejected') && (
-                <button
+                <ActionButton message="Revision submitted" description="The client has been notified"
                   type="button"
                   className="
                     mt-3
@@ -551,7 +552,7 @@ function DeliverableRow({
                 >
                   <Upload className="h-3 w-3" />
                   Submit revision
-                </button>
+                </ActionButton>
               )}
             </div>
           </div>

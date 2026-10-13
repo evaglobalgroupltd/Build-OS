@@ -20,6 +20,7 @@ import {
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 
+import { ActionButton, RoleLink } from '@/components/ui/ModuleActions'
 export function MilestoneReview() {
   return (
     <div className="space-y-6">
@@ -44,13 +45,12 @@ export function MilestoneReview() {
 
         <div className="relative px-6 pb-8 pt-6 sm:px-8 lg:px-10 lg:pb-9">
           {/* Back navigation */}
-          <button
-            type="button"
+          <RoleLink route="milestones"
             className="mb-7 inline-flex items-center gap-2 rounded-lg px-1 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/35 transition-colors hover:text-white/70"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             Back to milestones
-          </button>
+          </RoleLink>
 
           <div className="flex flex-col gap-7 xl:flex-row xl:items-end xl:justify-between">
             <div className="max-w-3xl">
@@ -361,29 +361,29 @@ export function MilestoneReview() {
               />
 
               <div className="mt-5 grid gap-2.5 sm:grid-cols-3">
-                <button
+                <ActionButton message="Milestone approved" description="Payment release has been queued for escrow"
                   type="button"
                   className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-[#0B1220] px-4 text-xs font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-[#111B2E]"
                 >
                   <CheckCircle2 className="h-4 w-4" />
                   Approve milestone
-                </button>
+                </ActionButton>
 
-                <button
+                <ActionButton message="Evidence requested" description="The contractor has been notified" tone="info"
                   type="button"
                   className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-amber-500/20 bg-amber-500/10 px-4 text-xs font-semibold text-amber-700 transition-colors hover:bg-amber-500/15"
                 >
                   <MessageSquare className="h-4 w-4" />
                   Request evidence
-                </button>
+                </ActionButton>
 
-                <button
+                <ActionButton message="Milestone rejected" description="The contractor will be asked to resubmit" tone="error"
                   type="button"
                   className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-rose-500/20 bg-rose-500/10 px-4 text-xs font-semibold text-rose-700 transition-colors hover:bg-rose-500/15"
                 >
                   <XCircle className="h-4 w-4" />
                   Reject
-                </button>
+                </ActionButton>
               </div>
 
               <p className="mt-4 text-center text-[9px] leading-4 text-ink/30">
@@ -643,8 +643,9 @@ function EvidenceCard({
   description: string
 }) {
   return (
-    <button
-      type="button"
+    <RoleLink
+      route="evidence"
+      fallbackRoute="documents"
       className="group flex items-start gap-3 rounded-2xl border border-line bg-paper-2 p-4 text-left transition-all hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_10px_30px_rgba(11,18,32,0.06)]"
     >
       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white shadow-sm">
@@ -668,7 +669,7 @@ function EvidenceCard({
           {description}
         </p>
       </div>
-    </button>
+    </RoleLink>
   )
 }
 

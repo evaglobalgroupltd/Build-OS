@@ -1,11 +1,10 @@
+import { useMemo, useState } from 'react'
 import {
   ArrowDownLeft,
   ArrowUpRight,
-  ChevronDown,
   Download,
   ExternalLink,
   FileText,
-  Filter,
   LockKeyhole,
   Search,
   ShieldCheck,
@@ -15,7 +14,7 @@ import {
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import type { FundingSource } from '@/modules/escrow/types'
-import { PrintButton, SoonButton } from '@/components/ui/ModuleActions'
+import { ActionButton, PrintButton } from '@/components/ui/ModuleActions'
 
 type TransactionType =
   | 'funding'
@@ -210,6 +209,20 @@ function getTransactionTone(status: TransactionStatus) {
 }
 
 export function Transactions() {
+  const [query, setQuery] = useState('')
+  const [typeFilter, setTypeFilter] = useState<'all' | TransactionType>('all')
+  const [statusFilter, setStatusFilter] = useState<'all' | TransactionStatus>('all')
+
+  const visibleTransactions = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    return transactions.filter(
+      (t) =>
+        (typeFilter === 'all' || t.type === typeFilter) &&
+        (statusFilter === 'all' || t.status === statusFilter) &&
+        (q === '' || JSON.stringify(t).toLowerCase().includes(q)),
+    )
+  }, [query, typeFilter, statusFilter])
+
   const completedVolume = transactions
     .filter((transaction) => transaction.status === 'completed')
     .reduce((total, transaction) => total + transaction.amount, 0)
@@ -351,28 +364,39 @@ export function Transactions() {
               <input
                 type="search"
                 placeholder="Search transaction, project, reference or counterparty..."
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
                 className="h-11 w-full rounded-[13px] border border-ink/[0.07] bg-[#F7F8F6] pl-10 pr-4 text-xs text-ink outline-none transition placeholder:text-ink/30 focus:border-ink/15 focus:bg-white focus:ring-4 focus:ring-ink/[0.025]"
               />
             </div>
 
-            <SoonButton
-              className="inline-flex h-11 items-center justify-between gap-4 rounded-[13px] border border-ink/[0.07] bg-[#F7F8F6] px-3.5 text-xs font-semibold text-ink/55 transition hover:border-ink/[0.12] hover:bg-white hover:text-ink"
+            <select
+              aria-label="Filter by type"
+              value={typeFilter}
+              onChange={(e) => setTypeFilter(e.target.value as 'all' | TransactionType)}
+              className="h-11 rounded-[13px] border border-ink/[0.07] bg-white px-4 text-xs font-medium capitalize text-ink/60 outline-none transition hover:border-ink/[0.15]"
             >
-              <span className="flex items-center gap-2">
-                <Filter className="h-4 w-4 text-ink/35" />
-                All types
-              </span>
+              <option value="all">All types</option>
+              {(['funding', 'reservation', 'release', 'refund', 'freeze', 'adjustment'] as const).map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
+            </select>
 
-              <ChevronDown className="h-3.5 w-3.5 text-ink/30" />
-            </SoonButton>
-
-            <SoonButton
-              className="inline-flex h-11 items-center justify-between gap-4 rounded-[13px] border border-ink/[0.07] bg-[#F7F8F6] px-3.5 text-xs font-semibold text-ink/55 transition hover:border-ink/[0.12] hover:bg-white hover:text-ink"
+            <select
+              aria-label="Filter by status"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value as 'all' | TransactionStatus)}
+              className="h-11 rounded-[13px] border border-ink/[0.07] bg-white px-4 text-xs font-medium capitalize text-ink/60 outline-none transition hover:border-ink/[0.15]"
             >
-              <span>All statuses</span>
-
-              <ChevronDown className="h-3.5 w-3.5 text-ink/30" />
-            </SoonButton>
+              <option value="all">All statuses</option>
+              {(['completed', 'pending', 'frozen', 'failed', 'reversed'] as const).map((st) => (
+                <option key={st} value={st}>
+                  {st}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Ledger metadata */}
@@ -387,7 +411,7 @@ export function Transactions() {
               <span className="text-[10px] text-ink/25">·</span>
 
               <span className="text-[10px] text-ink/40">
-                {transactions.length} recorded entries
+                {visibleTransactions.length} of {transactions.length} recorded entries
               </span>
             </div>
 
@@ -432,7 +456,7 @@ export function Transactions() {
               </thead>
 
               <tbody>
-                {transactions.map((transaction) => (
+                {visibleTransactions.map((transaction) => (
                   <TransactionRow
                     key={transaction.id}
                     transaction={transaction}
@@ -444,7 +468,7 @@ export function Transactions() {
 
           {/* Mobile ledger */}
           <div className="mt-4 space-y-3 md:hidden">
-            {transactions.map((transaction) => (
+            {visibleTransactions.map((transaction) => (
               <TransactionCard
                 key={transaction.id}
                 transaction={transaction}
@@ -556,12 +580,12 @@ function TransactionRow({
           {transaction.date}
         </p>
 
-        <SoonButton
+        <ActionButton message="Opening transaction" description="The receipt and audit trail load here" tone="info"
           className="mt-2 inline-flex items-center gap-1 text-[9px] font-semibold text-ink/35 transition hover:text-ink"
         >
           View transaction
           <ExternalLink className="h-3 w-3" />
-        </SoonButton>
+        </ActionButton>
       </td>
 
       <td className="relative w-0 p-0">
@@ -689,12 +713,12 @@ function TransactionCard({
         {transaction.description}
       </p>
 
-      <SoonButton
+      <ActionButton message="Opening transaction" description="The receipt and audit trail load here" tone="info"
         className="mt-4 inline-flex items-center gap-1.5 text-[10px] font-semibold text-ink/40 transition hover:text-ink"
       >
         View transaction
         <ExternalLink className="h-3 w-3" />
-      </SoonButton>
+      </ActionButton>
 
       <span
         className={`absolute bottom-0 left-0 right-0 h-0.5 ${tone.rail}`}

@@ -15,6 +15,7 @@ import { useMemo, useState } from 'react'
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 
+import { ActionButton, RoleLink } from '@/components/ui/ModuleActions'
 type ProposalStatus =
   | 'Submitted'
   | 'Under Review'
@@ -195,14 +196,13 @@ export function Proposals() {
             </p>
           </div>
 
-          <button
-            type="button"
+          <RoleLink route="invitations"
             className="group inline-flex h-11 items-center justify-center gap-2 rounded-full bg-[#0B1220] px-5 text-xs font-semibold text-white shadow-[0_8px_24px_rgba(11,18,32,0.16)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#1657FF] hover:shadow-[0_12px_28px_rgba(22,87,255,0.22)]"
           >
             <Send className="h-3.5 w-3.5 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
             New proposal
             <ChevronRight className="h-3.5 w-3.5 text-white/45 transition-transform group-hover:translate-x-0.5 group-hover:text-white" />
-          </button>
+          </RoleLink>
         </div>
       </header>
 
@@ -420,13 +420,13 @@ function ProposalRow({
           </div>
 
           {/* Action */}
-          <button
+          <ActionButton message="Opening proposal" description="Track its status from this page" tone="info"
             type="button"
             className="group/button inline-flex shrink-0 items-center justify-center gap-2 self-start rounded-xl border border-ink/[0.07] bg-white px-4 py-2.5 text-[11px] font-semibold text-ink shadow-[0_2px_8px_rgba(11,18,32,0.025)] transition-all duration-200 hover:-translate-y-0.5 hover:border-[#1657FF]/20 hover:bg-[#1657FF] hover:text-white hover:shadow-[0_8px_20px_rgba(22,87,255,0.14)]"
           >
             View proposal
             <ChevronRight className="h-3.5 w-3.5 text-ink/30 transition-all group-hover/button:translate-x-0.5 group-hover/button:text-white" />
-          </button>
+          </ActionButton>
         </div>
 
         {/* Metadata panel */}

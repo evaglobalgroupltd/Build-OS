@@ -754,14 +754,13 @@ function ProjectControlCard({
         {footer}
 
         {!footer && (
-          <button
-            type="button"
+          <RoleLink route="reports" sub="compliance"
             className="mt-4 flex w-full items-center justify-between rounded-xl px-1 py-1 text-xs font-semibold text-ink/45 transition hover:text-ink"
           >
             <span>Open detailed controls</span>
 
             <ChevronRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />
-          </button>
+          </RoleLink>
         )}
       </CardBody>
     </Card>

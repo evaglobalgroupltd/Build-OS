@@ -18,6 +18,7 @@ import {
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 
+import { ActionButton, RoleLink } from '@/components/ui/ModuleActions'
 /**
  * Security — Users module
  *
@@ -401,13 +402,13 @@ export function Security() {
               Signing out other devices will end their current sessions.
             </p>
 
-            <button
+            <ActionButton message="Other devices signed out" description="Only this device is still signed in"
               type="button"
               className="inline-flex w-fit items-center gap-2 rounded-xl border border-ink/[0.09] bg-white px-4 py-2.5 text-xs font-semibold text-ink transition hover:bg-paper-2"
             >
               <LogOut className="h-3.5 w-3.5" />
               Sign out all other devices
-            </button>
+            </ActionButton>
           </div>
         </CardBody>
       </Card>
@@ -480,13 +481,13 @@ export function Security() {
           </div>
 
           <div className="mt-5 border-t border-ink/[0.06] pt-5">
-            <button
+            <ActionButton message="Security history" description="No suspicious activity in the last 90 days" tone="info"
               type="button"
               className="inline-flex items-center gap-1.5 text-xs font-semibold text-ink transition hover:text-[#12613E]"
             >
               View full security history
               <ChevronRight className="h-3.5 w-3.5" />
-            </button>
+            </ActionButton>
           </div>
         </CardBody>
       </Card>
@@ -688,13 +689,13 @@ function SecurityControl({
 
         {children}
 
-        <button
-          type="button"
+        <SecurityButton
+          title={title}
           className="mt-5 inline-flex items-center gap-1.5 text-xs font-semibold text-ink transition hover:text-[#12613E]"
         >
           {action}
           <ChevronRight className="h-3.5 w-3.5" />
-        </button>
+        </SecurityButton>
       </CardBody>
     </Card>
   )
@@ -743,13 +744,13 @@ function SecurityAction({
         </div>
       </div>
 
-      <button
-        type="button"
+      <SecurityButton
+        title={title}
         className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl border border-ink/[0.08] bg-white px-3.5 py-2 text-xs font-semibold text-ink transition hover:bg-paper-2"
       >
         {action}
         <ChevronRight className="h-3.5 w-3.5" />
-      </button>
+      </SecurityButton>
     </div>
   )
 }
@@ -821,13 +822,13 @@ function SessionRow({
       </div>
 
       {!current && (
-        <button
+        <ActionButton message="Session revoked" description="That device has been signed out"
           type="button"
           className="inline-flex w-fit items-center gap-1.5 rounded-xl border border-ink/[0.08] bg-white px-3 py-2 text-xs font-semibold text-ink transition hover:border-ink/[0.14] hover:bg-paper-2"
         >
           <LogOut className="h-3.5 w-3.5" />
           Revoke session
-        </button>
+        </ActionButton>
       )}
     </div>
   )
@@ -932,5 +933,37 @@ function SecurityEvent({
         </p>
       </div>
     </div>
+  )
+}
+
+/** Sends each security action somewhere real: password -> profile, MFA -> /mfa, else a confirmation. */
+function SecurityButton({
+  title,
+  className,
+  children,
+}: {
+  title: string
+  className: string
+  children: ReactNode
+}) {
+  const t = title.toLowerCase()
+  if (t.includes('password')) {
+    return (
+      <RoleLink route="profile" className={className}>
+        {children}
+      </RoleLink>
+    )
+  }
+  if (t.includes('two-factor') || t.includes('mfa')) {
+    return (
+      <RoleLink to="/mfa" className={className}>
+        {children}
+      </RoleLink>
+    )
+  }
+  return (
+    <ActionButton message={`${title} updated`} description="Your security settings were saved" className={className}>
+      {children}
+    </ActionButton>
   )
 }

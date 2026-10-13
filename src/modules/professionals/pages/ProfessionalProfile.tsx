@@ -18,6 +18,7 @@ import {
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 
+import { ActionButton, RoleLink } from '@/components/ui/ModuleActions'
 type Service = {
   name: string
   description: string
@@ -112,8 +113,7 @@ export function ProfessionalProfile() {
       {/* Back navigation */}
       {/* ===================================================== */}
 
-      <button
-        type="button"
+      <RoleLink route="professionals"
         className="
           group
           inline-flex
@@ -138,7 +138,7 @@ export function ProfessionalProfile() {
           className="h-3.5 w-3.5 transition-transform group-hover:-translate-x-0.5"
         />
         Back to professionals
-      </button>
+      </RoleLink>
 
       {/* ===================================================== */}
       {/* Profile Hero */}
@@ -232,8 +232,7 @@ export function ProfessionalProfile() {
 
               <div className="flex flex-col gap-2 sm:flex-row">
 
-                <button
-                  type="button"
+                <RoleLink route="messages"
                   className="
                     inline-flex
                     items-center
@@ -255,9 +254,9 @@ export function ProfessionalProfile() {
                 >
                   <MessageSquare className="h-3.5 w-3.5" />
                   Message
-                </button>
+                </RoleLink>
 
-                <button
+                <ActionButton message="Invitation sent" description="They can accept or decline from their phone"
                   type="button"
                   className="
                     inline-flex
@@ -279,7 +278,7 @@ export function ProfessionalProfile() {
                 >
                   Invite to project
                   <ChevronRight className="h-3.5 w-3.5 text-white/60" />
-                </button>
+                </ActionButton>
 
               </div>
 
@@ -624,7 +623,7 @@ export function ProfessionalProfile() {
                 one of your projects.
               </p>
 
-              <button
+              <ActionButton message="Invitation sent" description="They can accept or decline from their phone"
                 type="button"
                 className="
                   mt-5
@@ -647,7 +646,7 @@ export function ProfessionalProfile() {
               >
                 Invite to project
                 <ChevronRight className="h-3.5 w-3.5 text-white/60" />
-              </button>
+              </ActionButton>
 
             </CardBody>
 

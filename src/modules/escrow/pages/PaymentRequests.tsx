@@ -10,11 +10,14 @@ import {
   ShieldCheck,
   User,
 } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+
+import { useAppRoutes } from '@/config/appRoutes'
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { CustodyNotice } from '@/modules/escrow/components/CustodyNotice'
-import { RoleLink, SoonButton } from '@/components/ui/ModuleActions'
+import { ActionButton, RoleLink } from '@/components/ui/ModuleActions'
 
 type RequestStatus =
   | 'draft'
@@ -208,12 +211,12 @@ export function PaymentRequests() {
           </p>
         </div>
 
-        <SoonButton
+        <ActionButton message="Payment request started" description="Add the milestone and amount to continue" tone="info"
           className="group inline-flex w-fit shrink-0 items-center gap-2 rounded-full border border-ink/[0.08] bg-white px-4 py-2.5 text-[11px] font-semibold text-ink/60 shadow-[0_5px_18px_rgba(20,30,25,0.035)] transition duration-200 hover:-translate-y-0.5 hover:border-ink/[0.12] hover:text-ink hover:shadow-[0_8px_24px_rgba(20,30,25,0.06)]"
         >
           <Plus className="h-3.5 w-3.5 transition-transform duration-200 group-hover:rotate-90" />
           New payment request
-        </SoonButton>
+        </ActionButton>
       </div>
 
       {/* ─────────────────────────────────────────────
@@ -380,6 +383,10 @@ function RequestCard({
 }: {
   request: PaymentRequest
 }) {
+  const navigate = useNavigate()
+  const app = useAppRoutes()
+  const canApprove = app.can('money', 'approvals')
+  const approvalsPath = canApprove ? app.to('money', 'approvals') : ''
   const blocked =
     request.disputeActive || request.status === 'blocked'
 
@@ -574,14 +581,16 @@ function RequestCard({
           </div>
 
           <div className="flex flex-col gap-2 sm:flex-row">
-            <SoonButton
+            <ActionButton message="Opening request" description="Full details open in the request panel" tone="info"
               className="inline-flex items-center justify-center gap-2 rounded-full border border-ink/[0.08] bg-white px-4 py-2.5 text-[11px] font-semibold text-ink/55 transition hover:border-ink/[0.13] hover:text-ink"
             >
               View request
-            </SoonButton>
+            </ActionButton>
 
-            <button
+            {canApprove && (
+<button
               type="button"
+              onClick={() => navigate(approvalsPath)}
               disabled={blocked}
               className="inline-flex items-center justify-center gap-2 rounded-full bg-ink px-4 py-2.5 text-[11px] font-semibold text-white shadow-[0_5px_14px_rgba(11,18,32,0.08)] transition hover:bg-ink/90 disabled:cursor-not-allowed disabled:opacity-35"
             >
@@ -597,6 +606,7 @@ function RequestCard({
                 </>
               )}
             </button>
+)}
           </div>
         </div>
       </div>

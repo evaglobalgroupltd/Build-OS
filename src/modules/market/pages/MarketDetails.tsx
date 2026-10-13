@@ -22,6 +22,7 @@ import {
 
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 
+import { RoleLink } from '@/components/ui/ModuleActions'
 const supplier = {
   name: 'Prime Build Materials Ltd.',
   registration: 'RC 2198473',
@@ -230,8 +231,7 @@ export function MarketDetails() {
 
             <div className="flex flex-wrap gap-2.5">
 
-              <button
-                type="button"
+              <RoleLink route="messages"
                 className="
                   inline-flex
                   items-center
@@ -253,10 +253,9 @@ export function MarketDetails() {
               >
                 <Mail className="h-3.5 w-3.5" />
                 Contact supplier
-              </button>
+              </RoleLink>
 
-              <button
-                type="button"
+              <RoleLink route="catalogue"
                 className="
                   inline-flex
                   items-center
@@ -276,7 +275,7 @@ export function MarketDetails() {
                 <ShoppingCart className="h-3.5 w-3.5" />
                 View catalogue
                 <ChevronRight className="h-3.5 w-3.5" />
-              </button>
+              </RoleLink>
 
             </div>
 
@@ -550,8 +549,7 @@ export function MarketDetails() {
 
             <div className="border-t border-line px-6 py-4">
 
-              <button
-                type="button"
+              <RoleLink route="catalogue"
                 className="
                   inline-flex
                   items-center
@@ -565,7 +563,7 @@ export function MarketDetails() {
               >
                 View full catalogue
                 <ChevronRight className="h-3.5 w-3.5" />
-              </button>
+              </RoleLink>
 
             </div>
 

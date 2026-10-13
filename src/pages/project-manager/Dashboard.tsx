@@ -24,6 +24,7 @@ import { useAuth } from '@/context/AuthContext'
 import { useProjectProfile } from '@/hooks/useProjectProfile'
 import { deriveProjectManagerDashboardConfig } from '@/derive/projectManagerDashboardConfig'
 
+import { RoleLink } from '@/components/ui/ModuleActions'
 const projectImages = [
   '/images/Real1.jpeg',
   '/images/Real3.jpeg',
@@ -109,8 +110,7 @@ export function ProjectManagerDashboard() {
           </p>
         </div>
 
-        <button
-          type="button"
+        <RoleLink route="projects"
           className="
             flex
             w-fit
@@ -129,7 +129,7 @@ export function ProjectManagerDashboard() {
         >
           <Eye size={14} />
           Project overview
-        </button>
+        </RoleLink>
 
       </div>
 
@@ -398,8 +398,7 @@ export function ProjectManagerDashboard() {
 
                 </div>
 
-                <button
-                  type="button"
+                <RoleLink route="projects" sub="current"
                   className="
                     mt-6
                     flex
@@ -418,7 +417,7 @@ export function ProjectManagerDashboard() {
                 >
                   Open project
                   <ArrowUpRight size={14} />
-                </button>
+                </RoleLink>
 
               </div>
 
@@ -530,8 +529,7 @@ export function ProjectManagerDashboard() {
 
                     </div>
 
-                    <button
-                      type="button"
+                    <RoleLink route="evidence"
                       className="
                         flex
                         shrink-0
@@ -546,7 +544,7 @@ export function ProjectManagerDashboard() {
                     >
                       View
                       <ChevronRight size={13} />
-                    </button>
+                    </RoleLink>
 
                   </div>
                 ))}
@@ -630,13 +628,12 @@ export function ProjectManagerDashboard() {
                         {inspection.status}
                       </span>
 
-                      <button
-                        type="button"
+                      <RoleLink route="milestones"
                         className="flex items-center gap-1 text-[10px] font-bold text-ink/60"
                       >
                         Review
                         <ChevronRight size={12} />
-                      </button>
+                      </RoleLink>
 
                     </div>
 
@@ -645,8 +642,7 @@ export function ProjectManagerDashboard() {
 
               </div>
 
-              <button
-                type="button"
+              <RoleLink route="inspections"
                 className="
                   mt-3
                   flex
@@ -671,7 +667,7 @@ export function ProjectManagerDashboard() {
                 </span>
 
                 <ChevronRight size={14} />
-              </button>
+              </RoleLink>
 
             </CardBody>
 
@@ -724,8 +720,7 @@ export function ProjectManagerDashboard() {
                   Review the latest update before the next milestone.
                 </p>
 
-                <button
-                  type="button"
+                <RoleLink route="risks"
                   className="
                     mt-4
                     flex
@@ -738,7 +733,7 @@ export function ProjectManagerDashboard() {
                 >
                   Review risk
                   <ArrowUpRight size={13} />
-                </button>
+                </RoleLink>
 
               </div>
 
@@ -814,8 +809,7 @@ export function ProjectManagerDashboard() {
 
               </div>
 
-              <button
-                type="button"
+              <RoleLink route="milestones"
                 className="
                   mt-4
                   flex
@@ -840,7 +834,7 @@ export function ProjectManagerDashboard() {
                 </span>
 
                 <ChevronRight size={14} />
-              </button>
+              </RoleLink>
 
             </CardBody>
 

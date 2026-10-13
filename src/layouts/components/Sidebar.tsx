@@ -15,8 +15,10 @@ import { NavLink, useNavigate } from 'react-router-dom'
 import * as Icons from 'lucide-react'
 import {
   Check,
+  ChevronRight,
   ChevronsUpDown,
   Circle,
+  Headset,
   PanelLeftClose,
   PanelLeftOpen,
   ShieldCheck,
@@ -858,6 +860,95 @@ function SidebarNav({
 }
 
 /* =============================================================================
+ * HELP
+ * Always one click away. Opens the support page in a new tab so nobody loses
+ * their place (or an unsaved form) in the app.
+ * ============================================================================= */
+
+const SUPPORT_HREF = '/contact'
+
+function HelpLink({
+  collapsed,
+  tip,
+  onNavigate,
+}: {
+  collapsed: boolean
+  tip: TipApi
+  onNavigate?: () => void
+}) {
+  if (collapsed) {
+    return (
+      <div className="shrink-0 px-3 pb-3">
+        <a
+          href={SUPPORT_HREF}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={onNavigate}
+          aria-label="Need help? Contact support (opens in a new tab)"
+          {...tipHandlers(tip, true, 'Need help? Contact support')}
+          className="
+            mx-auto flex h-11 w-full
+            items-center justify-center
+            rounded-xl
+            text-ink/55
+            transition-colors
+            hover:bg-ink/[0.045] hover:text-ink
+            focus-visible:outline-none
+            focus-visible:ring-2 focus-visible:ring-ink/25
+          "
+        >
+          <Headset size={19} strokeWidth={1.6} aria-hidden="true" />
+        </a>
+      </div>
+    )
+  }
+
+  return (
+    <div className="shrink-0 px-3 pb-3">
+      <a
+        href={SUPPORT_HREF}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={onNavigate}
+        aria-label="Need help? Contact support (opens in a new tab)"
+        className="
+          group flex items-center gap-3
+          rounded-xl
+          px-3 py-2.5
+          transition-colors
+          hover:bg-ink/[0.045]
+          focus-visible:outline-none
+          focus-visible:ring-2 focus-visible:ring-ink/25
+        "
+      >
+        <Headset
+          size={22}
+          strokeWidth={1.5}
+          className="shrink-0 text-ink/55"
+          aria-hidden="true"
+        />
+
+        <span className="min-w-0 flex-1">
+          <span className="block text-[13px] font-semibold text-ink">
+            Need help?
+          </span>
+
+          <span className="mt-0.5 flex items-center gap-1 text-[12px] font-medium text-teal">
+            Contact Support
+            <ChevronRight
+              size={14}
+              strokeWidth={1.8}
+              className="transition-transform group-hover:translate-x-0.5"
+              aria-hidden="true"
+            />
+          </span>
+        </span>
+      </a>
+    </div>
+  )
+}
+
+/* =============================================================================
  * ESCROW ASSURANCE
  * ============================================================================= */
 
@@ -998,6 +1089,7 @@ function EscrowNotice({
             text-[11px]
             leading-relaxed
             text-white/55
+            [@media(max-height:820px)]:hidden
           ">
             Funds remain secured until each project
             milestone has been independently verified
@@ -1034,6 +1126,13 @@ function SidebarBody({
 
       {/* Navigation */}
       <SidebarNav
+        collapsed={collapsed}
+        tip={tip}
+        onNavigate={onNavigate}
+      />
+
+      {/* Help */}
+      <HelpLink
         collapsed={collapsed}
         tip={tip}
         onNavigate={onNavigate}

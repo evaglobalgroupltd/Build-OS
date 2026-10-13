@@ -14,6 +14,7 @@ import {
 import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 
+import { RoleLink } from '@/components/ui/ModuleActions'
 interface AvailableProject {
   id: string
   title: string
@@ -269,8 +270,7 @@ function ProjectCard({ project }: { project: AvailableProject }) {
             )}
           </div>
 
-          <button
-            type="button"
+          <RoleLink route="bids" sub="submit"
             className="
               group/button
               inline-flex
@@ -301,7 +301,7 @@ function ProjectCard({ project }: { project: AvailableProject }) {
                 group-hover/button:-translate-y-0.5
               "
             />
-          </button>
+          </RoleLink>
         </div>
       </div>
     </Card>

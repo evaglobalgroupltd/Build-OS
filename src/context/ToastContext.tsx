@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react'
 
 export type ToastTone = 'success' | 'error' | 'info'
 
@@ -17,6 +17,23 @@ interface ToastContextValue {
 
 const ToastContext = createContext<ToastContextValue | undefined>(undefined)
 
+/* -----------------------------------------------------------------------------
+ * `toast` works anywhere (no hook needed), so a button in any module page can do
+ *   onClick={() => toast.success('Milestone approved')}
+ * ToastProvider listens and shows it. Use useToast() when you are already in a
+ * component that has it.
+ * -------------------------------------------------------------------------- */
+type ToastListener = (toast: Omit<Toast, 'id'>) => void
+const listeners = new Set<ToastListener>()
+const emit = (tone: ToastTone, title: string, description?: string) =>
+  listeners.forEach((listener) => listener({ tone, title, description }))
+
+export const toast = {
+  success: (title: string, description?: string) => emit('success', title, description),
+  info: (title: string, description?: string) => emit('info', title, description),
+  error: (title: string, description?: string) => emit('error', title, description),
+}
+
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([])
 
@@ -33,6 +50,13 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     },
     [dismissToast],
   )
+
+  useEffect(() => {
+    listeners.add(showToast)
+    return () => {
+      listeners.delete(showToast)
+    }
+  }, [showToast])
 
   return (
     <ToastContext.Provider value={{ toasts, showToast, dismissToast }}>

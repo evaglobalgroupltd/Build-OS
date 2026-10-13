@@ -22,6 +22,7 @@ import { useAuth } from '@/context/AuthContext'
 import { useProjectProfile } from '@/hooks/useProjectProfile'
 import { deriveSupplierDashboardConfig } from '@/derive/supplierDashboardConfig'
 
+import { RoleLink } from '@/components/ui/ModuleActions'
 const showcaseImages = [
   '/images/interior1.jpeg',
   '/images/interior2.jpeg',
@@ -133,8 +134,7 @@ export function MarketDashboard() {
             </Badge>
           )}
 
-          <button
-            type="button"
+          <RoleLink route="catalogue"
             className="
               flex
               items-center
@@ -152,7 +152,7 @@ export function MarketDashboard() {
           >
             <Boxes size={14} />
             Manage catalogue
-          </button>
+          </RoleLink>
 
         </div>
       </div>
@@ -315,8 +315,7 @@ export function MarketDashboard() {
 
             </div>
 
-            <button
-              type="button"
+            <RoleLink route="quotations"
               className="
                 mt-6
                 flex
@@ -335,7 +334,7 @@ export function MarketDashboard() {
             >
               Review requests
               <ArrowUpRight size={14} />
-            </button>
+            </RoleLink>
 
           </div>
         </div>
@@ -403,8 +402,7 @@ export function MarketDashboard() {
 
             </div>
 
-            <button
-              type="button"
+            <RoleLink route="money"
               className="
                 mt-5
                 flex
@@ -429,7 +427,7 @@ export function MarketDashboard() {
               </span>
 
               <ChevronRight size={15} />
-            </button>
+            </RoleLink>
 
           </CardBody>
         </Card>
@@ -462,12 +460,11 @@ export function MarketDashboard() {
                 Buyers browsing those categories can't currently find anything from you.
               </p>
 
-              <button
-                type="button"
+              <RoleLink route="catalogue"
                 className="mt-2.5 text-[11px] font-bold text-[#B85C12] underline underline-offset-2"
               >
                 Add catalogue items
-              </button>
+              </RoleLink>
             </div>
 
           </div>
@@ -530,21 +527,19 @@ export function MarketDashboard() {
 
             </div>
 
-            <button
-              type="button"
+            <RoleLink route="catalogue"
               className="
-                hidden
+                flex
                 items-center
                 gap-1
                 text-xs
                 font-semibold
                 text-[#B85C12]
-                sm:flex
               "
             >
               Manage catalogue
               <ChevronRight size={14} />
-            </button>
+            </RoleLink>
 
           </div>
 
@@ -674,12 +669,11 @@ export function MarketDashboard() {
               Finish adding prices and photos to publish them to your live catalogue.
             </p>
 
-            <button
-              type="button"
+            <RoleLink route="catalogue"
               className="mt-4 rounded-full bg-ink px-4 py-2 text-[11px] font-semibold text-white transition hover:opacity-90"
             >
               Resume drafts
-            </button>
+            </RoleLink>
           </div>
         )}
 
@@ -721,8 +715,7 @@ export function MarketDashboard() {
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
 
-          <button
-            type="button"
+          <RoleLink route="catalogue"
             className="
               group
               flex
@@ -759,10 +752,9 @@ export function MarketDashboard() {
               className="text-ink/25 transition group-hover:text-ink/50"
             />
 
-          </button>
+          </RoleLink>
 
-          <button
-            type="button"
+          <RoleLink route="quotations"
             className="
               group
               flex
@@ -799,10 +791,9 @@ export function MarketDashboard() {
               className="text-ink/25 transition group-hover:text-ink/50"
             />
 
-          </button>
+          </RoleLink>
 
-          <button
-            type="button"
+          <RoleLink route="deliveries"
             className="
               group
               flex
@@ -839,7 +830,7 @@ export function MarketDashboard() {
               className="text-ink/25 transition group-hover:text-ink/50"
             />
 
-          </button>
+          </RoleLink>
 
         </div>
 
